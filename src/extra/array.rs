@@ -1,6 +1,10 @@
-use std::{iter::TrustedLen, ops::{Try, Residual, FromResidual, ControlFlow}, mem::{self, MaybeUninit}, sync::{Arc, Mutex}, alloc::{Layout, alloc}, borrow::BorrowMut, fmt::Debug};
+use std::{iter::TrustedLen, ops::{Try, Residual, FromResidual, ControlFlow}, mem::{self, MaybeUninit}, sync::{Arc, Mutex}, alloc::{Layout, alloc}, borrow::BorrowMut, fmt::Debug, ptr::eq};
 use rayon::iter::{ParallelIterator, IntoParallelIterator};
 use super::never_short::NeverShortCircuit;
+
+pub fn empty_array<T> () -> [T;0] {
+    []
+}
 
 pub fn build_array<T: Copy, F: Fn(usize) -> T, const N: usize> (expr: F) -> [T;N] {
     let mut map = (0..N).into_iter().map(expr);

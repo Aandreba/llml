@@ -1,5 +1,5 @@
 use std::{ops::{Add, Index, IndexMut, Sub, Mul, Div}, fmt::{Debug}};
-use num::{Num, traits::real::Real};
+use num::{Num, traits::real::Real, Signed};
 
 use crate::{extra::array::build_array, arith, scal_arith};
 use super::mt::EucVecMt;
@@ -24,7 +24,7 @@ pub type EucVecd3 = EucVec<f64,3>;
 pub type EucVecd4 = EucVec<f64,4>;
 
 /* -- DEFINITION -- */
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct EucVec<T: Num, const N: usize> ([T;N]);
 
 impl<T: Num + Copy, const N: usize> EucVec<T,N> {
@@ -34,6 +34,10 @@ impl<T: Num + Copy, const N: usize> EucVec<T,N> {
 
     pub fn as_par (self) -> EucVecMt<T,N> where T: Send + Sync {
         EucVecMt::new(self.0)
+    }
+
+    pub fn into_iter (self) -> std::array::IntoIter<T,N> {
+        self.0.into_iter()
     }
 
     pub fn dot (self, other: EucVec<T,N>) -> T {
@@ -58,6 +62,14 @@ impl<T: Num + Copy, const N: usize> EucVec<T,N> {
 
     pub fn unit (self) -> EucVec<T,N> where T: Real {
         self / self.norm()
+    }
+
+    pub fn sum (self) -> Option<T> {
+        self.into_iter().reduce(|x, y| x + y)
+    }
+
+    pub fn abs (self) -> EucVec<T,N> where T: Signed {
+        Self(self.0.map(|x| x.abs()))
     }
 }
 
@@ -151,6 +163,12 @@ impl<T: Num, const N: usize> IndexMut<char> for EucVec<T,N>  {
             'w' => &mut self.0[3],
             _ => panic!("Invalid index")
         }
+    }
+}
+
+impl<T: Num, const N: usize> Into<[T;N]> for EucVec<T,N> {
+    fn into(self) -> [T;N] {
+        self.0
     }
 }
 

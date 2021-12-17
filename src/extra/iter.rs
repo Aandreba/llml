@@ -1,4 +1,4 @@
-use std::iter::TrustedLen;
+use std::{iter::{TrustedLen, Skip}, ops::{Deref, DerefMut}};
 
 #[derive(Debug)]
 pub struct IterSlice<I: Iterator> {
@@ -62,3 +62,22 @@ impl<I: Iterator> Iterator for IterSkip<I> {
 }
 
 unsafe impl<I: TrustedLen> TrustedLen for IterSkip<I> {}
+
+// TRUSTED SKIP
+pub struct TrustedSkip<I: Iterator>(Skip<I>);
+
+impl<I: Iterator> TrustedSkip<I> {
+    pub fn new (parent: Skip<I>) -> Self {
+        TrustedSkip(parent)
+    }
+}
+
+impl<I: Iterator> Iterator for TrustedSkip<I>  {
+    type Item = I::Item;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.next()
+    }
+}
+
+unsafe impl<I: Iterator> TrustedLen for TrustedSkip<I> {}

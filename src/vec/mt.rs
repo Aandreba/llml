@@ -1,5 +1,5 @@
 use std::{ops::{Add, Index, IndexMut, Sub, Mul, Div}, fmt::{Debug}, future};
-use num::{Num, traits::real::Real};
+use num::{Num, traits::real::Real, Signed};
 use rayon::{iter::{IntoParallelIterator, IndexedParallelIterator, ParallelIterator}};
 use crate::{extra::array::{build_array, build_array_mt}, arith, scal_arith};
 
@@ -37,6 +37,10 @@ impl<T: Num + Copy + Send + Sync, const N: usize> EucVecMt<T,N> {
         EucVec::new(self.0)
     }
 
+    pub fn into_iter (self) -> rayon::array::IntoIter<T,N> {
+        self.0.into_par_iter()
+    }
+
     pub fn dot (self, other: EucVecMt<T,N>) -> T {
         self.0.into_par_iter()
             .zip(other.0)
@@ -58,6 +62,17 @@ impl<T: Num + Copy + Send + Sync, const N: usize> EucVecMt<T,N> {
         let norm = self.norm();
         println!("{:?} {:?}", self,norm);
         self / norm
+    }
+
+    pub fn sum (self) -> Option<T> {
+        match N {
+            0|1 => None,
+            _ => Some(self.0.into_par_iter().reduce(|| T::zero(), |x, y| x + y))
+        }
+    }
+
+    pub fn abs (self) -> EucVecMt<T,N> where T: Signed {
+        Self(build_array_mt(|i| self[i].abs()))
     }
 }
 
@@ -151,6 +166,12 @@ impl<T: Num, const N: usize> IndexMut<char> for EucVecMt<T,N>  {
             'w' => &mut self.0[3],
             _ => panic!("Invalid index")
         }
+    }
+}
+
+impl<T: Num, const N: usize> Into<[T;N]> for EucVecMt<T,N> {
+    fn into(self) -> [T;N] {
+        self.0
     }
 }
 
