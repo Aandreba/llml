@@ -28,19 +28,19 @@ impl<I: Iterator> Iterator for IterSlice<I> {
 
 // SKIP
 #[derive(Debug)]
-pub struct IterSkip<I: Iterator> {
+pub struct IterJump<I: Iterator> {
     parent: I,
     at: usize,
     idx: usize
 }
 
-impl<I: Iterator> IterSkip<I> {
+impl<I: Iterator> IterJump<I> {
     pub fn new (parent: I, at: usize) -> Self {
         Self { parent, at, idx: 0 }
     }
 }
 
-impl<I: Iterator> Iterator for IterSkip<I> {
+impl<I: Iterator> Iterator for IterJump<I> {
     type Item = I::Item;
 
     fn next (&mut self) -> Option<Self::Item> {
@@ -61,7 +61,7 @@ impl<I: Iterator> Iterator for IterSkip<I> {
     }
 }
 
-unsafe impl<I: TrustedLen> TrustedLen for IterSkip<I> {}
+unsafe impl<I: TrustedLen> TrustedLen for IterJump<I> {}
 
 // TRUSTED SKIP
 pub struct TrustedSkip<I: Iterator>(Skip<I>);

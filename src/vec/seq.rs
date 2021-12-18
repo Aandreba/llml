@@ -1,5 +1,5 @@
-use std::{ops::{Add, Index, IndexMut, Sub, Mul, Div}, fmt::{Debug}};
-use num::{Num, traits::real::Real, Signed};
+use std::{ops::{Add, Index, IndexMut, Sub, Mul, Div, Neg}, fmt::{Debug}};
+use num::{Num, traits::real::Real, Signed, Complex};
 
 use crate::{extra::array::build_array, arith, scal_arith};
 use super::mt::EucVecMt;
@@ -116,6 +116,14 @@ scal_arith!(Div, EucVec<T,N>, div, |x : &EucVec<T,N>, y : &T| {
 });
 
 // OTHER TRAITS
+impl<O: Num + Copy, T: Num + Copy + Neg<Output = O>, const N: usize> Neg for EucVec<T,N> {
+    type Output = EucVec<O,N>;
+
+    fn neg (self) -> Self::Output {
+        EucVec(self.0.map(|x| -x))
+    }
+}
+
 impl<T: Num + Copy> EucVec3<T> {
     pub fn cross (self, other: EucVec3<T>) -> EucVec3<T> {
         EucVec3::new([
@@ -166,14 +174,27 @@ impl<T: Num, const N: usize> IndexMut<char> for EucVec<T,N>  {
     }
 }
 
+impl<T: Num + Default + Copy, const N: usize> Default for EucVec<T,N>  {
+    fn default() -> Self {
+        EucVec([T::default();N])
+    }
+}
+
+// INTO's
 impl<T: Num, const N: usize> Into<[T;N]> for EucVec<T,N> {
     fn into(self) -> [T;N] {
         self.0
     }
 }
 
-impl<T: Num + Default + Copy, const N: usize> Default for EucVec<T,N>  {
-    fn default() -> Self {
-        EucVec([T::default();N])
+impl<T: Num + Clone, const N: usize> Into<EucVec<Complex<T>,N>> for EucVec<T,N> {
+    fn into(self) -> EucVec<Complex<T>,N> {
+        EucVec(self.0.map(|x| Complex::new(x, T::zero())))
+    }
+}
+
+impl<T: Num + Clone, const N: usize> Into<EucVec<T,N>> for EucVec<Complex<T>,N> {
+    fn into(self) -> EucVec<T,N> {
+        EucVec(self.0.map(|x| x.re))
     }
 }

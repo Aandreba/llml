@@ -1,9 +1,19 @@
-use std::{iter::TrustedLen, ops::{Try, Residual, FromResidual, ControlFlow}, mem::{self, MaybeUninit}, sync::{Arc, Mutex}, alloc::{Layout, alloc}, borrow::BorrowMut, fmt::Debug, ptr::eq};
+use std::{iter::TrustedLen, ops::{Try, Residual, FromResidual, ControlFlow}, mem::{self, MaybeUninit}, sync::{Arc, Mutex}, alloc::{Layout, alloc, self}, borrow::BorrowMut, fmt::Debug, ptr::eq};
 use rayon::iter::{ParallelIterator, IntoParallelIterator};
 use super::never_short::NeverShortCircuit;
 
 pub fn empty_array<T> () -> [T;0] {
     []
+}
+
+pub unsafe fn malloc<T> () -> T {
+    let layout = Layout::new::<T>();
+    *(alloc(layout) as *const T)
+}
+
+pub unsafe fn allocate_array<T: Copy, const N: usize> () -> [T;N] {
+    let layout = Layout::new::<[T;N]>();
+    unsafe { *(alloc(layout) as *const [T;N]) }
 }
 
 pub fn build_array<T: Copy, F: Fn(usize) -> T, const N: usize> (expr: F) -> [T;N] {
@@ -13,14 +23,16 @@ pub fn build_array<T: Copy, F: Fn(usize) -> T, const N: usize> (expr: F) -> [T;N
     }
 }
 
-pub fn build_array_mt <T: Copy + Send + Sync, F: Fn(usize) -> T, const N: usize> (expr: F) -> [T;N] where F: Sync + Send {
-    let layout = Layout::new::<[T;N]>();
-    let ptr;
+pub fn array_map_mt<T: Send + Sync + Copy, U: Copy + Send + Sync, F: Fn(T) -> U, const N: usize> (array: [T;N], map: F) -> [U;N] where F: Send + Sync {
+    build_array_mt(|i| map(array[i]))
+}
 
+pub fn build_array_mt <T: Copy + Send + Sync, F: Fn(usize) -> T, const N: usize> (expr: F) -> [T;N] where F: Sync + Send {
+    let ptr;
     unsafe {
-        ptr = *(alloc(layout) as *mut [T;N]);
+        ptr = allocate_array();
     }
-    
+
     let arc = Arc::new(Mutex::new(ptr));
     (0..N).into_par_iter()
         .for_each_with(arc.clone(), |array, i| {
@@ -31,7 +43,7 @@ pub fn build_array_mt <T: Copy + Send + Sync, F: Fn(usize) -> T, const N: usize>
     
     let lock = arc.lock().unwrap();
     *lock
-}   
+}  
 
 pub unsafe fn collect_into_array_unchecked<I, const N: usize>(iter: &mut I) -> [I::Item; N]
 where

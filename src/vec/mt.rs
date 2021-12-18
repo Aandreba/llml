@@ -1,5 +1,5 @@
-use std::{ops::{Add, Index, IndexMut, Sub, Mul, Div}, fmt::{Debug}, future};
-use num::{Num, traits::real::Real, Signed};
+use std::{ops::{Add, Index, IndexMut, Sub, Mul, Div, Neg}, fmt::{Debug}, future};
+use num::{Num, traits::real::Real, Signed, Complex};
 use rayon::{iter::{IntoParallelIterator, IndexedParallelIterator, ParallelIterator}};
 use crate::{extra::array::{build_array, build_array_mt}, arith, scal_arith};
 
@@ -119,6 +119,15 @@ scal_arith!(Div, EucVecMt<T,N>, div, |x : &EucVecMt<T,N>, y : &T| {
 }, Send, Sync);
 
 // OTHER TRAITS
+impl<O: Num + Copy + Send + Sync, T: Num + Copy + Send + Sync + Neg<Output = O>, const N: usize> Neg for EucVecMt<T,N> {
+    type Output = EucVecMt<O,N>;
+
+    fn neg (self) -> Self::Output {
+        let array = build_array_mt(|i| -self[i]);
+        EucVecMt(array)
+    }
+}
+
 impl<T: Num + Copy + Send + Sync> EucVecMt3<T> {
     pub fn cross (self, other: EucVecMt3<T>) -> EucVecMt3<T> {
         EucVecMt3::new([
@@ -169,14 +178,29 @@ impl<T: Num, const N: usize> IndexMut<char> for EucVecMt<T,N>  {
     }
 }
 
+impl<T: Num + Default + Copy, const N: usize> Default for EucVecMt<T,N>  {
+    fn default() -> Self {
+        EucVecMt([T::default();N])
+    }
+}
+
+// INTO's
 impl<T: Num, const N: usize> Into<[T;N]> for EucVecMt<T,N> {
     fn into(self) -> [T;N] {
         self.0
     }
 }
 
-impl<T: Num + Default + Copy, const N: usize> Default for EucVecMt<T,N>  {
-    fn default() -> Self {
-        EucVecMt([T::default();N])
+impl<T: Num + Copy + Send + Sync, const N: usize> Into<EucVecMt<Complex<T>,N>> for EucVecMt<T,N> {
+    fn into(self) -> EucVecMt<Complex<T>,N> {
+        let array = build_array_mt(|i| Complex::new(self[i], T::zero()));
+        EucVecMt(array)
+    }
+}
+
+impl<T: Num + Copy + Send + Sync, const N: usize> Into<EucVecMt<T,N>> for EucVecMt<Complex<T>,N> {
+    fn into(self) -> EucVecMt<T,N> {
+        let array = build_array_mt(|i| self[i].re);
+        EucVecMt(array)
     }
 }

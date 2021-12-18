@@ -1,15 +1,6 @@
-use core::slice;
-use std::{iter::{Step, Sum}, ptr::{slice_from_raw_parts, addr_of}, ops::{Add, Mul}, fmt::Debug};
-use num::{Float, Complex, Num, Zero, traits::Pow};
-use crate::{extra::{complex::{sqrt, fst_cbrt}, consts::Consts}, array::{empty_array, build_array}, vec::seq::EucVec};
-
-macro_rules! cubic_loop {
-    () => {
-        let pow = pow * zeta;
-        let u = pow * c;
-        k * (u + b + (d0 / u))
-    };
-}
+use std::{ptr::{addr_of}};
+use num::{Float, Complex};
+use crate::{extra::{complex::{sqrt, fst_cbrt}, consts::Consts}, array::{build_array}, vec::seq::EucVec};
 
 // QUADRATIC
 pub fn quadratic <T: Float + Copy + Consts> (a: T, b: T, c: T) -> Option<(T,T)> {
@@ -62,11 +53,11 @@ pub fn cubic <T: Float + Copy + Consts> (a: T, b: T, c: T, d: T) -> (Complex<T>,
 }
 
 // NTH
-pub fn poly<'a, T: Float + Copy + Consts + Debug, const N: usize> (vals: [T;N]) -> [Complex<T>;N-1] {
+pub fn poly<T: Float + Copy + Consts, const N: usize> (limit: usize, vals: [T;N]) -> [Complex<T>; N-1] {
     match N {
         0|1 => panic!("Invalid size"),
 
-        2 => [Complex::new(-vals[1] / vals[0], T::zero());N-1],
+        2 => [Complex::new(-vals[1] / vals[0], T::zero()); N-1],
         
         3 => unsafe { 
             let tuple = quadratic_complex(vals[0], vals[1], vals[2]);
@@ -81,7 +72,7 @@ pub fn poly<'a, T: Float + Copy + Consts + Debug, const N: usize> (vals: [T;N]) 
         },
 
         _ => {
-            let limit = T::one() / T::max_value();
+            let min = T::one() / T::max_value();
             let vals = EucVec::new(vals) / vals[0];
             let mut result = EucVec::new(build_array(|i| {
                 let i = (i+1) as i32;
@@ -90,7 +81,7 @@ pub fn poly<'a, T: Float + Copy + Consts + Debug, const N: usize> (vals: [T;N]) 
 
             let mut last = result.clone();
 
-            loop {
+            for _ in 0..limit {
                 last = result.clone();
                 for i in 0..(N-1) {
                     let val = apply_poly(result[i], &vals);
@@ -105,8 +96,8 @@ pub fn poly<'a, T: Float + Copy + Consts + Debug, const N: usize> (vals: [T;N]) 
                 }
 
                 let all_equal : bool = (result - last).into_iter()
-                    .all(|x| x.re <= limit && x.im <= limit);
-
+                    .all(|x| x.re <= min && x.im <= min);
+                
                 if all_equal { break; }
             }
             
