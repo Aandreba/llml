@@ -1,7 +1,7 @@
 use std::{ops::{Add, Index, IndexMut, Sub, Mul, Div, Neg}, fmt::{Debug}, future};
 use num::{Num, traits::real::Real, Signed, Complex};
 use rayon::{iter::{IntoParallelIterator, IndexedParallelIterator, ParallelIterator}};
-use crate::{extra::array::{build_array, build_array_mt}, arith, scal_arith};
+use crate::{extra::array::{build_array, build_array_mt}, arith, scal_arith, frac::Fraction};
 
 use super::seq::EucVec;
 
@@ -194,6 +194,13 @@ impl<T: Num, const N: usize> Into<[T;N]> for EucVecMt<T,N> {
 impl<T: Num + Copy + Send + Sync, const N: usize> Into<EucVecMt<Complex<T>,N>> for EucVecMt<T,N> {
     fn into(self) -> EucVecMt<Complex<T>,N> {
         let array = build_array_mt(|i| Complex::new(self[i], T::zero()));
+        EucVecMt(array)
+    }
+}
+
+impl<T: Num + Copy + Send + Sync, const N: usize> Into<EucVecMt<Fraction<T>,N>> for EucVecMt<T,N> {
+    fn into(self) -> EucVecMt<Fraction<T>,N> {
+        let array = build_array_mt(|i| Fraction::of_value(self[i]));
         EucVecMt(array)
     }
 }

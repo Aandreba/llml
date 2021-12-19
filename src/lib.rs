@@ -11,7 +11,6 @@ pub use extra::array;
 
 // EXPORT
 pub mod poly;
-pub mod linalg;
 
 pub mod frac;
 pub mod vec;

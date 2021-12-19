@@ -6,7 +6,7 @@ pub fn empty_array<T> () -> [T;0] {
     []
 }
 
-pub unsafe fn malloc<T> () -> T {
+pub unsafe fn malloc<T: Copy> () -> T {
     let layout = Layout::new::<T>();
     *(alloc(layout) as *const T)
 }

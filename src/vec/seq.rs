@@ -1,7 +1,7 @@
 use std::{ops::{Add, Index, IndexMut, Sub, Mul, Div, Neg}, fmt::{Debug}};
 use num::{Num, traits::real::Real, Signed, Complex};
 
-use crate::{extra::array::build_array, arith, scal_arith};
+use crate::{extra::array::build_array, arith, scal_arith, frac::Fraction};
 use super::mt::EucVecMt;
 
 /* -- TYPES -- */
@@ -193,8 +193,20 @@ impl<T: Num + Clone, const N: usize> Into<EucVec<Complex<T>,N>> for EucVec<T,N> 
     }
 }
 
+impl<T: Num + Copy, const N: usize> Into<EucVec<Fraction<T>,N>> for EucVec<T,N> {
+    fn into(self) -> EucVec<Fraction<T>,N> {
+        EucVec(self.0.map(|x| Fraction::of_value(x)))
+    }
+}
+
 impl<T: Num + Clone, const N: usize> Into<EucVec<T,N>> for EucVec<Complex<T>,N> {
     fn into(self) -> EucVec<T,N> {
         EucVec(self.0.map(|x| x.re))
+    }
+}
+
+impl<T: Num + Copy, const N: usize> Into<EucVec<T,N>> for EucVec<Fraction<T>,N> {
+    fn into(self) -> EucVec<T,N> {
+        EucVec(self.0.map(|x| x.num / x.den))
     }
 }

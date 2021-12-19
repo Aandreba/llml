@@ -1,7 +1,7 @@
 use std::{ops::{Add, Sub, Mul, Index, Div, IndexMut, Neg}, fmt::Debug, alloc::{Layout, alloc}};
 use derive_more::Neg;
-use num::{Num, Float, FromPrimitive, Complex, Zero, One};
-use crate::{vec::seq::EucVec, mat_arith, array::{build_array, allocate_array}, mat_scal_arith, extra::{consts::Consts, iter::IterJump}, poly::{self}};
+use num::{Num, Float, FromPrimitive, Complex, Zero, One, Integer, traits::real::Real};
+use crate::{vec::seq::EucVec, mat_arith, array::{build_array, allocate_array}, mat_scal_arith, extra::{consts::Consts, iter::IterJump}, poly::{self}, frac::Fraction};
 
 pub type SqrMat<T, const N: usize> = Mat<T, N, N>;
 
@@ -29,11 +29,11 @@ impl<T: Num + Copy, const R: usize, const C: usize> Mat<T,R,C> {
         C
     }
 
-    pub fn rref (&self) -> Self {
-        let mut rc = self.clone();
+    pub fn rref (self) -> Self {
+        let mut rc : Mat<Fraction<T>,R,C> = self.into();
 
         for i in 0..R {
-            if rc[i][i] != T::zero() {
+            if !rc[i][i].is_zero() {
                 rc[i] = rc[i] / rc[i][i];
             }
 
@@ -43,7 +43,7 @@ impl<T: Num + Copy, const R: usize, const C: usize> Mat<T,R,C> {
             }
         }
 
-        rc
+        rc.into()
     }
 }
 
@@ -142,6 +142,43 @@ impl<T: Num + Copy, const R: usize, const C: usize, const N: usize> Mul<&Mat<T,C
     }
 }
 
+// MATRIX - VECTOR MULTIPLICATION
+impl<T: Num + Copy, const R: usize, const C: usize> Mul<EucVec<T,C>> for Mat<T,R,C> {
+    type Output = EucVec<T,R>;
+
+    fn mul(self, rhs: EucVec<T,C>) -> Self::Output {
+        let array = build_array(|i| self[i].dot(rhs));
+        EucVec::new(array)
+    }
+}
+
+impl<T: Num + Copy, const R: usize, const C: usize> Mul<&EucVec<T,C>> for Mat<T,R,C> {
+    type Output = EucVec<T,R>;
+
+    fn mul(self, rhs: &EucVec<T,C>) -> Self::Output {
+        let array = build_array(|i| self[i].dot(rhs.clone()));
+        EucVec::new(array)
+    }
+}
+
+impl<T: Num + Copy, const R: usize, const C: usize> Mul<EucVec<T,C>> for &Mat<T,R,C> {
+    type Output = EucVec<T,R>;
+
+    fn mul(self, rhs: EucVec<T,C>) -> Self::Output {
+        let array = build_array(|i| self[i].dot(rhs));
+        EucVec::new(array)
+    }
+}
+
+impl<T: Num + Copy, const R: usize, const C: usize> Mul<&EucVec<T,C>> for &Mat<T,R,C> {
+    type Output = EucVec<T,R>;
+
+    fn mul(self, rhs: &EucVec<T,C>) -> Self::Output {
+        let array = build_array(|i| self[i].dot(rhs.clone()));
+        EucVec::new(array)
+    }
+}
+
 // SCALAR
 mat_scal_arith!(Add, Mat<T, R, C>, add, |x : &Mat<T,R,C>, y: &T| {
     let array = build_array(|i| x.0[i] + y.clone());
@@ -174,7 +211,7 @@ impl<T: Num + Copy, const N: usize> SqrMat<T, N> {
         Self(array)
     }
 
-    pub fn of_diag_of_scal (value: T) -> Self {
+    pub fn of_diag_scal (value: T) -> Self {
         let array = build_array(|i | {
             let vec = build_array(|j| if i == j { value } else { T::zero() });
             EucVec::new(vec)
@@ -184,12 +221,51 @@ impl<T: Num + Copy, const N: usize> SqrMat<T, N> {
     }
 
     pub fn identity () -> Self {
-        Self::of_diag_of_scal(T::one())
+        Self::of_diag_scal(T::one())
     }
 
     pub fn scal_mul (self, rhs: SqrMat<T,N>) -> Self {
         let array = build_array(|i| self[i] * rhs[i]);
         Self(array)
+    }
+
+    // CONDITIONALS
+    pub fn is_diag (&self) -> bool {
+        (0..N).into_iter()
+            .flat_map(|i| IterJump::new(self[i].into_iter(), i))
+            .all(|x| x.is_zero())
+    }
+
+    /// SOLVE LINEAR EQUATIONS
+    pub fn solve_inv (self, out: EucVec<T,N>) -> Option<EucVec<T,N>> {
+        self.inv().map(|inv| inv * out)
+    }
+
+    pub fn solve_gauss (self, out: EucVec<T,N>) -> Option<EucVec<T,N>> {
+        let mut rc : SqrMat<Fraction<T>,N> = self.into();
+        let mut result : EucVec<Fraction<T>,N> = out.into();
+
+        for i in 0..N {
+            if !rc[i][i].is_zero() {
+                let div = rc[i][i];
+                rc[i] = rc[i] / div;
+                result[i] = result[i] / div;
+            }
+
+            for j in 0..N {
+                if i == j { continue; }
+
+                let alpha = rc[j][i];
+                rc[j] = rc[j] - (rc[i] * alpha);
+                result[j] = result[j] - (result[i] * alpha); 
+            }
+        }
+
+        if rc.is_diag() {
+            return Some(result.into())
+        }
+
+        None
     }
 
     pub fn diag (self) -> EucVec<T,N> {
@@ -207,21 +283,17 @@ impl<T: Num + Copy, const N: usize> SqrMat<T, N> {
     }
 
     pub fn det (self) -> Option<T> {
-        let rref = self.rref();
-        let iter = DiagIter::new(rref);
-        let prod = iter.reduce(|x, y| x * y);
-
-        
-        prod.map(|x| x)
+        let n = N-1;
+        self.bareiss().map(|x| x[n][n])
     }
-
-    pub fn inv (self) -> Option<Self> where T: Float {
-        let mut rc = self.clone();
-        let mut ident = Self::identity();
+    
+    pub fn inv (self) -> Option<Self> {
+        let mut rc : SqrMat<Fraction<T>,N> = self.into();
+        let mut ident = SqrMat::<Fraction<T>,N>::identity();
         let ident_clone = ident.clone();
 
         for i in 0..N {
-            if rc[i][i] != T::zero() {
+            if !rc[i][i].is_zero() {
                 let ii = rc[i][i];
                 rc[i] = rc[i] / ii;
                 ident[i] = ident[i] / ii;
@@ -236,17 +308,40 @@ impl<T: Num + Copy, const N: usize> SqrMat<T, N> {
         }
 
         if rc == ident_clone {
-            return Some(ident)
+            return Some(ident.into())
         }
 
         None
     }
 
+    pub fn bareiss (self) -> Option<Self> {
+        if self[0].into_iter().any(|x| x.is_zero()) {
+            return None
+        }
+    
+        let mut result : SqrMat<Fraction<T>,N> = self.into();
+        
+        for k in 0..N-1 {
+            let kp1 = k + 1;
+            let div = if k == 0 { Fraction::one() } else { 
+                let km1 = k - 1;
+                result[km1][km1]
+            };
+    
+            for i in kp1..N {
+                for j in kp1..N {
+                    let num = result[i][j] * result[k][k] - result[i][k] * result[k][i];
+                    result[i][j] = num / div
+                }
+            }
+        }
+    
+        Some(result.into())
+    }
+
     pub fn poly (self) -> [T; N+1] where T: Float + FromPrimitive  {
         let mut result;
-        unsafe {
-            result = allocate_array()
-        }
+        unsafe { result = allocate_array() }
 
         result[0] = T::one();
         let mut clone = self.clone();
@@ -263,49 +358,71 @@ impl<T: Num + Copy, const N: usize> SqrMat<T, N> {
     T: Float + Consts + FromPrimitive, 
     [T;N+1]: Sized,
     [Complex<T>; {N+1}-1]: Sized {
+
         let fadlev : [T;N+1] = self.poly();
         let poly = poly::poly(limit, fadlev);
 
         unsafe { *(poly.as_ptr() as *const EucVec<Complex<T>,N>) }
     }
 
-    pub fn eigvecs (self, limit: usize) -> SqrMat<Complex<T>,N> where 
-    T: Float + Consts + FromPrimitive + Debug + Default, 
+    pub fn eigvecs (self, limit: usize) -> SqrMat<Complex<T>,N> where
+    T: Float + Consts + FromPrimitive + Debug, 
     [T;N+1]: Sized,
-    [Complex<T>; {N+1}-1]: Sized  {
+    [Complex<T>; {N+1}-1]: Sized {
 
         let complex : SqrMat<Complex<T>,N> = self.into();
         let vals = self.eigvals(limit);
 
-        let mut result = SqrMat::<Complex<T>,N>::default();
-
         for i in 0..N {
-            let mat = complex - SqrMat::diag_of_scal(vals[i]);
-            let into : SqrMat<T,N> = mat.into();
-            let rref = mat.rref();
+            let submat = complex - SqrMat::of_diag_scal(vals[i]);
+            println!("{:?}", submat)
+        }
 
-            println!("{:?}", into);
+        todo!()
 
-            for j in 0..N {
-                let last = if j == 0 { Complex::one() } else { result[i][j-1] };
-                let row = rref[j];
+    }
 
-                let itself = row[j];
-                let non_zero : Vec<(usize, Complex<T>)> = IterJump::new(0..N, j)
-                    .map(|k| (k, row[k]))
-                    .filter(|(i, x)| !x.is_zero())
-                    .collect();
-                
-                if non_zero.len() == 0 {
-                    result[i][j] = Complex::zero();
-                    continue;
-                }
+    pub fn exp (self, limit: usize) -> Self where T: FromPrimitive {
+        let mut result = Self::identity();
+        let mut pow = result.clone();
+        let mut div = T::one();
+
+        for i in 1..=limit {
+            pow = pow * self;
+            div = div * T::from_usize(i).unwrap();
+            
+            let delta = pow / div;
+            if delta.into_iter().all(|x| x.into_iter().all(|y| y.is_zero())) {
+                break;
             }
 
-            //println!("{:?}\n", result[i]);
+            result = result + delta;
         }
-        
-        todo!()
+
+        result
+    }
+
+    // DIAGONALIZABLE
+    pub fn ln (self, limit: usize) -> Option<SqrMat<Complex<T>,N>> where 
+    T: Float + Consts + FromPrimitive + Debug, 
+    [T;N+1]: Sized,
+    [Complex<T>; {N+1}-1]: Sized {
+        let complx : SqrMat<Complex<T>,N> = self.into();
+        let vectors = self.eigvecs(limit);
+        let inv = vectors.inv();
+
+        match inv {
+            None => None,
+            Some(inv) => {
+                let alpha = inv * complx * vectors;
+                let mut alpha_log = alpha.clone();
+                for i in 0..N {
+                    alpha_log[i][i] = alpha_log[i][i].ln();
+                }
+
+                Some(vectors * alpha_log * inv)
+            }
+        }
     }
 }
 
@@ -353,7 +470,19 @@ impl<T: Num + Clone, const R: usize, const C: usize> Into<Mat<Complex<T>,R,C>> f
     }
 }
 
+impl<T: Num + Copy, const R: usize, const C: usize> Into<Mat<Fraction<T>,R,C>> for Mat<T,R,C> {
+    fn into(self) -> Mat<Fraction<T>,R,C> {
+        Mat(self.0.map(|x| x.into()))
+    }
+}
+
 impl<T: Num + Clone, const R: usize, const C: usize> Into<Mat<T,R,C>> for Mat<Complex<T>,R,C> {
+    fn into(self) -> Mat<T,R,C> {
+        Mat(self.0.map(|x| x.into()))
+    }
+}
+
+impl<T: Num + Copy, const R: usize, const C: usize> Into<Mat<T,R,C>> for Mat<Fraction<T>,R,C> {
     fn into(self) -> Mat<T,R,C> {
         Mat(self.0.map(|x| x.into()))
     }
