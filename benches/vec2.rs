@@ -1,23 +1,18 @@
-use std::{arch::aarch64::{float32x2_t, vmul_f32, vaddv_f32}, fmt::{Display, Debug}};
-
-use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
+use criterion::{criterion_group, criterion_main, Criterion};
 use llml::EucVecf2;
 use rand::random;
 
-#[derive(Debug, Clone, Copy)]
-struct BenchInput {
-    pub alpha: EucVecf2,
-    pub beta: EucVecf2
-}
-
-impl Display for BenchInput {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        <Self as Debug>::fmt(&self, f)
-    }
-}
-
 fn mul_scalar (c: &mut Criterion) {
+    let alpha = EucVecf2::new(random(), random());
+    let beta : f32 = random();
 
+    c.bench_function("Naive MulScalar", |b| {
+        b.iter(|| EucVecf2::new(alpha.x * beta, alpha.y * beta))
+    });
+
+    c.bench_function("Optimized MulScalar", |b| {
+        b.iter(|| alpha * beta)
+    });
 }
 
 fn dot (c: &mut Criterion) {
@@ -33,5 +28,5 @@ fn dot (c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, dot);
+criterion_group!(benches, mul_scalar);
 criterion_main!(benches);

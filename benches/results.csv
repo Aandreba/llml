@@ -1,2 +1,4 @@
 Benchmark, Naive (ps), Optimized (ps), System
 Vecf2 Dot Product, 555.18, 313.54, M1 Mac (aarch64)
+Vecf2 Mul, 689.06, 315.89, M1 Mac (aarch64)
+Vecf2 Mul Scalar, 614.27, 321.30, M1 Mac (aarch64)
