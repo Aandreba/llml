@@ -1,27 +1,39 @@
-#![feature(
-    trusted_len, try_trait_v2, try_trait_v2_residual, 
-    maybe_uninit_slice, maybe_uninit_uninit_array, maybe_uninit_array_assume_init,
-    array_zip, generic_const_exprs, toowned_clone_into, concat_idents, step_trait,
-    tuple_indexing
-)]
+#![feature(once_cell)]
+use cfg_if::cfg_if;
 
-// UTILS
-mod extra;
-pub use extra::array;
+macro_rules! flat_mod {
+    ($($i:ident),*) => {
+        $(
+            mod $i;
+            pub use $i::*;
+        )*
+    };
+}
 
-// EXPORT
-pub mod poly;
+macro_rules! map_to_trait {
+    ($lhs:ident, $trait:ident, $fn:ident, $f:expr) => {
+        map_to_trait!($lhs, $trait, $fn, Self, $f);
+    };
 
-pub mod frac;
-pub mod vec;
-pub mod mat;
+    ($lhs:ident, $trait:ident, $fn:ident, $o:ident, $f:expr) => {
+        map_to_trait!($lhs, $trait, Self, $fn, $o, $f);
+    };
 
-/*
-    "x86"
-    "x86_64"
-    "mips"
-    "powerpc"
-    "powerpc64"
-    "arm"
-    "aarch64"
-*/
+    ($lhs:ident, $trait:ident, $rhs:ident, $fn:ident, $o:ident, $f:expr) => {
+        impl $trait<$rhs> for $lhs {
+            type Output = $o;
+
+            #[inline(always)]
+            fn $fn (self, rhs: $rhs) -> $o {
+                unsafe { $f(self, rhs) }
+            }
+        }
+    };
+}
+
+flat_mod!(defs);
+cfg_if! {
+    if #[cfg(all(target_arch = "aarch64", target_feature = "neon"))] {
+        flat_mod!(aarch64);
+    }
+}
