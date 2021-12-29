@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 cfg-if = "1.0.0"
-rayon = "1.5.1"
 derive_more = "0.99.17"
 
 [dev-dependencies]
@@ -20,4 +19,8 @@ harness = false
 
 [[bench]]
 name = "vec3"
+harness = false
+
+[[bench]]
+name = "vec4"
 harness = false
