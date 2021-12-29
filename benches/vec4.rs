@@ -15,5 +15,18 @@ fn mul (c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, mul);
+fn dot (c: &mut Criterion) {
+    let alpha = EucVecf4::new(random(), random(), random(), random());
+    let beta = EucVecf4::new(random(), random(), random(), random());
+
+    c.bench_function("Optimized Vec4f Dot", |b| {
+        b.iter(|| alpha.dot(beta))
+    });
+
+    c.bench_function("Naive Vec4f Dot", |b| {
+        b.iter(|| alpha.x * beta.x + alpha.y * beta.y + alpha.z * beta.z + alpha.w * beta.w)
+    });
+}
+
+criterion_group!(benches, dot);
 criterion_main!(benches);

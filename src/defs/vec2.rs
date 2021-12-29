@@ -16,6 +16,11 @@ impl<T> EucVec2<T>  {
 
 impl EucVecf2 {
     #[inline(always)]
+    pub fn sum (self) -> f32 {
+        self.x + self.y
+    }
+
+    #[inline(always)]
     pub fn norm2 (self) -> f32 {
         self.dot(self)
     }

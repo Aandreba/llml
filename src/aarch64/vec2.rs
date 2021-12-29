@@ -22,11 +22,6 @@ map_to_trait!(f32, Div, EucVecf2, div, EucVecf2, |x: Self, y: EucVecf2| transmut
 
 impl EucVecf2 {
     #[inline(always)]
-    pub fn sum (self) -> f32 {
-        unsafe { vaddv_f32(transmute(self)) }
-    }
-    
-    #[inline(always)]
     pub fn dot (self, rhs: Self) -> f32 {
         unsafe { vaddv_f32(vmul_f32(transmute(self), transmute(rhs))) }
     }

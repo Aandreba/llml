@@ -3,11 +3,17 @@ name = "llml"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+avx2 = ["avx"]
+avx = ["sse41"]
+sse41 = []
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 cfg-if = "1.0.0"
 derive_more = "0.99.17"
+static_assertions = "1.1.0"
 
 [dev-dependencies]
 criterion = "0.3"
