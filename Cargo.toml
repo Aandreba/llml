@@ -17,3 +17,7 @@ rand = "0.8.4"
 [[bench]]
 name = "vec2"
 harness = false
+
+[[bench]]
+name = "vec3"
+harness = false

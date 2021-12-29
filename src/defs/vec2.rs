@@ -1,6 +1,7 @@
 pub type EucVecf2 = EucVec2<f32>;
 pub type EucVecd2 = EucVec2<f64>;
 
+#[repr(C)]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct EucVec2<T> {
     pub x: T,

@@ -19,14 +19,14 @@ fn dot (c: &mut Criterion) {
     let alpha = EucVecf2::new(random(), random());
     let beta = EucVecf2::new(random(), random());
 
-    c.bench_function("Naive", |b| {
+    c.bench_function("Naive Vecf3 dot", |b| {
         b.iter(|| alpha.x * beta.x + alpha.y * beta.y)
     });
 
-    c.bench_function("Optimized", |b| {
+    c.bench_function("Optimized Vecf3 dot", |b| {
         b.iter(|| alpha.dot(beta))
     });
 }
 
-criterion_group!(benches, mul_scalar);
+criterion_group!(benches, dot);
 criterion_main!(benches);
