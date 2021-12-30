@@ -1,5 +1,5 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use llml::{EucVecf4};
+use llml::vec::{EucVecf4};
 use rand::random;
 
 fn mul (c: &mut Criterion) {

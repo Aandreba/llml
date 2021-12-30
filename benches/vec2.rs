@@ -1,5 +1,5 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use llml::EucVecf2;
+use llml::vec::EucVecf2;
 use rand::random;
 
 fn mul_scalar (c: &mut Criterion) {

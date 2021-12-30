@@ -1,5 +1,7 @@
+use std::ops::Add;
+
 use cfg_if::cfg_if;
-use crate::EucVec2;
+use crate::vec::EucVec2;
 
 pub type Matf2 = Mat2<f32>;
 pub type Matd2 = Mat2<f64>;
@@ -12,8 +14,8 @@ cfg_if! {
             #[derive(Serialize, Deserialize, Default, Debug, Clone, Copy)]
             #[repr(C)]
             pub struct Mat2<T> {
-                pub x: crate::EucVec2<T>,
-                pub y: crate::EucVec2<T>
+                pub x: crate::vec::EucVec2<T>,
+                pub y: crate::vec::EucVec2<T>
             }
         }
     } else {
@@ -21,8 +23,8 @@ cfg_if! {
             #[derive(Default, Debug, Clone, Copy)]
             #[repr(C)]
             pub struct Mat2<T> {
-                pub x: crate::EucVec2<T>,
-                pub y: crate::EucVec2<T>
+                pub x: crate::vec::EucVec2<T>,
+                pub y: crate::vec::EucVec2<T>
             }
         }
     }
@@ -42,7 +44,31 @@ impl<T> Mat2<T>  {
         }
     }
 
+    #[inline(always)]
     pub fn transp (self) -> Self {
         Self::of_values(self.x.x, self.y.x, self.x.y, self.y.y)
+    }
+
+    #[inline(always)]
+    pub fn tr (self) -> <T as Add>::Output where T: Add {
+        self.x.x + self.y.y
+    }
+}
+
+impl Matf2 {
+    pub fn of_rot (rad: f32) -> Self {
+        let cos = rad.cos();
+        let sin = rad.sin();
+
+        Self::of_values(cos, -sin, sin, cos)
+    }
+}
+
+impl Matd2 {
+    pub fn of_rot (rad: f64) -> Self {
+        let cos = rad.cos();
+        let sin = rad.sin();
+
+        Self::of_values(cos, -sin, sin, cos)
     }
 }

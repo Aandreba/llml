@@ -1,11 +1,18 @@
-use llml::EucVecf2;
+#![feature(duration_consts_float)]
+use std::{thread::sleep, time::Duration};
+use llml::{Matf2};
+
+const WAIT : Duration = Duration::from_secs_f32(0.5);
 
 fn main () {
-    let alpha = EucVecf2::new(1., 2.);
+    let mut alpha = Matf2::of_rot(1.);
+    let beta = Matf2::of_rot(2.);
 
-    let serialized = serde_json::to_string(&alpha).unwrap();
-    println!("serialized = {}", serialized);
-
-    let deserialized: EucVecf2 = serde_json::from_str(&serialized).unwrap();
-    println!("deserialized = {:?}", deserialized);
+    loop {
+        alpha = alpha * beta;
+        let angle = alpha.x.x.acos();
+        
+        println!("{} => {:?}", angle, alpha);
+        sleep(WAIT);
+    }
 }

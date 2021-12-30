@@ -10,7 +10,7 @@ macro_rules! use_arch_x86 {
 
 macro_rules! impl_vecf {
     ($name:ident, $cast:expr, $from:expr) => {
-        use crate::$name;
+        use crate::vec::$name;
         use_arch_x86!(__m128, _mm_add_ps, _mm_sub_ps, _mm_mul_ps, _mm_div_ps);
 
         map_to_trait!($name, Add, add, |x: Self, y: Self| Self::unsafe_from(_mm_add_ps(x.casted(), y.casted())));
@@ -44,5 +44,6 @@ macro_rules! impl_vecf {
     };
 }
 
+flat_mod!(complx);
 flat_mod!(vec2, vec3, vec4);
 flat_mod!(mat2);

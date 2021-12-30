@@ -1,5 +1,5 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use llml::{Matf2};
+use llml::mat::{Matf2};
 use rand::random;
 
 fn mul (c: &mut Criterion) {
@@ -17,6 +17,19 @@ fn mul (c: &mut Criterion) {
         b.iter(|| alpha * beta)
     });
 }
+
+fn det (c: &mut Criterion) {
+    let alpha = Matf2::of_values(random(), random(), random(), random());
+
+    c.bench_function("Naive Mat2f det", |b| {
+        b.iter(|| alpha.x.x * alpha.y.y - alpha.x.y * alpha.y.x)
+    });
+
+    c.bench_function("Optimized Mat2f det", |b| {
+        b.iter(|| alpha.det())
+    });
+}
+
 
 criterion_group!(benches, mul);
 criterion_main!(benches);
