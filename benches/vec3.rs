@@ -13,8 +13,6 @@ fn dot (c: &mut Criterion) {
     c.bench_function("Optimized Vec3d Dot", |b| {
         b.iter(|| alpha.dot(beta))
     });
-
-    let a = 1. / alpha;
 }
 
 criterion_group!(benches, dot);
