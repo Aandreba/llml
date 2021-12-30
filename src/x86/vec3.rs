@@ -5,8 +5,8 @@ impl_vecf!(
     EucVecf3, 
     |x: Self| _mm_set_ps(x.x, x.y, x.z, 0.),
     |x: __m128| {
-        let cast : (f32, f32, f32, f32) = transmute(x);
-        Self::new(cast.0, cast.1, cast.2)
+        let ptr = &x as *const __m128 as *const f32;
+        Self::new(*(ptr.add(1)), *(ptr.add(2)), *(ptr.add(3)))
     }
 );
 

@@ -5,12 +5,14 @@ impl_vecf!(
     EucVecf2, 
     |x: Self| _mm_set_ps(x.x, x.y, 0., 0.),
     |x: __m128| {
-        let cast : (f32, f32, f32, f32) = transmute(x);
-        Self::new(cast.0, cast.1)
+        let ptr = &x as *const __m128 as *const f32;
+        Self::new(*(ptr.add(2)), *(ptr.add(3)))
     }
 );
 
 impl EucVecf2 {
+    // TO BENCH
+    #[inline(always)]
     pub fn dot (self, rhs: Self) -> f32 {
         (self * rhs).sum()
     } 

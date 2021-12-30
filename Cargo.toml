@@ -30,3 +30,7 @@ harness = false
 [[bench]]
 name = "vec4"
 harness = false
+
+[[bench]]
+name = "mat2"
+harness = false

@@ -20,7 +20,7 @@ cfg_if! {
     } else {
         mod def {
             #[derive(Default, Debug, Clone, Copy)]
-            #[repr(align(16))]
+            #[repr(C)]
             pub struct EucVec4<T> {
                 pub x: T,
                 pub y: T,

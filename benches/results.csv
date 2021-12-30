@@ -5,4 +5,5 @@ Vecf2 Mul Scalar, 614.27, 321.30, M1 Mac (aarch64)
 Vecf3 Add, 902.61, 320.87, M1 Mac (aarch64)
 Vecf3 Dot Product, 749.70, 314.58, M1 Mac (aarch64)
 Vecf4 Mul, 1405.2, 269.59, i7 8700 (x86_64)
-Vecf4 Dot Product, 1.2066, 251.34, i7 8700 (x86_64)
+Vecf4 Dot Product, 1206.6, 251.34, i7 8700 (x86_64),
+Matf2 Mul, 2037.6, 469.33, i7 8700 (x86_64)
