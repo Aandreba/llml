@@ -1,4 +1,4 @@
-#![feature(once_cell, concat_idents, core_intrinsics, stdarch)]
+#![feature(once_cell, concat_idents, core_intrinsics, stdarch, set_ptr_value)]
 use cfg_if::cfg_if;
 
 macro_rules! flat_mod {
