@@ -1,12 +1,33 @@
+use cfg_if::cfg_if;
+
 pub type EucVecf2 = EucVec2<f32>;
 pub type EucVecd2 = EucVec2<f64>;
 
-#[repr(C)]
-#[derive(Default, Debug, Clone, Copy)]
-pub struct EucVec2<T> {
-    pub x: T,
-    pub y: T
+cfg_if! {
+    if #[cfg(feature = "llml_serde")] {
+        mod def {
+            use serde::{Serialize, Deserialize};
+            
+            #[derive(Serialize, Deserialize, Default, Debug, Clone, Copy)]
+            #[repr(C)]
+            pub struct EucVec2<T> {
+                pub x: T,
+                pub y: T
+            }
+        }
+    } else {
+        mod def {
+            #[derive(Default, Debug, Clone, Copy)]
+            #[repr(C)]
+            pub struct EucVec2<T> {
+                pub x: T,
+                pub y: T
+            }
+        }
+    }
 }
+
+pub use def::*;
 
 impl<T> EucVec2<T>  {
     pub fn new (x: T, y: T) -> Self {

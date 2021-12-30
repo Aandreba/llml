@@ -4,9 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-avx2 = ["avx"]
-avx = ["sse41"]
-sse41 = []
+llml_serde = ["serde"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -14,10 +12,12 @@ sse41 = []
 cfg-if = "1.0.0"
 derive_more = "0.99.17"
 static_assertions = "1.1.0"
+serde = { version = "1.0.132", features = ["derive"], optional = true }
 
 [dev-dependencies]
 criterion = "0.3"
 rand = "0.8.4"
+serde_json = "1.0"
 
 [[bench]]
 name = "vec2"
