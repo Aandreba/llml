@@ -14,6 +14,7 @@ macro_rules! impl_inverse {
         )*
     };
 }
+
 macro_rules! impl_arith {
     ($trait:ident, $fn:ident, $symbol:tt) => {
         impl<T: $trait> $trait for EucVec2<T> {

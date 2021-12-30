@@ -28,7 +28,7 @@ macro_rules! impl_arith {
             type Output = EucVec4<<T as $trait>::Output>;
         
             fn $fn(self, rhs: T) -> Self::Output {
-                EucVec4::new(self.x $symbol rhs.clone(), self.y $symbol rhs.clone(), self.z $symbol rhs, self.w $symbol rhs)
+                EucVec4::new(self.x $symbol rhs.clone(), self.y $symbol rhs.clone(), self.z.clone() $symbol rhs, self.w $symbol rhs)
             }
         }
 
