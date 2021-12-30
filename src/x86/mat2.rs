@@ -1,5 +1,5 @@
 use std::{intrinsics::transmute, ops::{Add, Sub, Mul, Div}};
-use crate::mat::Matf2;
+use crate::{mat::Matf2, others::Complxf};
 
 use_arch_x86!(__m128, _mm_add_ps, _mm_sub_ps, _mm_mul_ps, _mm_div_ps, _mm_set_ps);
 
@@ -57,7 +57,7 @@ impl Matf2 {
     }
 
     #[inline(always)]
-    pub fn eigvals (self) -> f32 {
+    pub fn eigvals (self) -> Complxf {
         todo!()
     }
 
