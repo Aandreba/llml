@@ -5,8 +5,18 @@ macro_rules! flat_mod {
     ($($i:ident),*) => {
         $(
             mod $i;
-            pub use $i::*;
+            pub use self::$i::*;
         )*
+    };
+}
+
+macro_rules! import_derives {
+    () => {
+        #[cfg(feature = "llml_serde")]
+        use serde::{Serialize, Deserialize};
+
+        #[cfg(feature = "llml_rand")]
+        use randerive::{Rand};
     };
 }
 

@@ -1,18 +1,12 @@
-#![feature(duration_consts_float)]
-use std::{thread::sleep, time::Duration};
-use llml::{Matf2};
-
-const WAIT : Duration = Duration::from_secs_f32(0.5);
+use llml::{mat::Matf3};
+use llml::others::Random;
 
 fn main () {
-    let mut alpha = Matf2::of_rot(1.);
-    let beta = Matf2::of_rot(2.);
+    let alpha = Matf3::random();
+    let beta = Matf3::random();
+    let gamma = alpha + beta;
 
-    loop {
-        alpha = alpha * beta;
-        let angle = alpha.x.x.acos();
-        
-        println!("{} => {:?}", angle, alpha);
-        sleep(WAIT);
-    }
+    assert_eq!(alpha.x + beta.x, gamma.x);
+    assert_eq!(alpha.y + beta.y, gamma.y);
+    assert_eq!(alpha.z + beta.z, gamma.z);
 }

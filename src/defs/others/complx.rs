@@ -1,35 +1,17 @@
+import_derives!();
+
 use std::ops::Neg;
-
-use cfg_if::cfg_if;
-
 pub type Complxf = Complx<f32>;
 pub type Complxd = Complx<f64>;
 
-cfg_if! {
-    if #[cfg(feature = "llml_serde")] {
-        mod def {
-            use serde::{Serialize, Deserialize};
-            
-            #[derive(Serialize, Deserialize, Default, Debug, Clone, Copy)]
-            #[repr(C)]
-            pub struct Complx<T> {
-                pub re: T,
-                pub im: T
-            }
-        }
-    } else {
-        mod def {
-            #[derive(Default, Debug, Clone, Copy)]
-            #[repr(C)]
-            pub struct Complx<T> {
-                pub re: T,
-                pub im: T
-            }
-        }
-    }
+#[repr(C)]
+#[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(feature = "llml_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "llml_rand", derive(Rand))]
+pub struct Complx<T> {
+    pub re: T,
+    pub im: T
 }
-
-pub use def::*;
 
 impl<T> Complx<T>  {
     pub fn new (re: T, im: T) -> Self {
