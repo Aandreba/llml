@@ -1,8 +1,12 @@
+import_derives!();
+
 pub type EucVecf3 = EucVec3<f32>;
 pub type EucVecd3 = EucVec3<f64>;
 
 #[repr(C)]
-#[derive(Default, Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "llml_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "llml_rand", derive(Rand))]
 pub struct EucVec3<T> {
     pub x: T,
     pub y: T,

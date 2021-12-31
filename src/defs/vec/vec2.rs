@@ -1,8 +1,12 @@
+import_derives!();
+
 pub type EucVecf2 = EucVec2<f32>;
 pub type EucVecd2 = EucVec2<f64>;
 
 #[repr(C)]
-#[derive(Default, Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "llml_serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "llml_rand", derive(Rand))]
 pub struct EucVec2<T> {
     pub x: T,
     pub y: T
@@ -15,6 +19,11 @@ impl<T> EucVec2<T>  {
 }
 
 impl EucVecf2 {
+    #[inline(always)]
+    pub fn sum (self) -> f32 {
+        self.x + self.y
+    }
+
     #[inline(always)]
     pub fn norm2 (self) -> f32 {
         self.dot(self)

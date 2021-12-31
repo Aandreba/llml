@@ -3,16 +3,23 @@ name = "llml"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+llml_serde = ["serde"]
+llml_rand = ["rand", "randerive"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 cfg-if = "1.0.0"
-rayon = "1.5.1"
 derive_more = "0.99.17"
+serde = { version = "1.0.132", features = ["derive"], optional = true }
+rand = { version = "0.8.4", optional = true }
+randerive = { version = "1.2.0", optional = true }
 
 [dev-dependencies]
 criterion = "0.3"
 rand = "0.8.4"
+serde_json = "1.0"
 
 [[bench]]
 name = "vec2"
@@ -20,4 +27,16 @@ harness = false
 
 [[bench]]
 name = "vec3"
+harness = false
+
+[[bench]]
+name = "vec4"
+harness = false
+
+[[bench]]
+name = "mat2"
+harness = false
+
+[[bench]]
+name = "mat3"
 harness = false

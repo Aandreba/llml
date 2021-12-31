@@ -1,2 +1,3 @@
-flat_mod!(vec2);
-flat_mod!(vec3);
+pub mod others;
+pub mod vec;
+pub mod mat;
