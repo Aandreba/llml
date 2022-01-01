@@ -1,6 +1,6 @@
 import_derives!();
 
-use std::ops::Add;
+use std::ops::{Add, Neg};
 use crate::vec::EucVec2;
 
 pub type Matf2 = Mat2<f32>;
@@ -44,6 +44,11 @@ impl Matf2 {
         let sin = rad.sin();
 
         Self::of_values(cos, -sin, sin, cos)
+    }
+
+    #[inline(always)]
+    pub fn inv (self) -> Self {
+        Self::of_values(self.y.y, -self.x.y, -self.y.x, self.x.x) / self.det()
     }
 }
 

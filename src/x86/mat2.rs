@@ -1,21 +1,21 @@
 use std::{intrinsics::transmute, ops::{Add, Sub, Mul, Div}};
 use crate::{mat::Matf2, others::Complxf};
 
-use_arch_x86!(__m128, _mm_add_ps, _mm_sub_ps, _mm_mul_ps, _mm_div_ps, _mm_set_ps);
+use_arch_x86!(__m128, _mm_set1_ps, _mm_add_ps, _mm_sub_ps, _mm_mul_ps, _mm_div_ps, _mm_set_ps);
 
 map_to_trait!(Matf2, Add, add, |x: Self, y: Self| Self::from_vec(_mm_add_ps(x.as_vec(), y.as_vec())));
-map_to_trait!(Matf2, Add, f32, add, Matf2, |x: Self, y: f32| Self::from_vec(_mm_add_ps(x.as_vec(), transmute((y,y,y,y)))));
-map_to_trait!(f32, Add, Matf2, add, Matf2, |x: Self, y: Matf2| Matf2::from_vec(_mm_add_ps(transmute((x,x,x,x)), y.as_vec())));
+map_to_trait!(Matf2, Add, f32, add, Matf2, |x: Self, y: f32| Self::from_vec(_mm_add_ps(x.as_vec(), _mm_set1_ps(y))));
+map_to_trait!(f32, Add, Matf2, add, Matf2, |x: Self, y: Matf2| Matf2::from_vec(_mm_add_ps(_mm_set1_ps(x), y.as_vec())));
 
 map_to_trait!(Matf2, Sub, sub, |x: Self, y: Self| Self::from_vec(_mm_sub_ps(x.as_vec(), y.as_vec())));
-map_to_trait!(Matf2, Sub, f32, sub, Matf2, |x: Self, y: f32| Self::from_vec(_mm_sub_ps(x.as_vec(), transmute((y,y,y,y)))));
-map_to_trait!(f32, Sub, Matf2, sub, Matf2, |x: Self, y: Matf2| Matf2::from_vec(_mm_sub_ps(transmute((x,x,x,x)), y.as_vec())));
+map_to_trait!(Matf2, Sub, f32, sub, Matf2, |x: Self, y: f32| Self::from_vec(_mm_sub_ps(x.as_vec(), _mm_set1_ps(y))));
+map_to_trait!(f32, Sub, Matf2, sub, Matf2, |x: Self, y: Matf2| Matf2::from_vec(_mm_sub_ps(_mm_set1_ps(x), y.as_vec())));
 
-map_to_trait!(Matf2, Mul, f32, mul, Matf2, |x: Self, y: f32| Self::from_vec(_mm_mul_ps(x.as_vec(), transmute((y,y,y,y)))));
-map_to_trait!(f32, Mul, Matf2, mul, Matf2, |x: Self, y: Matf2| Matf2::from_vec(_mm_mul_ps(transmute((x,x,x,x)), y.as_vec())));
+map_to_trait!(Matf2, Mul, f32, mul, Matf2, |x: Self, y: f32| Self::from_vec(_mm_mul_ps(x.as_vec(), _mm_set1_ps(y))));
+map_to_trait!(f32, Mul, Matf2, mul, Matf2, |x: Self, y: Matf2| Matf2::from_vec(_mm_mul_ps(_mm_set1_ps(x), y.as_vec())));
 
-map_to_trait!(Matf2, Div, f32, div, Matf2, |x: Self, y: f32| Self::from_vec(_mm_div_ps(x.as_vec(), transmute((y,y,y,y)))));
-map_to_trait!(f32, Div, Matf2, div, Matf2, |x: Self, y: Matf2| Matf2::from_vec(_mm_div_ps(transmute((x,x,x,x)), y.as_vec())));
+map_to_trait!(Matf2, Div, f32, div, Matf2, |x: Self, y: f32| Self::from_vec(_mm_div_ps(x.as_vec(), _mm_set1_ps(y))));
+map_to_trait!(f32, Div, Matf2, div, Matf2, |x: Self, y: Matf2| Matf2::from_vec(_mm_div_ps(_mm_set1_ps(x), y.as_vec())));
 
 impl Mul for Matf2 {
     type Output = Self;
