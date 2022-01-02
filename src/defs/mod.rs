@@ -6,3 +6,6 @@ pub mod vec;
 
 /// Matrix types
 pub mod mat;
+
+/// Affine transformations
+pub mod transf;

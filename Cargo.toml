@@ -29,6 +29,7 @@ llml_derive_crate = { version = "0.1.0", path = "derive", optional = true }
 criterion = "0.3"
 rand = "0.8.4"
 serde_json = "1.0"
+glam = "0.20.2"
 
 [[bench]]
 name = "vec2"

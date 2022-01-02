@@ -1,3 +1,5 @@
+use crate::others::Complx;
+
 import_derives!();
 
 pub type EucVecf2 = EucVec2<f32>;
@@ -41,5 +43,17 @@ impl EucVecf2 {
     /// Unit vector
     pub fn unit (self) -> Self {
         self / self.norm()
+    }
+}
+
+impl<T> Into<Complx<T>> for EucVec2<T> {
+    fn into(self) -> Complx<T> {
+        Complx::new(self.x, self.y)
+    }
+}
+
+impl<T> From<Complx<T>> for EucVec2<T> {
+    fn from(x: Complx<T>) -> EucVec2<T> {
+        EucVec2::new(x.re, x.im)
     }
 }

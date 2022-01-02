@@ -30,6 +30,32 @@ Implementation of basic math data types with high level frontend and low level b
 | Hyperbolic Cosine  | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
 | Hyperbolic Tangent | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
 
+### Quaternion
+|                    | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
+| ----------------   | ------------ | -------------- | ---- | ----- |
+| Addition           | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Subtraction        | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Multiplication     | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Division           | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Conjugate          | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Polar Coordinates  | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Square Root        | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Exponential        | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Natural Logarithm  | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Sine               | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Cosine             | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Tangent            | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Hyperbolic Sine    | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Hyperbolic Cosine  | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Hyperbolic Tangent | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+
+### Affine Transform 2D
+|                    | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
+| ----------------   | ------------ | -------------- | ---- | ----- |
+| Addition           | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Subtraction        | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Tranformation      | 🟧           | ⚠️            | ⚠️   | 🟧   |
+
 ### Vector 2
 |                  | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
 | ---------------- | ------------ | -------------- | ---- | ----- |
