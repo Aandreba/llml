@@ -117,6 +117,7 @@ impl Mul for Matf3 {
 impl Mul<EucVecf3> for Matf3 {
     type Output = EucVecf3;
 
+    #[inline(always)]
     fn mul (self, rhs: EucVecf3) -> Self::Output {
         unsafe {
             let v1 = _mm_set_ps(self.y.x, self.x.z, self.x.y, self.x.x);
