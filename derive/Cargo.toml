@@ -2,6 +2,7 @@
 name = "llml_derive_crate"
 version = "0.1.0"
 edition = "2021"
+description = "Derive macros for llml"
 repository = "https://github.com/Aandreba/llml/derive"
 license = "MIT OR Apache-2.0"
 keywords = ["asm", "assembly", "sse", "instrinsics", "simd"]

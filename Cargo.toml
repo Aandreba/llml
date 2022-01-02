@@ -2,6 +2,7 @@
 name = "llml"
 version = "0.1.0"
 edition = "2021"
+description = "Implementation of basic math data types with high level frontend and low level backend"
 readme = "README.md"
 repository = "https://github.com/Aandreba/llml"
 license = "MIT OR Apache-2.0"
