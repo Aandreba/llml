@@ -6,6 +6,8 @@ edition = "2021"
 [features]
 llml_serde = ["serde"]
 llml_rand = ["rand", "randerive"]
+llml_derive = ["llml_derive_crate"]
+llml_naive = []
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -15,6 +17,7 @@ derive_more = "0.99.17"
 serde = { version = "1.0.132", features = ["derive"], optional = true }
 rand = { version = "0.8.4", optional = true }
 randerive = { version = "1.2.0", optional = true }
+llml_derive_crate = { path = "derive", optional = true }
 
 [dev-dependencies]
 criterion = "0.3"

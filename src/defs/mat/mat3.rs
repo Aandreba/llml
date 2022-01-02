@@ -1,5 +1,5 @@
 import_derives!();
-use crate::vec::EucVec3;
+use crate::vec::{EucVec3, EucVecf3};
 
 pub type Matf3 = Mat3<f32>;
 pub type Matd3 = Mat3<f64>;
@@ -55,6 +55,11 @@ impl Matf3 {
             sa * cb, sa.mul_add(sbsy, ca * cy), sa.mul_add(sbcy, -ca * sy),
             -sb, cb * sy, cb * cy
         )
+    }
+
+    #[inline(always)]
+    pub fn tr (self) -> f32 {
+        EucVecf3::new(self.x.x, self.y.y, self.z.z).sum()
     }
 }
 

@@ -23,7 +23,7 @@ map_to_trait!(Complxf, Mul, mul, |x: Self, y: Self| {
 map_to_trait!(Complxf, Mul, f32, mul, Complxf, |x: Self, y: f32| Self::unsafe_from(_mm_mul_ps(x.casted(), transmute((y,y,y,y)))));
 map_to_trait!(f32, Mul, Complxf, mul, Complxf, |x: Self, y: Complxf| Complxf::unsafe_from(_mm_mul_ps(transmute((x,x,x,x)), y.casted())));
 
-map_to_trait!(Complxf, Div, div, |x: Self, y: Self| (x * y.conj()) / y.magn());
+map_to_trait!(Complxf, Div, div, |x: Self, y: Self| (x * y.conj()) / y.radius());
 map_to_trait!(Complxf, Div, f32, div, Complxf, |x: Self, y: f32| Self::unsafe_from(_mm_div_ps(x.casted(), transmute((y,y,y,y)))));
 map_to_trait!(f32, Div, Complxf, div, Complxf, |x: Self, y: Complxf| Complxf::unsafe_from(_mm_div_ps(transmute((x,x,x,x)), y.casted())));
 

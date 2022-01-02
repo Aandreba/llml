@@ -25,4 +25,14 @@ impl EucVecf4 {
     pub fn norm2 (self) -> f32 {
         self.dot(self)
     }
+
+    #[inline(always)]
+    pub fn norm (self) -> f32 {
+        self.norm2().sqrt()
+    }
+
+    #[inline(always)]
+    pub fn unit (self) -> Self {
+        self / self.norm()
+    }
 }

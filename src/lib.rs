@@ -43,11 +43,18 @@ macro_rules! map_to_trait {
 
 flat_mod!(defs);
 cfg_if! {
-    if #[cfg(all(target_arch = "aarch64", target_feature = "neon"))] {
+    if #[cfg(feature = "llml_naive")] {
+        flat_mod!(naive);
+    } else if #[cfg(all(target_arch = "aarch64", target_feature = "neon"))] {
         flat_mod!(aarch64);
     } else if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), target_feature = "sse"))] {
         flat_mod!(x86);
     } else {
         flat_mod!(naive);
     }
+}
+
+#[cfg(feature = "llml_derive")]
+pub mod derive {
+    pub use llml_derive_crate::*;
 }

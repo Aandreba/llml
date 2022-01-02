@@ -1,4 +1,4 @@
-use std::{intrinsics::transmute, ops::{Add, Sub, Mul, Div}};
+use std::{ops::{Add, Sub, Mul, Div}};
 use_arch_x86!(_mm_set_ps, _mm_shuffle_ps, _mm_movehl_ps, _mm_cvtss_f32, _MM_SHUFFLE);
 
 impl_vecf!(
@@ -29,15 +29,7 @@ impl EucVecf3 {
     #[inline(always)]
     pub fn dot (self, rhs: Self) -> f32 {
         unsafe {
-            let mul = _mm_mul_ps(self.casted(), rhs.casted());
-
-            let shuf = _mm_shuffle_ps(mul, mul, _MM_SHUFFLE(2, 3, 0, 1));
-            let sums = _mm_add_ps(mul, shuf);
-            
-            let shuf = _mm_movehl_ps(shuf, sums);
-            let sums = _mm_add_ps(sums, shuf);
-            
-            return _mm_cvtss_f32(sums);
+            Self::raw_dot(self.casted(), rhs.casted())
         }
     }
 
@@ -54,5 +46,18 @@ impl EucVecf3 {
 
             Self::unsafe_from(_mm_sub_ps(m1, m2))
         }
-    } 
+    }
+
+    #[inline(always)]
+    pub(crate) unsafe fn raw_dot (alpha: __m128, beta: __m128) -> f32 {
+        let mul = _mm_mul_ps(alpha, beta);
+
+        let shuf = _mm_shuffle_ps(mul, mul, _MM_SHUFFLE(2, 3, 0, 1));
+        let sums = _mm_add_ps(mul, shuf);
+        
+        let shuf = _mm_movehl_ps(shuf, sums);
+        let sums = _mm_add_ps(sums, shuf);
+        
+        return _mm_cvtss_f32(sums);
+    }
 }
