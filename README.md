@@ -1,4 +1,7 @@
 # Low Level Math Library (LLML)
+[![Crate](https://img.shields.io/crates/v/llml.svg)](https://crates.io/crates/llml)
+[![API](https://docs.rs/llml/badge.svg)](https://docs.rs/llml)
+
 Implementation of basic math data types with high level frontend and low level backend
 
 # Current implementation

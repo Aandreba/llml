@@ -2,6 +2,11 @@
 name = "llml"
 version = "0.1.0"
 edition = "2021"
+readme = "README.md"
+repository = "https://github.com/Aandreba/llml"
+license = "MIT OR Apache-2.0"
+keywords = ["asm", "assembly", "sse", "instrinsics", "simd"]
+categories = ["data-structures", "hardware-support", "mathematics"]
 
 [features]
 llml_serde = ["serde"]
