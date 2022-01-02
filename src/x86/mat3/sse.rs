@@ -1,5 +1,5 @@
 use std::{ops::{Add, Sub, Mul, Div}, intrinsics::transmute};
-use crate::{mat::Matf3, vec::{EucVecf3, EucVecf4}};
+use crate::{mat::{Matf3, Matf2}, vec::{EucVecf3, EucVecf4}, others::Zero};
 use_arch_x86!(_mm_set_ps, _mm_set1_ps, _mm_mul_ps, _mm_add_ps, _mm_sub_ps, _mm_div_ps, __m128);
 
 macro_rules! impl_arith {
@@ -168,6 +168,41 @@ impl Matf3 {
 
             let m2 = _mm_mul_ps(v4, _mm_mul_ps(v5, v6));
             EucVecf4::raw_sum(m2)
+        }
+    }
+
+    #[inline(always)]
+    pub fn inv (self) -> Option<Self> {
+        let det = self.det();
+        if det.is_zero() {
+            return None;
+        }
+
+        let s3 = Matf2::of_values(self.x.x, self.x.y, self.y.x, self.y.y).det() / det;
+        unsafe {
+            // SECTION 1
+            let v1 = _mm_set_ps(self.y.z, self.x.y, self.x.z, self.y.y);
+            let v2 = _mm_set_ps(self.z.x, self.y.z, self.z.y, self.z.z);
+            let m11 = _mm_mul_ps(v1, v2);
+
+            let v3 = _mm_set_ps(self.x.y, self.y.x, self.x.z, self.x.x);
+            let v4 = _mm_set_ps(self.z.x, self.z.y, self.y.x, self.z.z);
+            let m12 = _mm_mul_ps(v3, v4);
+
+            // SECTION 2
+            let v1 = _mm_set_ps(self.y.x, self.x.z, self.x.y, self.y.z);
+            let v2 = _mm_set_ps(self.z.z, self.y.y, self.z.z, self.z.y);
+            let m21 = _mm_mul_ps(v1, v2);
+
+            let v3 = _mm_set_ps(self.x.x, self.y.y, self.x.x, self.x.z);
+            let v4 = _mm_set_ps(self.z.y, self.z.x, self.y.z, self.z.x);
+            let m22 = _mm_mul_ps(v3, v4);
+
+            let det = _mm_set1_ps(det);
+            let s1 = _mm_div_ps( _mm_sub_ps(m11, m21), det);
+            let s2 = _mm_div_ps(_mm_sub_ps(m12, m22), det);
+
+            Some(Self::from(s1, s2, s3))
         }
     }
 }

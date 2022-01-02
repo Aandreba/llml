@@ -18,15 +18,7 @@ impl EucVecf4 {
     #[inline(always)]
     pub fn dot (self, rhs: Self) -> f32 {
         unsafe {
-            let mul = _mm_mul_ps(self.casted(), rhs.casted());
-
-            let shuf = _mm_shuffle_ps(mul, mul, _MM_SHUFFLE(2, 3, 0, 1));
-            let sums = _mm_add_ps(mul, shuf);
-            
-            let shuf = _mm_movehl_ps(shuf, sums);
-            let sums = _mm_add_ps(sums, shuf);
-            
-            return _mm_cvtss_f32(sums);
+            Self::raw_sum(_mm_mul_ps(self.casted(), rhs.casted()))
         }
     }
 
@@ -38,6 +30,6 @@ impl EucVecf4 {
         let shuf = _mm_movehl_ps(shuf, sums);
         let sums = _mm_add_ps(sums, shuf);
         
-        return _mm_cvtss_f32(sums);
+        _mm_cvtss_f32(sums)
     }
 }

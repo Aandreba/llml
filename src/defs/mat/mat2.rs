@@ -1,7 +1,7 @@
 import_derives!();
 
 use std::ops::{Add, Neg};
-use crate::vec::EucVec2;
+use crate::{vec::EucVec2, others::Zero};
 
 pub type Matf2 = Mat2<f32>;
 pub type Matd2 = Mat2<f64>;
@@ -47,8 +47,13 @@ impl Matf2 {
     }
 
     #[inline(always)]
-    pub fn inv (self) -> Self {
-        Self::of_values(self.y.y, -self.x.y, -self.y.x, self.x.x) / self.det()
+    pub fn inv (self) -> Option<Self> {
+        let det = self.det();
+        if det.is_zero() {
+            return None;
+        }
+
+        Some(Self::of_values(self.y.y, -self.x.y, -self.y.x, self.x.x) / det)
     }
 }
 

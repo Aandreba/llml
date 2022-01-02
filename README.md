@@ -87,7 +87,7 @@ Implementation of basic math data types with high level frontend and low level b
 | Multiplication   | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 | Division         | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 | Transposed       | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Inverse          | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Inverse          | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 | Trace            | ✔️           | ✔️            | ⚠️   | ✔️   |
 | Determinant      | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 
