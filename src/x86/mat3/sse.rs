@@ -152,6 +152,7 @@ impl Matf3 {
         )
     }
 
+    /// Matrix determinant
     #[inline(always)]
     pub fn det (self) -> f32 {
         unsafe {
@@ -171,6 +172,7 @@ impl Matf3 {
         }
     }
 
+    /// Matrix inverse. Returns ```None``` if the matrix determinant is 0, ```Some(inverse)``` otherwise 
     #[inline(always)]
     pub fn inv (self) -> Option<Self> {
         let det = self.det();

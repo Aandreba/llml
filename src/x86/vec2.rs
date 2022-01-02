@@ -11,7 +11,7 @@ impl_vecf!(
 );
 
 impl EucVecf2 {
-    // TO BENCH
+    // Vector dot product
     #[inline(always)]
     pub fn dot (self, rhs: Self) -> f32 {
         (self * rhs).sum()

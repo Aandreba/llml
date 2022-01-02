@@ -8,6 +8,7 @@ use super::{Exp, SinCos, Hypot, Atan2, Ln, Zero, Sqrt, ComplxSqrt, Two, Signum, 
 pub type Complxf = Complx<f32>;
 pub type Complxd = Complx<f64>;
 
+// Complex number
 #[repr(C)]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "llml_serde", derive(Serialize, Deserialize))]
@@ -30,16 +31,19 @@ impl<T> Complx<T>  {
         Self { re: T::zero(), im }
     }
 
+    /// Complex conjugate
     #[inline(always)]
     pub fn conj (self) -> Self where T: Neg<Output = T> {
         Self::new(self.re, -self.im)
     }
 
+    /// Complex radius
     #[inline(always)]
     pub fn radius (self) -> T where T: Hypot {
         self.re.hypot(self.im)
     }
 
+    /// Complex angle
     #[inline(always)]
     pub fn angle (self) -> T where T: Atan2 {
         self.im.atan2(self.re)
@@ -51,6 +55,7 @@ impl<T> Complx<T>  {
         Polar::new(self.clone().radius(), self.angle())
     }
 
+    /// Returns ```exp(x * i)```
     #[inline]
     pub fn expi (x: T) -> Complx<T> where T: SinCos {
         let sin_cos = x.sin_cos();
@@ -121,6 +126,7 @@ impl<T: Zero> Zero for Complx<T> {
     }
 }
 
+/// Polar coordinates
 #[repr(C)]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "llml_serde", derive(Serialize, Deserialize))]

@@ -54,16 +54,19 @@ impl Mul<EucVecf2> for Matf2 {
 }
 
 impl Matf2 {
+    /// Matrix scalar multiplication
     #[inline(always)]
     pub fn scal_mul (self, rhs: Self) -> Self {
         unsafe { Self::from_vec(_mm_mul_ps(self.as_vec(), rhs.as_vec())) }
     }
 
+    /// Matrix scalar division
     #[inline(always)]
     pub fn scal_div (self, rhs: Self) -> Self {
         unsafe { Self::from_vec(_mm_div_ps(self.as_vec(), rhs.as_vec())) }
     }
 
+    /// Matrix determinant
     #[inline(always)]
     pub fn det (self) -> f32 {
         unsafe {

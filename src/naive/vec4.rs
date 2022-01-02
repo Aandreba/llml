@@ -45,6 +45,7 @@ impl_arith!(Mul, mul, *);
 impl_arith!(Div, div, /);
 
 impl<T> EucVec4<T> {
+    /// Vector dot product
     pub fn dot (self, rhs: Self) -> T where T: Mul<T, Output = T> + Add<T, Output = T> {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z + self.w * rhs.w
     }

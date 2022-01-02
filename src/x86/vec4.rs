@@ -8,6 +8,7 @@ impl_vecf!(
 );
 
 impl EucVecf4 {
+    /// Summation of all the values inside the vector
     #[inline(always)]
     pub fn sum (self) -> f32 {
         unsafe {
@@ -15,6 +16,7 @@ impl EucVecf4 {
         }
     }
 
+    // Vector dot product
     #[inline(always)]
     pub fn dot (self, rhs: Self) -> f32 {
         unsafe {

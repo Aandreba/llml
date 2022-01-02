@@ -4,6 +4,7 @@ use crate::vec::{EucVec3, EucVecf3};
 pub type Matf3 = Mat3<f32>;
 pub type Matd3 = Mat3<f64>;
 
+/// 3x3 Matrix
 #[repr(C)]
 #[derive(Debug, Default, Clone, Copy)]
 #[cfg_attr(feature = "llml_serde", derive(Serialize, Deserialize))]
@@ -31,6 +32,7 @@ impl<T> Mat3<T>  {
         }
     }
 
+    /// Matrix transpose
     #[inline(always)]
     pub fn transp (self) -> Self {
         Self::of_values(
@@ -42,6 +44,7 @@ impl<T> Mat3<T>  {
 }
 
 impl Matf3 {
+    /// Returns a matrix thet represents the specified rotation (in radians)
     pub fn of_rot (roll: f32, pitch: f32, yaw: f32) -> Self {
         let (sy, cy) = roll.sin_cos();
         let (sb, cb) = pitch.sin_cos();
@@ -57,6 +60,7 @@ impl Matf3 {
         )
     }
 
+    /// Matrix trace
     #[inline(always)]
     pub fn tr (self) -> f32 {
         EucVecf3::new(self.x.x, self.y.y, self.z.z).sum()
@@ -64,6 +68,7 @@ impl Matf3 {
 }
 
 impl Matd3 {
+    /// Returns a matrix thet represents the specified rotation (in radians)
     pub fn of_rot (roll: f64, pitch: f64, yaw: f64) -> Self {
         let (sy, cy) = roll.sin_cos();
         let (sb, cb) = pitch.sin_cos();

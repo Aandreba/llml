@@ -1,11 +1,12 @@
 import_derives!();
 
-use std::ops::{Add, Neg};
+use std::ops::{Add};
 use crate::{vec::EucVec2, others::Zero};
 
 pub type Matf2 = Mat2<f32>;
 pub type Matd2 = Mat2<f64>;
 
+/// 2x2 Matrix
 #[repr(C)]
 #[derive(Debug, Default, Clone, Copy)]
 #[cfg_attr(feature = "llml_serde", derive(Serialize, Deserialize))]
@@ -25,13 +26,15 @@ impl<T> Mat2<T>  {
             x: EucVec2::new(xx, xy),
             y: EucVec2::new(yx, yy) 
         }
-    }
+    }   
 
+    /// Matrix transpose
     #[inline(always)]
     pub fn transp (self) -> Self {
         Self::of_values(self.x.x, self.y.x, self.x.y, self.y.y)
     }
 
+    /// Matrix trace
     #[inline(always)]
     pub fn tr (self) -> <T as Add>::Output where T: Add {
         self.x.x + self.y.y
@@ -39,6 +42,7 @@ impl<T> Mat2<T>  {
 }
 
 impl Matf2 {
+    /// Returns a matrix thet represents the specified rotation (in radians)
     pub fn of_rot (rad: f32) -> Self {
         let cos = rad.cos();
         let sin = rad.sin();
@@ -46,6 +50,7 @@ impl Matf2 {
         Self::of_values(cos, -sin, sin, cos)
     }
 
+    /// Matrix inverse. Returns ```None``` if the matrix determinant is 0, ```Some(inverse)``` otherwise 
     #[inline(always)]
     pub fn inv (self) -> Option<Self> {
         let det = self.det();
@@ -58,6 +63,7 @@ impl Matf2 {
 }
 
 impl Matd2 {
+    /// Returns a matrix thet represents the specified rotation (in radians)
     pub fn of_rot (rad: f64) -> Self {
         let cos = rad.cos();
         let sin = rad.sin();
