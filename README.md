@@ -11,8 +11,8 @@ Implementation of basic math data types with high level frontend and low level b
 ### Complex number
 |                    | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
 | ----------------   | ------------ | -------------- | ---- | ----- |
-| Addition           | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Subtraction        | ✔️           | ⚠️            | ⚠️   | ⚠️   |
+| Addition           | ✔️           | ⚠️            | ⚠️   | ✔️   |
+| Subtraction        | ✔️           | ⚠️            | ⚠️   | ✔️   |
 | Multiplication     | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 | Division           | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 | Conjugate          | ✔️           | ✔️            | ⚠️   | ✔️   |
