@@ -1,5 +1,5 @@
 use std::{intrinsics::transmute, ops::{Add, Sub, Mul, Div}};
-use crate::{mat::Matf2, others::Complxf};
+use crate::{mat::Matf2, others::Complxf, vec::EucVecf2};
 
 use_arch_x86!(__m128, _mm_set1_ps, _mm_add_ps, _mm_sub_ps, _mm_mul_ps, _mm_div_ps, _mm_set_ps);
 
@@ -36,6 +36,23 @@ impl Mul for Matf2 {
     }
 }
 
+impl Mul<EucVecf2> for Matf2 {
+    type Output = EucVecf2;
+
+    #[inline(always)]
+    fn mul (self, rhs: EucVecf2) -> Self::Output {
+        unsafe {
+            let v1 = self.as_vec();
+            let v2 = _mm_set_ps(rhs.y, rhs.x, rhs.y, rhs.x);
+            let m1 = &_mm_mul_ps(v1, v2) as *const __m128 as *const f32;
+
+            let v3 = _mm_set_ps(0., 0., *m1.add(2), *m1);
+            let v4 = _mm_set_ps(0., 0., *m1.add(3), *m1.add(1));
+            EucVecf2::unsafe_from(_mm_add_ps(v3, v4))
+        }
+    }
+}
+
 impl Matf2 {
     #[inline(always)]
     pub fn scal_mul (self, rhs: Self) -> Self {
@@ -58,7 +75,7 @@ impl Matf2 {
 
     #[inline(always)]
     pub fn eigvals (self) -> Complxf {
-        todo!()
+        todo!();
     }
 
     #[inline(always)]

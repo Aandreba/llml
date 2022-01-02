@@ -3,3 +3,6 @@ Cargo.lock
 
 testx/target/
 testx/Cargo.lock
+
+derive/target/
+derive/Cargo.lock
