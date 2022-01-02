@@ -89,7 +89,7 @@ Implementation of basic math data types with high level frontend and low level b
 | Transposed       | ✔️           | ✔️            | ⚠️   | ✔️   |
 | Inverse          | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
 | Trace            | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Determinant      | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Determinant      | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 
 ### Matrix 4
 4x4 matrices are yet to be implemented, but are expected to be in the future

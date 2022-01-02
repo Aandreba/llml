@@ -11,15 +11,7 @@ impl EucVecf4 {
     #[inline(always)]
     pub fn sum (self) -> f32 {
         unsafe {
-            let mul = self.casted();
-
-            let shuf = _mm_shuffle_ps(mul, mul, _MM_SHUFFLE(2, 3, 0, 1));
-            let sums = _mm_add_ps(mul, shuf);
-            
-            let shuf = _mm_movehl_ps(shuf, sums);
-            let sums = _mm_add_ps(sums, shuf);
-            
-            return _mm_cvtss_f32(sums);
+            Self::raw_sum(self.casted())
         }
     }
 
@@ -36,5 +28,16 @@ impl EucVecf4 {
             
             return _mm_cvtss_f32(sums);
         }
+    }
+
+    #[inline(always)]
+    pub(crate) unsafe fn raw_sum (mul: __m128) -> f32 {
+        let shuf = _mm_shuffle_ps(mul, mul, _MM_SHUFFLE(2, 3, 0, 1));
+        let sums = _mm_add_ps(mul, shuf);
+        
+        let shuf = _mm_movehl_ps(shuf, sums);
+        let sums = _mm_add_ps(sums, shuf);
+        
+        return _mm_cvtss_f32(sums);
     }
 }

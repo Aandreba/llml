@@ -1,5 +1,5 @@
 use std::{ops::{Add, Sub, Mul, Div}, intrinsics::transmute};
-use crate::{mat::Matf3, vec::EucVecf3};
+use crate::{mat::Matf3, vec::{EucVecf3, EucVecf4}};
 use_arch_x86!(_mm_set_ps, _mm_set1_ps, _mm_mul_ps, _mm_add_ps, _mm_sub_ps, _mm_div_ps, __m128);
 
 macro_rules! impl_arith {
@@ -150,5 +150,24 @@ impl Matf3 {
             EucVecf3::new(*alpha.add(3), *beta, *beta.add(1)), 
             EucVecf3::new(*beta.add(2), *beta.add(3), gamma)
         )
+    }
+
+    #[inline(always)]
+    pub fn det (self) -> f32 {
+        unsafe {
+            let v1 = _mm_set_ps(self.x.y, -self.x.y, -self.x.x, self.x.x);
+            let v2 = _mm_set_ps(self.y.z, self.y.x, self.y.z, self.y.y);
+            let v3 = _mm_set_ps(self.z.x, self.z.z, self.z.y, self.z.z);
+            
+            let m1 = _mm_mul_ps(v1, _mm_mul_ps(v2, v3));
+            let s1 = EucVecf4::raw_sum(m1);
+
+            let v4 = _mm_set_ps(0., s1, -self.x.z, self.x.z);
+            let v5 = _mm_set_ps(0., 1., self.y.y, self.y.x);
+            let v6 = _mm_set_ps(0., 1., self.z.x, self.z.y);
+
+            let m2 = _mm_mul_ps(v4, _mm_mul_ps(v5, v6));
+            EucVecf4::raw_sum(m2)
+        }
     }
 }
