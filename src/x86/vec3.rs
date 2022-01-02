@@ -1,4 +1,4 @@
-use std::{intrinsics::transmute, ops::{Add, Sub, Mul, Div}};
+use std::{ops::{Add, Sub, Mul, Div}};
 use_arch_x86!(_mm_set_ps, _mm_shuffle_ps, _mm_movehl_ps, _mm_cvtss_f32, _MM_SHUFFLE);
 
 impl_vecf!(

@@ -74,11 +74,6 @@ impl Matf2 {
     }
 
     #[inline(always)]
-    pub fn eigvals (self) -> Complxf {
-        todo!();
-    }
-
-    #[inline(always)]
     pub(crate) unsafe fn as_vec (self) -> __m128 {
         transmute(self)
     }

@@ -114,6 +114,30 @@ impl Mul for Matf3 {
     }
 }
 
+impl Mul<EucVecf3> for Matf3 {
+    type Output = EucVecf3;
+
+    fn mul (self, rhs: EucVecf3) -> Self::Output {
+        unsafe {
+            let v1 = _mm_set_ps(self.y.x, self.x.z, self.x.y, self.x.x);
+            let v2 = _mm_set_ps(rhs.x, rhs.z, rhs.y, rhs.x);
+
+            let v3 = _mm_set_ps(self.z.y, self.z.x, self.y.z, self.y.y);
+            let v4 = _mm_set_ps(rhs.y, rhs.x, rhs.z, rhs.y);
+            
+            let m1 = &_mm_mul_ps(v1, v2) as *const __m128 as *const f32;
+            let m2 = &_mm_mul_ps(v3, v4) as *const __m128 as *const f32;
+            let m3 = self.z.z * rhs.z;
+            
+            let v5 = _mm_set_ps(0., *m2.add(2), *m1.add(3), *m1);
+            let v6 = _mm_set_ps(0., *m2.add(3), *m2, *m1.add(1));
+            let v7 = _mm_set_ps(0., m3, *m2.add(1), *m1.add(2));
+
+            EucVecf3::unsafe_from(_mm_add_ps(v5, _mm_add_ps(v6, v7)))
+        }
+    }
+}
+
 impl Matf3 {
     #[inline(always)]
     pub(crate) unsafe fn from (alpha: __m128, beta: __m128, gamma: f32) -> Self {
