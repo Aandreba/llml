@@ -91,7 +91,7 @@ Implementation of basic math data types with high level frontend and low level b
 | Division         | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 | Transposed       | ✔️           | ✔️            | ⚠️   | ✔️   |
 | Inverse          | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Trace            | ✔️           | ✔️            | ⚠️   | ✔️   |
+| Trace            | ✔️           | ⚠️            | ⚠️   | ✔️   |
 | Determinant      | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 
 ### Matrix 4
