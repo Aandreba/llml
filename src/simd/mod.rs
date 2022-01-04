@@ -185,4 +185,4 @@ unsafe impl<T> IntoSimd for T where T: SimdElement {
 }
 
 flat_mod!(vec2, vec3, vec4);
-flat_mod!(mat2, mat3);
+flat_mod!(mat2, mat3, mat4);

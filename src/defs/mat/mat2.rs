@@ -5,6 +5,9 @@ use crate::{vec::EucVec2};
 
 pub type Matf2 = Mat2<f32>;
 pub type Matd2 = Mat2<f64>;
+pub type Mati2 = Mat2<i32>;
+pub type Matu2 = Mat2<u32>;
+pub type Matl2 = Mat2<i64>;
 
 /// 2x2 Matrix
 #[repr(C)]

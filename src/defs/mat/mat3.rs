@@ -1,8 +1,12 @@
 import_derives!();
-use crate::vec::{EucVec3, EucVecf3};
+use crate::vec::{EucVec3};
 
 pub type Matf3 = Mat3<f32>;
 pub type Matd3 = Mat3<f64>;
+pub type Mati3 = Mat3<i32>;
+pub type Matu3 = Mat3<u32>;
+pub type Matl3 = Mat3<i64>;
+
 
 /// 3x3 Matrix
 #[repr(C)]
