@@ -104,7 +104,74 @@ macro_rules! simd_map {
     };
 }
 
-flat_mod!(vec2, vec3, vec4);
+macro_rules! simd_mat_map {
+    ($t1:ident) => {
+        use crate::simd::IntoSimd;
+        use std::ops::{Add, Sub, Mul, Div};
+
+        simd_mat_map!(
+            $t1,
+            u8, u16, u32, u64, usize,
+            i8, i16, i32, i64, isize,
+            f32, f64
+        );
+    };
+
+    ($t1:ident, $($t2:ident),+) => {
+        $(
+            simd_mat_map!(
+                $t1, $t2,
+                Add, add, +,
+                Sub, sub, -
+            );
+
+            simd_mat_scalar!(
+                $t1, $t2,
+                Mul, mul, *,
+                Div, div, /
+            );
+        )*
+    };
+
+    ($t1:ident, $t2:ident, $($trait:ident, $fn:ident, $sy:tt),+) => {
+        $(
+            impl $trait for $t1<$t2> {
+                type Output = Self;
+
+                #[inline(always)]
+                fn $fn (self, rhs: Self) -> Self::Output {
+                    unsafe { Self::from_simd(self.into_simd() $sy rhs.into_simd()) }
+                }
+            }
+
+            simd_mat_scalar!($t1, $t2, $trait, $fn, $sy);
+        )*
+    };
+}
+
+macro_rules! simd_mat_scalar {
+    ($t1:ident, $t2:ident, $($trait:ident, $fn:ident, $sy:tt),+) => {
+        $(
+            impl $trait<$t2> for $t1<$t2> {
+                type Output = Self;
+
+                #[inline(always)]
+                fn $fn (self, rhs: $t2) -> Self::Output {
+                    unsafe { Self::from_simd(self.into_simd() $sy rhs.into_simd()) }
+                }
+            }
+
+            impl $trait<$t1<$t2>> for $t2 {
+                type Output = $t1<$t2>;
+
+                #[inline(always)]
+                fn $fn (self, rhs: $t1<$t2>) -> Self::Output {
+                    unsafe { $t1::<$t2>::from_simd(self.into_simd() $sy rhs.into_simd()) }
+                }
+            }
+        )*
+    };
+}
 
 unsafe trait IntoSimd: SimdElement {
     fn into_simd<const N: usize> (self) -> Simd<Self, N> where LaneCount<N>: SupportedLaneCount;
@@ -116,3 +183,6 @@ unsafe impl<T> IntoSimd for T where T: SimdElement {
         Simd::from_array([self;N])
     }
 }
+
+flat_mod!(vec2, vec3, vec4);
+flat_mod!(mat2);
