@@ -1,5 +1,5 @@
 use std::ops::{Add, Sub, Mul, Div};
-use crate::{EucVec3};
+use crate::vec::{EucVec3};
 
 macro_rules! impl_inverse {
     ($trait:ident, $fn:ident, $symbol:tt, $($target:ident),*) => {

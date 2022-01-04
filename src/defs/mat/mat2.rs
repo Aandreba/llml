@@ -1,7 +1,7 @@
 import_derives!();
 
 use std::ops::{Add};
-use crate::{vec::EucVec2, others::Zero};
+use crate::{vec::EucVec2};
 
 pub type Matf2 = Mat2<f32>;
 pub type Matd2 = Mat2<f64>;
@@ -53,12 +53,13 @@ impl Matf2 {
     /// Matrix inverse. Returns ```None``` if the matrix determinant is 0, ```Some(inverse)``` otherwise 
     #[inline(always)]
     pub fn inv (self) -> Option<Self> {
-        let det = self.det();
+        todo!()
+        /*let det = self.det();
         if det.is_zero() {
             return None;
         }
 
-        Some(Self::of_values(self.y.y, -self.x.y, -self.y.x, self.x.x) / det)
+        Some(Self::of_values(self.y.y, -self.x.y, -self.y.x, self.x.x) / det)*/
     }
 }
 

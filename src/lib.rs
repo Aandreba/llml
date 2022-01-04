@@ -1,4 +1,4 @@
-#![feature(once_cell, concat_idents, core_intrinsics, stdarch, set_ptr_value)]
+#![feature(once_cell, concat_idents, core_intrinsics, set_ptr_value, portable_simd, trivial_bounds)]
 use cfg_if::cfg_if;
 
 macro_rules! flat_mod {
@@ -41,19 +41,21 @@ macro_rules! map_to_trait {
     };
 }
 
-/// Test
 flat_mod!(defs);
-cfg_if! {
+/*cfg_if! {
     if #[cfg(feature = "llml_naive")] {
         flat_mod!(naive);
     } else if #[cfg(all(target_arch = "aarch64", target_feature = "neon"))] {
+        compile_error!("Hi");
         flat_mod!(aarch64);
     } else if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), target_feature = "sse"))] {
         flat_mod!(x86);
     } else {
         flat_mod!(naive);
     }
-}
+}*/
+
+flat_mod!(simd);
 
 #[cfg(feature = "llml_derive")]
 pub mod derive {

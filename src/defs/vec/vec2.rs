@@ -1,9 +1,14 @@
-use crate::others::Complx;
+use std::ops::Div;
+use crate::others::Hypot;
 
+//use crate::others::Complx;
 import_derives!();
 
 pub type EucVecf2 = EucVec2<f32>;
 pub type EucVecd2 = EucVec2<f64>;
+pub type EucVeci2 = EucVec2<i32>;
+pub type EucVecu2 = EucVec2<u32>;
+pub type EucVecl2 = EucVec2<i64>;
 
 /// Euclidian Vector of 2 values
 #[repr(C)]
@@ -21,31 +26,7 @@ impl<T> EucVec2<T>  {
     }
 }
 
-impl EucVecf2 {
-    /// Summation of all the values inside the vector
-    #[inline(always)]
-    pub fn sum (self) -> f32 {
-        self.x + self.y
-    }
-
-    /// Returns ```norm(self)^2```
-    #[inline(always)]
-    pub fn norm2 (self) -> f32 {
-        self.dot(self)
-    }
-
-    /// Vector length / norm
-    #[inline(always)]
-    pub fn norm (self) -> f32 {
-        self.x.hypot(self.y)
-    }
-
-    /// Unit vector
-    pub fn unit (self) -> Self {
-        self / self.norm()
-    }
-}
-
+/*
 impl<T> Into<Complx<T>> for EucVec2<T> {
     fn into(self) -> Complx<T> {
         Complx::new(self.x, self.y)
@@ -56,4 +37,4 @@ impl<T> From<Complx<T>> for EucVec2<T> {
     fn from(x: Complx<T>) -> EucVec2<T> {
         EucVec2::new(x.re, x.im)
     }
-}
+}*/

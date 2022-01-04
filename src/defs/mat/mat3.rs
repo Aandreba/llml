@@ -63,7 +63,8 @@ impl Matf3 {
     /// Matrix trace
     #[inline(always)]
     pub fn tr (self) -> f32 {
-        EucVecf3::new(self.x.x, self.y.y, self.z.z).sum()
+        todo!()
+        //EucVecf3::new(self.x.x, self.y.y, self.z.z).sum()
     }
 }
 

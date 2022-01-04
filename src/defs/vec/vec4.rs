@@ -2,6 +2,9 @@ import_derives!();
 
 pub type EucVecf4 = EucVec4<f32>;
 pub type EucVecd4 = EucVec4<f64>;
+pub type EucVeci4 = EucVec4<i32>;
+pub type EucVecu4 = EucVec4<u32>;
+pub type EucVecl4 = EucVec4<i64>;
 
 /// Euclidian Vector of 4 values
 #[repr(C)]
@@ -18,25 +21,5 @@ pub struct EucVec4<T> {
 impl<T> EucVec4<T>  {
     pub fn new (x: T, y: T, z: T, w: T) -> Self {
         Self { x, y, z, w }
-    }
-}
-
-impl EucVecf4 {
-    /// Returns ```norm(self)^2```
-    #[inline(always)]
-    pub fn norm2 (self) -> f32 {
-        self.dot(self)
-    }
-
-    /// Vector length / norm
-    #[inline(always)]
-    pub fn norm (self) -> f32 {
-        self.norm2().sqrt()
-    }
-
-    /// Unit vector
-    #[inline(always)]
-    pub fn unit (self) -> Self {
-        self / self.norm()
     }
 }

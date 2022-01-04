@@ -1,6 +1,6 @@
 use std::{arch::aarch64::{float32x2_t, vadd_f32, vsub_f32, vmul_f32, vmul_n_f32, vdiv_f32, vaddv_f32}, ops::{Add, Sub, Mul, Div}};
 use core::mem::transmute;
-use crate::EucVecf2;
+use crate::vec::EucVecf2;
 
 // FLOAT
 map_to_trait!(EucVecf2, Add, add, |x: Self, y: Self| transmute(vadd_f32(transmute(x), transmute(y))));
