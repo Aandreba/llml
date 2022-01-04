@@ -1,3 +1,5 @@
+use std::intrinsics::transmute;
+
 import_derives!();
 
 pub type EucVecf4 = EucVec4<f32>;
@@ -21,5 +23,9 @@ pub struct EucVec4<T> {
 impl<T> EucVec4<T>  {
     pub fn new (x: T, y: T, z: T, w: T) -> Self {
         Self { x, y, z, w }
+    }
+
+    pub fn from_array (array: [T;4]) -> Self where T: Copy {
+        unsafe { *(&array as *const [T;4] as *const Self) }
     }
 }

@@ -56,6 +56,7 @@ flat_mod!(defs);
 }*/
 
 flat_mod!(simd);
+mod utils;
 
 #[cfg(feature = "llml_derive")]
 pub mod derive {

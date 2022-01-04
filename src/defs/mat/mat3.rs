@@ -20,7 +20,7 @@ impl<T> Mat3<T>  {
         Self { x, y, z }
     }
 
-    pub fn of_values (
+    pub fn from_values (
         xx: T, xy: T,  xz: T,
         yx: T, yy: T, yz: T,
         zx: T, zy: T, zz: T
@@ -32,10 +32,21 @@ impl<T> Mat3<T>  {
         }
     }
 
+    pub fn from_array (array: [T;9]) -> Self where T: Copy {
+        let ptr = &array as *const [T;9] as *const EucVec3<T>;
+        unsafe {
+            Self { 
+                x: *ptr,
+                y: *ptr.add(1),
+                z: *ptr.add(2)
+            }
+        }
+    } 
+
     /// Matrix transpose
     #[inline(always)]
     pub fn transp (self) -> Self {
-        Self::of_values(
+        Self::from_values(
             self.x.x, self.y.x, self.z.x, 
             self.x.y, self.y.y, self.z.y,
             self.x.z, self.y.z, self.z.z
@@ -53,7 +64,7 @@ impl Matf3 {
         let sbsy = sb * sy;
         let sbcy = sb * cy;
 
-        Self::of_values(
+        Self::from_values(
             ca * cb, ca.mul_add(sbsy, -sa * cy), ca.mul_add(sbcy, sa * sy), 
             sa * cb, sa.mul_add(sbsy, ca * cy), sa.mul_add(sbcy, -ca * sy),
             -sb, cb * sy, cb * cy
@@ -78,7 +89,7 @@ impl Matd3 {
         let sbsy = sb * sy;
         let sbcy = sb * cy;
 
-        Self::of_values(
+        Self::from_values(
             ca * cb, ca.mul_add(sbsy, -sa * cy), ca.mul_add(sbcy, sa * sy), 
             sa * cb, sa.mul_add(sbsy, ca * cy), sa.mul_add(sbcy, -ca * sy),
             -sb, cb * sy, cb * cy

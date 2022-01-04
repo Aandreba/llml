@@ -1,5 +1,6 @@
 use std::{simd::{Simd}};
 use crate::vec::EucVec3;
+use crate::utils::copy_slice;
 
 macro_rules! into {
     () => {
@@ -25,8 +26,7 @@ macro_rules! into {
             
                 #[inline(always)]
                 pub(crate) unsafe fn from_simd (x: Simd<$target,4>) -> Self {
-                    let x = &x as *const Simd<$target,4> as *const $target;
-                    Self::new(*x, *x.add(1), *x.add(2))
+                    Self::from_array(copy_slice::<$target,4,3>(x.as_array()))
                 }
             }
 

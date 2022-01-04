@@ -1,4 +1,4 @@
-use std::{simd::SimdElement, ops::Div};
+use std::{simd::SimdElement, ops::Div, intrinsics::transmute};
 
 use crate::others::{Hypot, Sqrt};
 
@@ -24,5 +24,9 @@ pub struct EucVec3<T> {
 impl<T> EucVec3<T>  {
     pub fn new (x: T, y: T, z: T) -> Self {
         Self { x, y, z }
+    }
+
+    pub fn from_array (array: [T;3]) -> Self where T: Copy {
+        unsafe { *(&array as *const [T;3] as *const Self) }
     }
 }

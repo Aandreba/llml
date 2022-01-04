@@ -1,4 +1,4 @@
-use std::ops::Div;
+use std::{ops::Div, intrinsics::transmute};
 use crate::others::Hypot;
 
 //use crate::others::Complx;
@@ -23,6 +23,10 @@ pub struct EucVec2<T> {
 impl<T> EucVec2<T>  {
     pub fn new (x: T, y: T) -> Self {
         Self { x, y }
+    }
+
+    pub fn from_array (array: [T;2]) -> Self where T: Copy {
+        unsafe { *(&array as *const [T;2] as *const Self) }
     }
 }
 

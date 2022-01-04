@@ -20,18 +20,28 @@ impl<T> Mat2<T>  {
     pub fn new (x: EucVec2<T>, y: EucVec2<T>) -> Self {
         Self { x, y }
     }
-
-    pub fn of_values (xx: T, xy: T, yx: T, yy: T) -> Self {
+    
+    pub fn from_values (xx: T, xy: T, yx: T, yy: T) -> Self {
         Self { 
             x: EucVec2::new(xx, xy),
             y: EucVec2::new(yx, yy) 
         }
-    }   
+    }  
+
+    pub fn from_array (array: [T;4]) -> Self where T: Copy {
+        let ptr = &array as *const [T;4] as *const EucVec2<T>;
+        unsafe {
+            Self { 
+                x: *ptr,
+                y: *ptr.add(1) 
+            }
+        }
+    }  
 
     /// Matrix transpose
     #[inline(always)]
     pub fn transp (self) -> Self {
-        Self::of_values(self.x.x, self.y.x, self.x.y, self.y.y)
+        Self::from_values(self.x.x, self.y.x, self.x.y, self.y.y)
     }
 
     /// Matrix trace
@@ -47,7 +57,7 @@ impl Matf2 {
         let cos = rad.cos();
         let sin = rad.sin();
 
-        Self::of_values(cos, -sin, sin, cos)
+        Self::from_values(cos, -sin, sin, cos)
     }
 
     /// Matrix inverse. Returns ```None``` if the matrix determinant is 0, ```Some(inverse)``` otherwise 
@@ -69,6 +79,6 @@ impl Matd2 {
         let cos = rad.cos();
         let sin = rad.sin();
 
-        Self::of_values(cos, -sin, sin, cos)
+        Self::from_values(cos, -sin, sin, cos)
     }
 }
