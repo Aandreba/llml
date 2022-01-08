@@ -30,7 +30,7 @@ macro_rules! into_simd {
 
                 #[inline(always)]
                 pub(crate) unsafe fn from_simd (x: Simd<$ty,16>) -> Self {
-                    Mat3::from_array(copy_slice::<$ty,16,9>(x.as_array()))
+                    Mat3::from_array(*copy_slice::<$ty,16,9>(x.as_array()))
                 }
             } 
 
@@ -67,7 +67,8 @@ macro_rules! impl_mul {
         $(
             impl Mul for Mat3<$ty> {
                 type Output = Self;
-            
+                
+                #[inline(always)]
                 fn mul(self, rhs: Self) -> Self::Output {
                     let a = Simd::from_array([
                         self.x.x, self.x.x, self.x.x,
@@ -119,7 +120,8 @@ macro_rules! impl_mul {
             
             impl Mul<EucVec3<$ty>> for Mat3<$ty> {
                 type Output = EucVec3<$ty>;
-            
+                
+                #[inline(always)]
                 fn mul(self, rhs: EucVec3<$ty>) -> Self::Output {
                     let a = Simd::from_array([
                         self.x.x, self.y.x, self.z.x,
@@ -153,6 +155,41 @@ macro_rules! impl_mul {
     };
 }
 
+macro_rules! impl_various {
+    () => {
+        impl_various!(
+            0,
+            i8, i16, i32, i64, isize
+        );
+
+        impl_various!(
+            0.,
+            f32, f64
+        );
+    };
+
+    ($zero:literal, $($ty:ident),+) => {
+        $(
+            impl Mat3<$ty> {
+                /// Matrix determinant
+                #[inline(always)]
+                pub fn det (self) -> $ty {
+                    let neg;
+                    unsafe {
+                        neg = -self.into_simd();
+                    }
+
+                    let v1 = Simd::from_array([self.x.x, self.x.y, self.x.z, neg[2], neg[1], neg[0], $zero, $zero]);
+                    let v2 = Simd::from_array([self.y.y, self.y.z, self.y.x, self.y.y, self.y.x, self.y.z, $zero, $zero]);
+                    let v3 = Simd::from_array([self.z.z, self.z.x, self.z.y, self.z.x, self.z.z, self.z.y, $zero, $zero]);
+                    (v1 * v2 * v3).horizontal_sum()
+                }
+            }
+        )*
+    };
+}
+
 simd_mat_map!(Mat3);
 into_simd!();
 impl_mul!();
+impl_various!();

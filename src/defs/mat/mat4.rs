@@ -7,7 +7,7 @@ pub type Mati4 = Mat4<i32>;
 pub type Matu4 = Mat4<u32>;
 pub type Matl4 = Mat4<i64>;
 
-/// 3x3 Matrix
+/// 4x4 Matrix
 #[repr(C)]
 #[derive(Debug, Default, Clone, Copy)]
 #[cfg_attr(feature = "llml_serde", derive(Serialize, Deserialize))]

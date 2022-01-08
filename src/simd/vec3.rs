@@ -26,7 +26,7 @@ macro_rules! into {
             
                 #[inline(always)]
                 pub(crate) unsafe fn from_simd (x: Simd<$target,4>) -> Self {
-                    Self::from_array(copy_slice::<$target,4,3>(x.as_array()))
+                    Self::from_array(*copy_slice::<$target,4,3>(x.as_array()))
                 }
             }
 

@@ -63,10 +63,10 @@ macro_rules! impl_mul {
             
                     let m1 = a * b;
                     unsafe {
-                        let v1 = Simd::from_array(copy_slice::<$ty,64,16>(m1.as_array()));
-                        let v2 = Simd::from_array(copy_slice_w_offset::<$ty,64,16>(m1.as_array(), 16));
-                        let v3 = Simd::from_array(copy_slice_w_offset::<$ty,64,16>(m1.as_array(), 32));
-                        let v4 = Simd::from_array(copy_slice_w_offset::<$ty,64,16>(m1.as_array(), 48));
+                        let v1 = Simd::from_array(*copy_slice::<$ty,64,16>(m1.as_array()));
+                        let v2 = Simd::from_array(*copy_slice_w_offset::<$ty,64,16>(m1.as_array(), 16));
+                        let v3 = Simd::from_array(*copy_slice_w_offset::<$ty,64,16>(m1.as_array(), 32));
+                        let v4 = Simd::from_array(*copy_slice_w_offset::<$ty,64,16>(m1.as_array(), 48));
 
                         Self::from_simd(v1 + v2 + v3 + v4)
                     }
@@ -94,10 +94,10 @@ macro_rules! impl_mul {
 
                     let m1 = a * b;
                     unsafe {
-                        let v1 = Simd::from_array(copy_slice::<$ty,16,4>(m1.as_array()));
-                        let v2 = Simd::from_array(copy_slice_w_offset::<$ty,16,4>(m1.as_array(), 4));
-                        let v3 = Simd::from_array(copy_slice_w_offset::<$ty,16,4>(m1.as_array(), 8));
-                        let v4 = Simd::from_array(copy_slice_w_offset::<$ty,16,4>(m1.as_array(), 16));
+                        let v1 = Simd::from_array(*copy_slice::<$ty,16,4>(m1.as_array()));
+                        let v2 = Simd::from_array(*copy_slice_w_offset::<$ty,16,4>(m1.as_array(), 4));
+                        let v3 = Simd::from_array(*copy_slice_w_offset::<$ty,16,4>(m1.as_array(), 8));
+                        let v4 = Simd::from_array(*copy_slice_w_offset::<$ty,16,4>(m1.as_array(), 16));
 
                         EucVec4::<$ty>::from_simd(v1 + v2 + v3 + v4)
                     }

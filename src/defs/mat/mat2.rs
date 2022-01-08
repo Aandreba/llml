@@ -62,18 +62,6 @@ impl Matf2 {
 
         Self::from_values(cos, -sin, sin, cos)
     }
-
-    /// Matrix inverse. Returns ```None``` if the matrix determinant is 0, ```Some(inverse)``` otherwise 
-    #[inline(always)]
-    pub fn inv (self) -> Option<Self> {
-        todo!()
-        /*let det = self.det();
-        if det.is_zero() {
-            return None;
-        }
-
-        Some(Self::of_values(self.y.y, -self.x.y, -self.y.x, self.x.x) / det)*/
-    }
 }
 
 impl Matd2 {

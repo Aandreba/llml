@@ -29,8 +29,8 @@ macro_rules! impl_mul {
             
                     let m1 = v1 * v2;
                     unsafe {
-                        let v1 = Simd::from_array(copy_slice::<$ty,8,4>(m1.as_array()));
-                        let v2 = Simd::from_array(copy_slice_w_offset::<$ty,8,4>(m1.as_array(), 4));
+                        let v1 = Simd::from_array(*copy_slice::<$ty,8,4>(m1.as_array()));
+                        let v2 = Simd::from_array(*copy_slice_w_offset::<$ty,8,4>(m1.as_array(), 4));
                         Self::from_simd(v1 + v2)
                     }
                 }
@@ -51,8 +51,8 @@ macro_rules! impl_mul {
             
                     let m1 = v1 * v2;
                     unsafe {
-                        let v1 = Simd::from_array(copy_slice::<$ty,4,2>(m1.as_array()));
-                        let v2 = Simd::from_array(copy_slice_w_offset::<$ty,4,2>(m1.as_array(), 2));
+                        let v1 = Simd::from_array(*copy_slice::<$ty,4,2>(m1.as_array()));
+                        let v2 = Simd::from_array(*copy_slice_w_offset::<$ty,4,2>(m1.as_array(), 2));
                         EucVec2::from_simd(v1 + v2)
                     }
                 }
@@ -61,8 +61,35 @@ macro_rules! impl_mul {
     };
 }
 
+macro_rules! impl_various {
+    () => {
+        impl_various!(
+            u8, u16, u32, u64, usize,
+            i8, i16, i32, i64, isize,
+            f32, f64
+        );
+    };
+
+    ($($ty:ident),+) => {
+        $(
+            impl Mat2<$ty> {
+                /// Matrix determinant
+                #[inline(always)]
+                pub fn det (self) -> $ty {
+                    let v1 = Simd::from_array([self.x.x, self.x.y]);
+                    let v2 = Simd::from_array([self.x.y, self.y.x]);
+
+                    let m1 = v1 * v2;
+                    m1[0] - m1[1]
+                }
+            }
+        )*
+    };
+}
+
 simd_mat_map!(Mat2);
 impl_mul!();
+impl_various!();
 
 impl<T: SimdElement> Mat2<T> {
     #[inline(always)]

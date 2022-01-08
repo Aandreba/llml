@@ -26,6 +26,28 @@ macro_rules! define_norm {
     }
 }
 
+macro_rules! define_neg {
+    ($base:ident) => {
+        define_neg!(
+            $base,
+            i8, i16, i32, i64, isize,
+            f32, f64
+        );
+    };
+
+    ($base:ident, $($ty:ident),+) => {
+        $(
+            impl Neg for $base<$ty> {
+                type Output = Self;
+
+                fn neg (self) -> Self {
+                    unsafe { Self::from_simd(-self.into_simd()) }
+                }
+            }
+        )*
+    }
+}
+
 macro_rules! simd_map {
     ($base:ident) => {
         simd_map!(
@@ -34,11 +56,13 @@ macro_rules! simd_map {
             i8, i16, i32, i64, isize,
             f32, f64
         );
+
+        define_neg!($base);
     };
 
     ($base:ident, $($target:ident),+) => {
         use crate::simd::IntoSimd;
-        use std::ops::{Add, Sub, Mul, Div};
+        use std::ops::{Add, Sub, Mul, Div, Neg};
         use crate::others::{Hypot, Sqrt};
 
         $(

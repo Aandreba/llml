@@ -1,9 +1,11 @@
+use std::intrinsics::transmute;
+
 use criterion::{criterion_group, criterion_main, Criterion};
 use glam::Mat3;
 use llml::{mat::{Matf3}, vec::EucVecf3};
 use rand::random;
 
-fn inverse (c: &mut Criterion) {
+/*fn inverse (c: &mut Criterion) {
     let alpha : Matf3 = random();
     let glam = Mat3::from_cols_array(&[
         alpha.x.x, alpha.x.y, alpha.x.z,
@@ -18,14 +20,14 @@ fn inverse (c: &mut Criterion) {
     c.bench_function("Glam Mat3f inverse", |b| {
         b.iter(|| glam.inverse())
     });
-}
+}*/
 
-/*fn mul (c: &mut Criterion) {
+fn mul (c: &mut Criterion) {
     let alpha : Matf3 = random();
     let beta : Matf3 = random();
     
     c.bench_function("Naive Mat3f mul", |b| {
-        b.iter(|| Matf3::of_values(
+        b.iter(|| Matf3::from_values(
             alpha.x.x * beta.x.x + alpha.x.y * beta.y.x + alpha.x.z * beta.z.x,
             alpha.y.x * beta.x.x + alpha.y.y * beta.y.x + alpha.y.z * beta.z.x,
             alpha.z.x * beta.x.x + alpha.z.y * beta.y.x + alpha.z.z * beta.z.x,
@@ -43,7 +45,16 @@ fn inverse (c: &mut Criterion) {
     c.bench_function("Optimized Mat3f mul", |b| {
         b.iter(|| alpha * beta)
     });
-}*/
 
-criterion_group!(benches, inverse);
+    unsafe {
+        c.bench_function("Glam Mat3f mul", |b| {
+            let _a : glam::Mat3 = transmute(alpha);
+            let _b : glam::Mat3 = transmute(beta);
+
+            b.iter(|| _a * _b)
+        });
+    }
+}
+
+criterion_group!(benches, mul);
 criterion_main!(benches);
