@@ -41,7 +41,6 @@ macro_rules! map_to_trait {
     };
 }
 
-flat_mod!(defs);
 /*cfg_if! {
     if #[cfg(feature = "llml_naive")] {
         flat_mod!(naive);
@@ -55,8 +54,7 @@ flat_mod!(defs);
     }
 }*/
 
-flat_mod!(simd);
-mod utils;
+flat_mod!(arm);
 
 #[cfg(feature = "llml_derive")]
 pub mod derive {

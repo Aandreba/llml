@@ -32,21 +32,5 @@ serde_json = "1.0"
 glam = "0.20.2"
 
 [[bench]]
-name = "vec2"
-harness = false
-
-[[bench]]
 name = "vec3"
-harness = false
-
-[[bench]]
-name = "vec4"
-harness = false
-
-[[bench]]
-name = "mat2"
-harness = false
-
-[[bench]]
-name = "mat3"
 harness = false
