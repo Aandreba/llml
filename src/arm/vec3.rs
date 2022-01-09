@@ -60,32 +60,6 @@ macro_rules! impl_vec3_vs {
             }
         }
 
-        impl Index<usize> for $target {
-            type Output = $ty;
-
-            #[inline(always)]
-            fn index (&self, idx: usize) -> &$ty {
-                match idx {
-                    0 => unsafe { &*(addr_of!(self.0) as *const $ty) },
-                    1 => unsafe { &*(addr_of!(self.0) as *const $ty).add(1) },
-                    2 => &self.1,
-                    _ => panic!("Index '{}' out of bounds", idx)
-                }
-            }
-        }
-
-        impl IndexMut<usize> for $target {
-            #[inline(always)]
-            fn index_mut (&mut self, idx: usize) -> &mut $ty {
-                match idx {
-                    0 => unsafe { &mut *(addr_of_mut!(self.0) as *mut $ty) },
-                    1 => unsafe { &mut *(addr_of_mut!(self.0) as *mut $ty).add(1) },
-                    2 => &mut self.1,
-                    _ => panic!("Index '{}' out of bounds", idx)
-                }
-            }
-        }
-
         impl PartialEq for $target {
             #[inline(always)]
             fn eq (&self, rhs: &Self) -> bool {
@@ -136,8 +110,7 @@ macro_rules! impl_vec3_vs {
 wrap!(EucVecf3, float32x4_t);
 impl_vec3!(EucVecf3, f32, q, u32);
 
-
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C, align(16))]
 pub struct EucVecd3 (pub(crate) EucVecd2, pub(crate) f64);
 impl Eq for EucVecd3 {}

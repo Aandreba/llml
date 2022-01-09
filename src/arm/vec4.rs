@@ -60,38 +60,6 @@ macro_rules! impl_vec4_vv {
             }
         }
 
-        impl Index<usize> for $target {
-            type Output = $ty;
-
-            #[inline(always)]
-            fn index (&self, idx: usize) -> &$ty {
-                unsafe {
-                    match idx {
-                        0 => &*(addr_of!(self.0) as *const $ty),
-                        1 => &*(addr_of!(self.0) as *const $ty).add(1),
-                        2 => &*(addr_of!(self.1) as *const $ty),
-                        3 => &*(addr_of!(self.1) as *const $ty).add(1),
-                        _ => panic!("Index '{}' out of bounds", idx)
-                    }
-                }
-            }
-        }
-
-        impl IndexMut<usize> for $target {
-            #[inline(always)]
-            fn index_mut (&mut self, idx: usize) -> &mut $ty {
-                unsafe {
-                    match idx {
-                        0 => &mut *(addr_of_mut!(self.0) as *mut $ty),
-                        1 => &mut *(addr_of_mut!(self.0) as *mut $ty).add(1),
-                        2 => &mut *(addr_of_mut!(self.1) as *mut $ty),
-                        3 => &mut *(addr_of_mut!(self.1) as *mut $ty).add(1),
-                        _ => panic!("Index '{}' out of bounds", idx)
-                    }
-                }
-            }
-        }
-
         impl PartialEq for $target {
             #[inline(always)]
             fn eq (&self, rhs: &Self) -> bool {
@@ -142,7 +110,7 @@ macro_rules! impl_vec4_vv {
 wrap!(EucVecf4, float32x4_t);
 impl_vec4!(EucVecf4, f32, q, u32);
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C, align(16))]
 pub struct EucVecd4 (pub(crate) EucVecd2, pub(crate) EucVecd2);
 impl Eq for EucVecd4 {}

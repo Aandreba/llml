@@ -11,6 +11,7 @@ macro_rules! arm_use {
 macro_rules! wrap {
     ($($name:ident, $og:ident),+) => {
         $(
+            #[derive(Debug)]
             #[repr(transparent)]
             pub struct $name (pub(crate) $og);
 
@@ -128,8 +129,8 @@ macro_rules! impl_vec {
 macro_rules! impl_vec2 {
     ($($target:ident, $ty:ident, $eq:ident),+) => {
         $(
-            impl_vec2!(1, $target, $ty,);
-            impl_eq!($target, $ty, $eq, 2,);
+            impl_vec2!(1, $target, $ty, );
+            impl_eq!($target, $ty, $eq, 2, );
         )*
     };
 
@@ -157,42 +158,12 @@ macro_rules! impl_vec2 {
 
             #[inline(always)]
             pub fn x (&self) -> $ty {
-                unsafe { *(self as *const Self as *const $ty) }
+                unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 0) }
             }
 
             #[inline(always)]
             pub fn y (&self) -> $ty {
-                unsafe { *(self as *const Self as *const $ty).add(1) }
-            }
-        }
-
-        impl Index<usize> for $target {
-            type Output = $ty;
-
-            #[inline(always)]
-            fn index (&self, idx: usize) -> &$ty {
-                let ptr : *const $ty = self as *const Self as *const $ty;
-                unsafe {
-                    match idx {
-                        0 => &*ptr,
-                        1 => &*ptr.add(1),
-                        _ => panic!("Index '{}' out of bounds", idx)
-                    }
-                }
-            }
-        }
-
-        impl IndexMut<usize> for $target {
-            #[inline(always)]
-            fn index_mut (&mut self, idx: usize) -> &mut $ty {
-                let ptr : *mut $ty = self as *mut Self as *mut $ty;
-                unsafe {
-                    match idx {
-                        0 => &mut *ptr,
-                        1 => &mut *ptr.add(1),
-                        _ => panic!("Index '{}' out of bounds", idx)
-                    }
-                }
+                unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 1) }
             }
         }
 
@@ -237,17 +208,17 @@ macro_rules! impl_vec3 {
 
             #[inline(always)]
             pub fn x (&self) -> $ty {
-                unsafe { *(self as *const Self as *const $ty) }
+                unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 0) }
             }
 
             #[inline(always)]
             pub fn y (&self) -> $ty {
-                unsafe { *(self as *const Self as *const $ty).add(1) }
+                unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 1) }
             }
 
             #[inline(always)]
             pub fn z (&self) -> $ty {
-                unsafe { *(self as *const Self as *const $ty).add(2) }
+                unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 2) }
             }
 
             #[inline(always)]
@@ -258,38 +229,6 @@ macro_rules! impl_vec3 {
             #[inline]
             pub fn cross (self, rhs: Self) -> Self {
                 todo!()
-            }
-        }
-
-        impl Index<usize> for $target {
-            type Output = $ty;
-
-            #[inline(always)]
-            fn index (&self, idx: usize) -> &$ty {
-                let ptr : *const $ty = self as *const Self as *const $ty;
-                unsafe {
-                    match idx {
-                        0 => &*ptr,
-                        1 => &*ptr.add(1),
-                        2 => &*ptr.add(2),
-                        _ => panic!("Index '{}' out of bounds", idx)
-                    }
-                }
-            }
-        }
-
-        impl IndexMut<usize> for $target {
-            #[inline(always)]
-            fn index_mut (&mut self, idx: usize) -> &mut $ty {
-                let ptr : *mut $ty = self as *mut Self as *mut $ty;
-                unsafe {
-                    match idx {
-                        0 => &mut *ptr,
-                        1 => &mut *ptr.add(1),
-                        2 => &mut *ptr.add(2),
-                        _ => panic!("Index '{}' out of bounds", idx)
-                    }
-                }
             }
         }
 
@@ -334,61 +273,27 @@ macro_rules! impl_vec4 {
 
             #[inline(always)]
             pub fn x (&self) -> $ty {
-                unsafe { *(self as *const Self as *const $ty) }
+                unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 0) }
             }
 
             #[inline(always)]
             pub fn y (&self) -> $ty {
-                unsafe { *(self as *const Self as *const $ty).add(1) }
+                unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 1) }
             }
 
             #[inline(always)]
             pub fn z (&self) -> $ty {
-                unsafe { *(self as *const Self as *const $ty).add(2) }
+                unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 2) }
             }
 
             #[inline(always)]
             pub fn w (&self) -> $ty {
-                unsafe { *(self as *const Self as *const $ty).add(3) }
+                unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 3) }
             }
 
             #[inline(always)]
             pub fn dot (self, rhs: Self) -> $ty {
                 (self * rhs).sum()
-            }
-        }
-
-        impl Index<usize> for $target {
-            type Output = $ty;
-
-            #[inline(always)]
-            fn index (&self, idx: usize) -> &$ty {
-                let ptr : *const $ty = self as *const Self as *const $ty;
-                unsafe {
-                    match idx {
-                        0 => &*ptr,
-                        1 => &*ptr.add(1),
-                        2 => &*ptr.add(2),
-                        3 => &*ptr.add(3),
-                        _ => panic!("Index '{}' out of bounds", idx)
-                    }
-                }
-            }
-        }
-
-        impl IndexMut<usize> for $target {
-            #[inline(always)]
-            fn index_mut (&mut self, idx: usize) -> &mut $ty {
-                let ptr : *mut $ty = self as *mut Self as *mut $ty;
-                unsafe {
-                    match idx {
-                        0 => &mut *ptr,
-                        1 => &mut *ptr.add(1),
-                        2 => &mut *ptr.add(2),
-                        3 => &mut *ptr.add(3),
-                        _ => panic!("Index '{}' out of bounds", idx)
-                    }
-                }
             }
         }
 
@@ -402,3 +307,4 @@ macro_rules! impl_vec4 {
 }
 
 flat_mod!(vec2, vec3, vec4);
+flat_mod!(mat2);
