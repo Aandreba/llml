@@ -59,11 +59,6 @@ macro_rules! impl_vec {
             pub fn sum (self) -> $ty {
                 unsafe { concat_idents!(vaddv, _, $ty)(self.0) }
             }
-
-            #[inline(always)]
-            pub fn dot (self, rhs: Self) -> $ty {
-                (self * rhs).sum()
-            }
         }
     };
     
@@ -164,6 +159,11 @@ macro_rules! impl_vec2 {
             #[inline(always)]
             pub fn y (&self) -> $ty {
                 unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 1) }
+            }
+
+            #[inline(always)]
+            pub fn dot (self, rhs: Self) -> $ty {
+                (self * rhs).sum()
             }
         }
 

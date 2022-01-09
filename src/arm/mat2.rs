@@ -28,7 +28,7 @@ macro_rules! impl_mat_scal {
 }
 
 macro_rules! impl_mat {
-    ($($target:ident, $vec:ident, $ty:ident),+) => {
+    ($($target:ident, $og:ident, $vec:ident, $ty:ident),+) => {
         $(
             impl_mat!(
                 1, $target, $ty,
@@ -48,6 +48,29 @@ macro_rules! impl_mat {
                     Self::new(
                         self.0.x(), self.0.z(), 
                         self.0.y(), self.0.w()
+                    )
+                }
+
+                #[inline(always)]
+                pub fn tr (self) -> $ty {
+                    self.0.x() + self.0.w()
+                }
+
+                #[inline(always)]
+                pub fn inv (self) -> Self {
+                    let neg = -$vec::new(self.0.y(), self.0.z());
+                    Self($og::new(self.0.w(), neg.x(), neg.y(), self.0.x()) / self.det())
+                }
+            }
+
+            impl Mul<$vec> for $target {
+                type Output = $vec;
+            
+                #[inline(always)]
+                fn mul (self, rhs: $vec) -> Self::Output {
+                    $vec::new(
+                        self.x().dot(rhs),
+                        self.y().dot(rhs)
                     )
                 }
             }
@@ -102,8 +125,8 @@ mat_wrap!(
 );
 
 impl_mat!(
-    Matf2, EucVecf2, f32,
-    Matd2, EucVecd2, f64
+    Matf2, EucVecf4, EucVecf2, f32,
+    Matd2, EucVecd4, EucVecd2, f64
 );
 
 // FLOAT
@@ -119,20 +142,9 @@ impl Matf2 {
     }
 
     #[inline(always)]
-    pub fn tr (self) -> f32 {
-        self.0.x() + self.0.w()
-    }
-
-    //[inline(always)]
     pub fn det (self) -> f32 {
-        let m1 = self.x() * EucVecf2(unsafe { vrev64_f32(self.y().0) });
+        let m1 = unsafe { self.x() * EucVecf2(vrev64_f32(self.y().0)) };
         m1.x() - m1.y()
-    }
-
-    #[inline(always)]
-    pub fn inv (self) -> Self {
-        let neg = -EucVecf2::new(self.0.y(), self.0.z());
-        Self(EucVecf4::new(self.0.w(), neg.x(), neg.y(), self.0.x()) / self.det())
     }
 }
 
@@ -158,29 +170,44 @@ impl Mul for Matf2 {
     }
 }
 
-impl Mul<EucVecf2> for Matf2 {
-    type Output = EucVecf2;
-
-    #[inline(always)]
-    fn mul(self, rhs: EucVecf2) -> Self::Output {
-        unsafe {
-            EucVecf2::new(
-                self.x().dot(rhs),
-                self.y().dot(rhs)
-            )
-        }
-    }
-}
-
 // DOUBLE
 impl Matd2 {
     #[inline(always)]
     pub fn x (&self) -> EucVecd2 {
-        self.0.0.clone()
+        self.0.0
     }
 
     #[inline(always)]
     pub fn y (&self) -> EucVecd2 {
-        self.0.1.clone()
+        self.0.1
+    }
+
+    #[inline(always)]
+    pub fn det (self) -> f64 {
+        let y = self.y();
+        let m1 = self.x() * EucVecd2::new(y.y(), y.x());
+        m1.x() - m1.y()
+    }
+}
+
+impl Mul for Matd2 {
+    type Output = Self;
+
+    #[inline(always)]
+    fn mul (self, rhs: Self) -> Self::Output {
+        let x = rhs.x();
+        let y = rhs.y();
+
+        unsafe {
+            let v1 = EucVecd4(EucVecd2(vld1q_dup_f64(&self.0.x())), EucVecd2(vld1q_dup_f64(&self.0.y())));
+            let v2 = EucVecd4(x, x);
+            let m1 = v1 * v2;
+
+            let v3 = EucVecd4(EucVecd2(vld1q_dup_f64(&self.0.z())), EucVecd2(vld1q_dup_f64(&self.0.w())));
+            let v4 = EucVecd4(y, y);
+            let m2 = v3 * v4;
+
+            Self(m1 + m2)
+        }
     }
 }
