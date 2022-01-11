@@ -1,4 +1,4 @@
-#![feature(once_cell, concat_idents, core_intrinsics, set_ptr_value, portable_simd, trivial_bounds)]
+#![feature(once_cell, concat_idents, core_intrinsics, set_ptr_value, portable_simd, trivial_bounds, generic_const_exprs)]
 use cfg_if::cfg_if;
 
 macro_rules! flat_mod {
@@ -40,6 +40,8 @@ macro_rules! map_to_trait {
         }
     };
 }
+
+pub mod traits;
 
 /*cfg_if! {
     if #[cfg(feature = "llml_naive")] {

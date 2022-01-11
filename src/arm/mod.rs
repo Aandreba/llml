@@ -306,5 +306,6 @@ macro_rules! impl_vec4 {
     };
 }
 
+flat_mod!(complex);
 flat_mod!(vec2, vec3, vec4);
-flat_mod!(mat2);
+flat_mod!(mat2, mat3);

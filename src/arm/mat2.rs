@@ -1,6 +1,7 @@
 use std::ptr::addr_of;
 use std::{ops::{Add, Sub, Mul, Div, Neg, Index, IndexMut}};
-use crate::{EucVecf2, EucVecf4, EucVecd2, EucVecd4};
+use crate::traits::Zero;
+use crate::{EucVecf2, EucVecf4, EucVecd2, EucVecd4, Complxf};
 arm_use!();
 
 macro_rules! impl_mat_scal {
@@ -44,34 +45,8 @@ macro_rules! impl_mat {
 
             impl $target {
                 #[inline(always)]
-                pub fn transp (self) -> Self {
-                    Self::new(
-                        self.0.x(), self.0.z(), 
-                        self.0.y(), self.0.w()
-                    )
-                }
-
-                #[inline(always)]
                 pub fn tr (self) -> $ty {
                     self.0.x() + self.0.w()
-                }
-
-                #[inline(always)]
-                pub fn inv (self) -> Self {
-                    let neg = -$vec::new(self.0.y(), self.0.z());
-                    Self($og::new(self.0.w(), neg.x(), neg.y(), self.0.x()) / self.det())
-                }
-            }
-
-            impl Mul<$vec> for $target {
-                type Output = $vec;
-            
-                #[inline(always)]
-                fn mul (self, rhs: $vec) -> Self::Output {
-                    $vec::new(
-                        self.x().dot(rhs),
-                        self.y().dot(rhs)
-                    )
                 }
             }
 
@@ -112,7 +87,7 @@ macro_rules! mat_wrap {
             impl $target {
                 #[inline]
                 pub fn new (xx: $ty, xy: $ty, yx: $ty, yy: $ty) -> Self {
-                    Self($og::new(xx, xy, yx, yy))
+                    Self($og::new(xx, yx, xy, yy))
                 }
             }
         )*
@@ -120,31 +95,117 @@ macro_rules! mat_wrap {
 }
 
 mat_wrap!(
-    Matf2, EucVecf4, f32,
-    Matd2, EucVecd4, f64
+    Matf2, EucVecf4, f32
 );
 
 impl_mat!(
-    Matf2, EucVecf4, EucVecf2, f32,
-    Matd2, EucVecd4, EucVecd2, f64
+    Matf2, EucVecf4, EucVecf2, f32
 );
 
 // FLOAT
 impl Matf2 {
     #[inline(always)]
-    pub fn x (&self) -> EucVecf2 {
+    pub fn from_cols (x: EucVecf2, y: EucVecf2) -> Self {
+        unsafe { Self(EucVecf4(vcombine_f32(x.0, y.0))) }
+    }
+
+    #[inline(always)]
+    pub fn col_x (&self) -> EucVecf2 {
         unsafe { EucVecf2(vget_low_f32(self.0.0)) }
     }
 
     #[inline(always)]
-    pub fn y (&self) -> EucVecf2 {
+    pub fn col_y (&self) -> EucVecf2 {
         unsafe { EucVecf2(vget_high_f32(self.0.0)) }
     }
 
     #[inline(always)]
+    pub fn transp (self) -> Self {
+        unsafe {
+            let x = vget_low_f32(self.0.0);
+            let y = vget_high_f32(self.0.0);
+            Self(EucVecf4(vcombine_f32(vtrn1_f32(x, y), vtrn2_f32(x, y))))
+        }
+    }
+
+    #[inline(always)]
     pub fn det (self) -> f32 {
-        let m1 = unsafe { self.x() * EucVecf2(vrev64_f32(self.y().0)) };
-        m1.x() - m1.y()
+        unsafe {
+            let x = vget_low_f32(self.0.0);
+            let y = vget_high_f32(self.0.0);
+    
+            let v1 = vtrn1_f32(x, y);
+            let v2 = vrev64_f32(vtrn2_f32(x, y));
+            let v2 = vset_lane_f32(-vdups_lane_f32(v2, 1), v2, 1);
+
+            EucVecf2(v1).dot(EucVecf2(v2))
+        }
+    }
+
+    //#[inline(always)]
+    pub fn inv (self) -> Option<Self> {
+        unsafe {
+            let x = vget_low_f32(self.0.0);
+            let y = vget_high_f32(self.0.0);
+
+            let v1 = vtrn1_f32(x, y);
+            let v2 = vrev64_f32(vtrn2_f32(x, y));
+
+            let neg_c = -vdups_lane_f32(v2, 1);
+            let v2 = vset_lane_f32(neg_c, v2, 1);
+
+            let det = EucVecf2(v1).dot(EucVecf2(v2));
+            if det.is_zero() {
+                return None
+            }
+
+            Some(Matf2::new(
+                vdups_lane_f32(v2, 0), 
+                -vdups_lane_f32(v1, 1),
+                neg_c,
+                vdups_lane_f32(v1, 0)
+            ) / det)
+        }
+    }
+
+    #[inline(always)]
+    pub unsafe fn inv_unchecked (self) -> Self {
+        let x = vget_low_f32(self.0.0);
+        let y = vget_high_f32(self.0.0);
+
+        let v1 = vtrn1_f32(x, y);
+        let v2 = vrev64_f32(vtrn2_f32(x, y));
+
+        let neg_c = -vdups_lane_f32(v2, 1);
+        let v2 = vset_lane_f32(neg_c, v2, 1);
+
+        let det = EucVecf2(v1).dot(EucVecf2(v2));
+        Matf2::new(
+            vdups_lane_f32(v2, 0), 
+            -vdups_lane_f32(v1, 1),
+            neg_c,
+            vdups_lane_f32(v1, 0)
+        ) / det
+    }
+
+    #[inline(always)]
+    pub fn eigvals (self) -> [Complxf;2] {
+        todo!()
+    }
+}
+
+impl Mul<EucVecf2> for Matf2 {
+    type Output = EucVecf2;
+
+    #[inline(always)]
+    fn mul (self, rhs: EucVecf2) -> Self::Output {
+        unsafe {
+            let mul = self.0 * EucVecf4(vcombine_f32(vld1_dup_f32(&rhs.x()), vld1_dup_f32(&rhs.y())));
+            let m1 = vget_low_f32(mul.0);
+            let m2 = vget_high_f32(mul.0);
+
+            EucVecf2(m1) + EucVecf2(m2)
+        }
     }
 }
 
@@ -153,61 +214,11 @@ impl Mul for Matf2 {
 
     #[inline(always)]
     fn mul (self, rhs: Self) -> Self::Output {
-        let x = rhs.x();
-        let y = rhs.y();
+        let x = self * rhs.col_x();
+        let y = self * rhs.col_y();
 
         unsafe {
-            let v1 = vcombine_f32(vld1_dup_f32(&self.0.x()), vld1_dup_f32(&self.0.z()));
-            let v2 = vcombine_f32(x.0, x.0);
-            let m1 = EucVecf4(v1) * EucVecf4(v2);
-
-            let v3 = vcombine_f32(vld1_dup_f32(&self.0.y()), vld1_dup_f32(&self.0.w()));
-            let v4 = vcombine_f32(y.0, y.0);
-            let m2 = EucVecf4(v3) * EucVecf4(v4);
-
-            Self(m1 + m2)
-        }
-    }
-}
-
-// DOUBLE
-impl Matd2 {
-    #[inline(always)]
-    pub fn x (&self) -> EucVecd2 {
-        self.0.0
-    }
-
-    #[inline(always)]
-    pub fn y (&self) -> EucVecd2 {
-        self.0.1
-    }
-
-    #[inline(always)]
-    pub fn det (self) -> f64 {
-        let y = self.y();
-        let m1 = self.x() * EucVecd2::new(y.y(), y.x());
-        m1.x() - m1.y()
-    }
-}
-
-impl Mul for Matd2 {
-    type Output = Self;
-
-    #[inline(always)]
-    fn mul (self, rhs: Self) -> Self::Output {
-        let x = rhs.x();
-        let y = rhs.y();
-
-        unsafe {
-            let v1 = EucVecd4(EucVecd2(vld1q_dup_f64(&self.0.x())), EucVecd2(vld1q_dup_f64(&self.0.y())));
-            let v2 = EucVecd4(x, x);
-            let m1 = v1 * v2;
-
-            let v3 = EucVecd4(EucVecd2(vld1q_dup_f64(&self.0.z())), EucVecd2(vld1q_dup_f64(&self.0.w())));
-            let v4 = EucVecd4(y, y);
-            let m2 = v3 * v4;
-
-            Self(m1 + m2)
+            Self(EucVecf4(vcombine_f32(x.0, y.0)))
         }
     }
 }
