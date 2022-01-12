@@ -1,30 +1,8 @@
-#![feature(asm, asm_const)]
-
-use std::arch::asm;
+use llml::{EucVecf4, EucVecd4};
 
 fn main () {
-    let alpha = &[1f32, 2.] as *const [f32;2] as *const f32;
-    let beta : u64;
+    let alpha= EucVecf4::new(1., 2., 3., 4.);
+    let beta : EucVecd4 = alpha.into();
 
-    unsafe {
-        asm!(
-            "add {0}, {1}, {1}",
-            out(reg) beta,
-            in(reg) alpha
-        );
-
-        println!("{:?}", *(beta as *const [f32;2]));
-    }
+    println!("{:?} {:?}", alpha, beta);
 }
-
-/*fn main () {
-    unsafe {
-        let a : float32x2_t = transmute([1f32, 2.]);
-        let b : float32x2_t = transmute([1f32, 2.]);
-
-        let c : [f32;2] = transmute(vadd_f32(a, b));
-        if c[0] == 2. {
-            panic!()
-        }
-    }
-}*/

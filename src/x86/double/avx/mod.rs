@@ -1,0 +1,1 @@
+flat_mod!(vec3, vec4);

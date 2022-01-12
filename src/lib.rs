@@ -1,4 +1,6 @@
-#![feature(once_cell, concat_idents, core_intrinsics, set_ptr_value, portable_simd, trivial_bounds, generic_const_exprs)]
+#![feature(once_cell, concat_idents, core_intrinsics, set_ptr_value, portable_simd, trivial_bounds, stdsimd)]
+#![cfg_attr(any(target_arch = "x86", target_arch = "x86_64"), feature(stdarch))]
+
 use cfg_if::cfg_if;
 
 macro_rules! flat_mod {
@@ -43,20 +45,15 @@ macro_rules! map_to_trait {
 
 pub mod traits;
 
-/*cfg_if! {
-    if #[cfg(feature = "llml_naive")] {
-        flat_mod!(naive);
-    } else if #[cfg(all(target_arch = "aarch64", target_feature = "neon"))] {
-        compile_error!("Hi");
-        flat_mod!(aarch64);
+cfg_if! {
+    if #[cfg(all(any(target_arch = "arm", target_arch = "aarch64"), target_feature = "neon"))] {
+        flat_mod!(arm);
     } else if #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), target_feature = "sse"))] {
         flat_mod!(x86);
     } else {
-        flat_mod!(naive);
+        compile_error!("LLML not available for this target");
     }
-}*/
-
-flat_mod!(arm);
+}
 
 #[cfg(feature = "llml_derive")]
 pub mod derive {

@@ -1,19 +1,44 @@
-use std::{ops::{Add, Sub, Mul, Div}};
-use_arch_x86!(_mm_set_ps);
+x86_use!();
+use std::ops::{Add, Sub, Mul, Div, Neg};
 
-impl_vecf!(
-    EucVecf2, 
-    |x: Self| _mm_set_ps(0., 0., x.y, x.x),
-    |x: __m128| {
-        let ptr = &x as *const __m128 as *const f32;
-        Self::new(*ptr, *ptr.add(1))
-    }
-);
+use crate::EucVecd2;
+
+#[derive(Debug)]
+#[repr(transparent)]
+pub struct EucVecf2 (pub(crate) __m128);
+impl_arith_sse!(EucVecf2, f32);
 
 impl EucVecf2 {
-    // Vector dot product
+    #[inline(always)]
+    pub fn new (x: f32, y: f32) -> Self {
+        unsafe { Self(_mm_set_ps(0., 0., y, x)) }
+    }
+
+    #[inline(always)]
+    pub fn x (&self) -> f32 {
+        unsafe { _mm_cvtss_f32(self.0) }
+    }
+
+    #[inline(always)]
+    pub fn y (&self) -> f32 {
+        unsafe { _mm_cvtss_f32(_mm_shuffle_ps(self.0, self.0, _MM_SHUFFLE(1, 1, 1, 1))) }
+    }
+
+    #[inline(always)]
+    pub fn sum (self) -> f32 {
+        self.x() + self.y()
+    }
+
     #[inline(always)]
     pub fn dot (self, rhs: Self) -> f32 {
         (self * rhs).sum()
-    } 
+    }
+}
+
+#[cfg(target_feature = "sse2")]
+impl Into<EucVecd2> for EucVecf2 {
+    #[inline(always)]
+    fn into (self) -> EucVecd2 {
+        unsafe { EucVecd2(_mm_cvtps_pd(self.0)) }
+    }
 }
