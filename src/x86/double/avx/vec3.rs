@@ -55,3 +55,10 @@ impl PartialEq for EucVecd3 {
         }
     }
 }
+
+impl Into<EucVecf3> for EucVecd3 {
+    #[inline(always)]
+    fn into (self) -> EucVecf3 {
+        unsafe { EucVecf4(_mm256_cvtpd_ps(self.0)) }
+    }
+}

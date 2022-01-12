@@ -52,7 +52,7 @@ impl Into<EucVecd4> for EucVecf4 {
     fn into (self) -> EucVecd4 {
         cfg_if! {
             if #[cfg(target_feature = "avx")] { 
-                todo!()
+                unsafe { EucVecf4(_mm256_cvtps_pd(self.0)) }
             } else {
                 unsafe { 
                     EucVecd4(

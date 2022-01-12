@@ -1,4 +1,5 @@
-use crate::EucVecd2;
+x86_use!();
+use crate::{EucVecd2, EucVecf4};
 use std::ops::{Add, Sub, Mul, Div, Neg};
 
 #[derive(Debug)]
@@ -40,5 +41,13 @@ impl EucVecd4 {
     #[inline(always)]
     pub fn dot (self, rhs: Self) -> f64 {
         (self * rhs).sum()
+    }
+}
+
+impl Into<EucVecf4> for EucVecd4 {
+    fn into (self) -> EucVecf4 {
+        unsafe {
+            EucVecf4(_mm_shuffle_ps(_mm_cvtpd_ps(self.0.0),  _mm_cvtpd_ps(self.1.0), _MM_SHUFFLE(1, 0, 1, 0)))
+        }
     }
 }

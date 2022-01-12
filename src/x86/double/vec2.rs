@@ -1,6 +1,8 @@
 x86_use!();
 use std::ops::{Add, Sub, Mul, Div, Neg};
 
+use crate::{EucVecf4, EucVecf2};
+
 #[derive(Debug)]
 #[repr(transparent)]
 pub struct EucVecd2 (pub(crate) __m128d);
@@ -30,5 +32,12 @@ impl EucVecd2 {
     #[inline(always)]
     pub fn dot (self, rhs: Self) -> f64 {
         (self * rhs).sum()
+    }
+}
+
+impl Into<EucVecf2> for EucVecd2 {
+    #[inline(always)]
+    fn into(self) -> EucVecf2 {
+        unsafe { EucVecf2(_mm_cvtpd_ps(self.0)) }
     }
 }
