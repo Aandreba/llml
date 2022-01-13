@@ -12,8 +12,7 @@ categories = ["data-structures", "hardware-support", "mathematics"]
 [features]
 llml_serde = ["serde"]
 llml_rand = ["rand", "randerive"]
-llml_derive = ["llml_derive_crate"]
-llml_naive = []
+llml_half = []
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

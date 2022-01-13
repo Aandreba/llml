@@ -1,3 +1,5 @@
+use cfg_if::cfg_if;
+
 macro_rules! x86_use {
     () => {
         #[cfg(target_arch = "x86")]
@@ -8,11 +10,9 @@ macro_rules! x86_use {
     };
 }
 
-pub(crate) type __m128s = __m128;
-
 macro_rules! impl_arith {
     ($target:ident, f32) => {
-        use crate::__m128s;
+        type __m128s = __m128;
         impl_arith!($target, f32, s, m);
     };
 
@@ -117,6 +117,7 @@ macro_rules! impl_arith_sse {
 
 x86_use!();
 flat_mod!(vec2, vec3, vec4);
+flat_mod!(mat);
 
 #[cfg(target_feature = "sse2")]
 flat_mod!(double);

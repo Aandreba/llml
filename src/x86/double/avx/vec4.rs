@@ -1,6 +1,6 @@
 x86_use!();
 use std::ops::{Add, Sub, Mul, Div, Neg};
-use crate::EucVecd2;
+use crate::{EucVecd2, EucVecf4};
 
 #[derive(Debug)]
 #[repr(transparent)]

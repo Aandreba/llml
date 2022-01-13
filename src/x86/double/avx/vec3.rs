@@ -1,6 +1,6 @@
 x86_use!();
 use std::ops::{Add, Sub, Mul, Div, Neg};
-use crate::EucVecd2;
+use crate::{EucVecd2, EucVecf4, EucVecf3};
 
 #[derive(Debug)]
 #[repr(transparent)]
@@ -59,6 +59,6 @@ impl PartialEq for EucVecd3 {
 impl Into<EucVecf3> for EucVecd3 {
     #[inline(always)]
     fn into (self) -> EucVecf3 {
-        unsafe { EucVecf4(_mm256_cvtpd_ps(self.0)) }
+        unsafe { EucVecf3(_mm256_cvtpd_ps(self.0)) }
     }
 }
