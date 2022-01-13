@@ -76,7 +76,16 @@ impl Matf2 {
             return None
         }
 
-        todo!()
+        unsafe {
+            let neg = EucVecf4(_mm_sub_ps(_mm_setzero_ps(), _mm_shuffle_ps(self.0.0, self.0.0, _MM_SHUFFLE(0, 0, 2, 1))));
+            Some(Self(EucVecf4::new(self.0.w(), neg.x(), neg.y(), self.0.x()) / det))
+        }
+    }
+
+    #[inline(always)]
+    pub unsafe fn inv_unsafe (self) -> Self {
+        let neg = EucVecf4(_mm_sub_ps(_mm_setzero_ps(), _mm_shuffle_ps(self.0.0, self.0.0, _MM_SHUFFLE(0, 0, 2, 1))));
+        Self(EucVecf4::new(self.0.w(), neg.x(), neg.y(), self.0.x()) / self.det())
     }
 }
 

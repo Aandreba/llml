@@ -73,9 +73,7 @@ macro_rules! impl_arith {
 
             #[inline(always)]
             fn $fun (self, rhs: $ty) -> Self::Output {
-                unsafe {
-                    Self(concat_idents!(_m, $tag, _, $fun, _p, $sub)(self.0, concat_idents!(_m, $tag, _set1_p, $sub)(rhs)))
-                }
+                self.$fun(Self::from_scalar(rhs))
             }
         }
 
@@ -84,9 +82,7 @@ macro_rules! impl_arith {
 
             #[inline(always)]
             fn $fun (self, rhs: $target) -> Self::Output {
-                unsafe {
-                    $target(concat_idents!(_m, $tag, _, $fun, _p, $sub)(concat_idents!(_m, $tag, _set1_p, $sub)(self), rhs.0))
-                }
+                $target::from_scalar(self).$fun(rhs)
             }
         }
     }

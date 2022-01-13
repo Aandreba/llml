@@ -16,6 +16,11 @@ impl EucVecf4 {
     }
 
     #[inline(always)]
+    pub fn from_scalar (x: f32) -> Self {
+        unsafe { Self(_mm_set1_ps(x)) }
+    }
+
+    #[inline(always)]
     pub fn x (&self) -> f32 {
         unsafe { _mm_cvtss_f32(self.0) }
     }
