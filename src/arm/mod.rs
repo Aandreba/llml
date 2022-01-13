@@ -306,6 +306,61 @@ macro_rules! impl_vec4 {
     };
 }
 
-flat_mod!(complex);
+macro_rules! impl_mat2 {
+    ($target:ident, $ty:ident) => {
+        impl_mat2!(
+            $target, $ty,
+            Add, add,
+            Sub, sub
+        );
+
+        impl_mat2_scal!(
+            $target, $ty,
+            Mul, mul,
+            Div, div
+        );
+    };
+
+    ($target:ident, $ty:ident, $($trait:ident, $fun:ident),+) => {
+        $(
+            impl $trait for $target {
+                type Output = Self;
+
+                #[inline(always)]
+                fn $fun (self, rhs: Self) -> Self::Output {
+                    Self(self.0.$fun(rhs.0))
+                }
+            }
+
+            impl_mat2_scal!($target, $ty, $trait, $fun);
+        )*
+    };
+}
+
+macro_rules! impl_mat2_scal {
+    ($target:ident, $ty:ident, $($trait:ident, $fun:ident),+) => {
+        $(
+            impl $trait<$ty> for $target {
+                type Output = Self;
+
+                #[inline(always)]
+                fn $fun (self, rhs: $ty) -> Self::Output {
+                    Self(self.0.$fun(rhs))
+                }
+            }
+
+            impl $trait<$target> for $ty {
+                type Output = $target;
+
+                #[inline(always)]
+                fn $fun (self, rhs: $target) -> Self::Output {
+                    $target(self.$fun(rhs.0))
+                }
+            }
+        )*
+    };
+}
+
+flat_mod!(double, complex);
 flat_mod!(vec2, vec3, vec4);
 flat_mod!(mat2);
