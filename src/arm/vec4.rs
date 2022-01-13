@@ -114,5 +114,26 @@ impl_vec4!(EucVecf4, f32, q, u32);
 #[repr(C, align(16))]
 pub struct EucVecd4 (pub(crate) EucVecd2, pub(crate) EucVecd2);
 impl Eq for EucVecd4 {}
-
 impl_vec4_vv!(EucVecd4, f64, q);
+
+impl Into<EucVecf4> for EucVecd4 {
+    #[inline(always)]
+    fn into (self) -> EucVecf4 {
+        unsafe {
+            let xy = vcvt_f32_f64(self.0.0);
+            let zw = vcvt_f32_f64(self.1.0);
+            EucVecf4(vcombine_f32(xy, zw))
+        }
+    }
+}
+
+impl Into<EucVecd4> for EucVecf4 {
+    #[inline(always)]
+    fn into(self) -> EucVecd4 {
+        unsafe {
+            let xy = vcvt_f64_f32(vget_low_f32(self.0));
+            let zw = vcvt_f64_f32(vget_high_f32(self.0));
+            EucVecd4(EucVecd2(xy), EucVecd2(zw))
+        }
+    }
+}

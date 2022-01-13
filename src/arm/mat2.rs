@@ -87,7 +87,7 @@ macro_rules! mat_wrap {
             impl $target {
                 #[inline]
                 pub fn new (xx: $ty, xy: $ty, yx: $ty, yy: $ty) -> Self {
-                    Self($og::new(xx, yx, xy, yy))
+                    Self($og::new(xx, zy, xy, yy))
                 }
             }
         )*
@@ -166,31 +166,6 @@ impl Matf2 {
                 vdups_lane_f32(v1, 0)
             ) / det)
         }
-    }
-
-    #[inline(always)]
-    pub unsafe fn inv_unchecked (self) -> Self {
-        let x = vget_low_f32(self.0.0);
-        let y = vget_high_f32(self.0.0);
-
-        let v1 = vtrn1_f32(x, y);
-        let v2 = vrev64_f32(vtrn2_f32(x, y));
-
-        let neg_c = -vdups_lane_f32(v2, 1);
-        let v2 = vset_lane_f32(neg_c, v2, 1);
-
-        let det = EucVecf2(v1).dot(EucVecf2(v2));
-        Matf2::new(
-            vdups_lane_f32(v2, 0), 
-            -vdups_lane_f32(v1, 1),
-            neg_c,
-            vdups_lane_f32(v1, 0)
-        ) / det
-    }
-
-    #[inline(always)]
-    pub fn eigvals (self) -> [Complxf;2] {
-        todo!()
     }
 }
 

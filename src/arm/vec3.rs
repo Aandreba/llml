@@ -1,8 +1,8 @@
 arm_use!();
 use core::mem::transmute;
-use std::ptr::{addr_of, addr_of_mut};
-use std::{ops::{Add, Sub, Mul, Div, Neg, Index, IndexMut}};
-use crate::EucVecd2;
+use std::ptr::{addr_of};
+use std::{ops::{Add, Sub, Mul, Div, Neg}};
+use crate::{EucVecd2};
 
 macro_rules! impl_vec3_vs {
     ($target:ident, $ty:ident, $tag:ident) => {
@@ -114,5 +114,26 @@ impl_vec3!(EucVecf3, f32, q, u32);
 #[repr(C, align(16))]
 pub struct EucVecd3 (pub(crate) EucVecd2, pub(crate) f64);
 impl Eq for EucVecd3 {}
-
 impl_vec3_vs!(EucVecd3, f64, q);
+
+impl Into<EucVecf3> for EucVecd3 {
+    #[inline(always)]
+    fn into(self) -> EucVecf3 {
+        unsafe { 
+            let xy = vcvt_f32_f64(self.0.0);
+            let z = vld1_f32(&[self.1 as f32, 0.] as *const [f32;2] as *const f32);
+            EucVecf3(vcombine_f32(xy, z))
+        }
+    }
+}
+
+impl Into<EucVecd3> for EucVecf3 {
+    #[inline(always)]
+    fn into(self) -> EucVecd3 {
+        unsafe {
+            let xy = vcvt_f64_f32(vget_low_f32(self.0));
+            let z = self.z() as f64;
+            EucVecd3(EucVecd2(xy), z)
+        }
+    }
+}

@@ -10,3 +10,17 @@ wrap!(
 
 impl_vec2!(EucVecf2, f32, u32);
 impl_vec2!(EucVecd2, f64, q, u64);
+
+impl Into<EucVecf2> for EucVecd2 {
+    #[inline(always)]
+    fn into(self) -> EucVecf2 {
+        unsafe { EucVecf2(vcvt_f32_f64(self.0)) }
+    }
+}
+
+impl Into<EucVecd2> for EucVecf2 {
+    #[inline(always)]
+    fn into(self) -> EucVecd2 {
+        unsafe { EucVecd2(vcvt_f64_f32(self.0)) }
+    }
+}
