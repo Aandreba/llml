@@ -20,6 +20,11 @@ macro_rules! impl_vec3_vs {
                 unsafe { Self(transmute([x, y]), z) }
             }
 
+            #[inline]
+            pub fn from_scalar (x: $ty) -> Self {
+                Self::new(x, x, x)
+            }
+
             #[inline(always)]
             pub fn x (&self) -> $ty {
                 self.0.x()

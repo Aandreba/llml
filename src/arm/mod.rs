@@ -106,7 +106,7 @@ macro_rules! impl_vec {
 
             #[inline(always)]
             fn $fun (self, rhs: $ty) -> Self::Output {
-                unsafe { Self(concat_idents!(v, $fun, $($tag,)? _, $ty)(self.0, concat_idents!(vld1, $($tag,)? _dup_, $ty)(&rhs))) }
+                self.$fun(Self::from_scalar(rhs))
             }
         }
 
@@ -115,7 +115,7 @@ macro_rules! impl_vec {
 
             #[inline(always)]
             fn $fun (self, rhs: $target) -> Self::Output {
-                unsafe { $target(concat_idents!(v, $fun, $($tag,)? _, $ty)(concat_idents!(vld1, $($tag,)? _dup_, $ty)(&self), rhs.0)) }
+                $target::from_scalar(self).$fun(rhs)
             }
         }
     };
@@ -149,6 +149,11 @@ macro_rules! impl_vec2 {
             #[inline]
             pub fn new (x: $ty, y: $ty) -> Self {
                 unsafe { Self(transmute([x, y])) }
+            }
+
+            #[inline]
+            pub fn from_scalar (x: $ty) -> Self {
+                unsafe { Self(concat_idents!(vld1, $($tag,)? _dup_, $ty)(&x)) }
             }
 
             #[inline(always)]
@@ -204,6 +209,11 @@ macro_rules! impl_vec3 {
             #[inline]
             pub fn new (x: $ty, y: $ty, z: $ty) -> Self {
                 unsafe { Self(transmute([x, y, z, 0.])) }
+            }
+
+            #[inline]
+            pub fn from_scalar (x: $ty) -> Self {
+                Self::new(x, x, x)
             }
 
             #[inline(always)]
@@ -269,6 +279,11 @@ macro_rules! impl_vec4 {
             #[inline]
             pub fn new (x: $ty, y: $ty, z: $ty, w: $ty) -> Self {
                 unsafe { Self(transmute([x, y, z, w])) }
+            }
+
+            #[inline]
+            pub fn from_scalar (x: f32) -> Self {
+                unsafe { Self(vld1q_dup_f32(&x)) }
             }
 
             #[inline(always)]
@@ -363,4 +378,4 @@ macro_rules! impl_mat2_scal {
 
 flat_mod!(double, complex);
 flat_mod!(vec2, vec3, vec4);
-flat_mod!(mat2);
+flat_mod!(mat2, mat3);
