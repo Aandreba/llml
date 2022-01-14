@@ -1,3 +1,5 @@
+use cfg_if::cfg_if;
+
 macro_rules! x86_use {
     () => {
         #[cfg(target_arch = "x86")]
@@ -8,11 +10,9 @@ macro_rules! x86_use {
     };
 }
 
-pub(crate) type __m128s = __m128;
-
 macro_rules! impl_arith {
     ($target:ident, f32) => {
-        use crate::__m128s;
+        type __m128s = __m128;
         impl_arith!($target, f32, s, m);
     };
 
@@ -73,9 +73,7 @@ macro_rules! impl_arith {
 
             #[inline(always)]
             fn $fun (self, rhs: $ty) -> Self::Output {
-                unsafe {
-                    Self(concat_idents!(_m, $tag, _, $fun, _p, $sub)(self.0, concat_idents!(_m, $tag, _set1_p, $sub)(rhs)))
-                }
+                self.$fun(Self::from_scalar(rhs))
             }
         }
 
@@ -84,9 +82,7 @@ macro_rules! impl_arith {
 
             #[inline(always)]
             fn $fun (self, rhs: $target) -> Self::Output {
-                unsafe {
-                    $target(concat_idents!(_m, $tag, _, $fun, _p, $sub)(concat_idents!(_m, $tag, _set1_p, $sub)(self), rhs.0))
-                }
+                $target::from_scalar(self).$fun(rhs)
             }
         }
     }
@@ -115,8 +111,50 @@ macro_rules! impl_arith_sse {
     }
 }
 
+macro_rules! trait_map {
+    ($target:ident, $ty:ident, $($trait:ident, $fun:ident),+) => {
+        $(
+            impl $trait for $target {
+                type Output = Self;
+
+                #[inline(always)]
+                fn $fun (self, rhs: Self) -> Self::Output {
+                    Self(self.0.$fun(rhs.0))
+                }
+            }
+
+            trait_map_scal!($target, $ty, $trait, $fun);
+        )*
+    };
+}
+
+macro_rules! trait_map_scal {
+    ($target:ident, $ty:ident, $($trait:ident, $fun:ident),+) => {
+        $(
+            impl $trait<$ty> for $target {
+                type Output = Self;
+
+                #[inline(always)]
+                fn $fun (self, rhs: $ty) -> Self::Output {
+                    Self(self.0.$fun(rhs))
+                }
+            }
+
+            impl $trait<$target> for $ty {
+                type Output = $target;
+
+                #[inline(always)]
+                fn $fun (self, rhs: $target) -> Self::Output {
+                    $target(self.$fun(rhs.0))
+                }
+            }
+        )*
+    };
+}
+
 x86_use!();
 flat_mod!(vec2, vec3, vec4);
+flat_mod!(mat);
 
 #[cfg(target_feature = "sse2")]
 flat_mod!(double);

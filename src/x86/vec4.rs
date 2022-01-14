@@ -16,6 +16,11 @@ impl EucVecf4 {
     }
 
     #[inline(always)]
+    pub fn from_scalar (x: f32) -> Self {
+        unsafe { Self(_mm_set1_ps(x)) }
+    }
+
+    #[inline(always)]
     pub fn x (&self) -> f32 {
         unsafe { _mm_cvtss_f32(self.0) }
     }
@@ -52,7 +57,7 @@ impl Into<EucVecd4> for EucVecf4 {
     fn into (self) -> EucVecd4 {
         cfg_if! {
             if #[cfg(target_feature = "avx")] { 
-                unsafe { EucVecf4(_mm256_cvtps_pd(self.0)) }
+                unsafe { EucVecd4(_mm256_cvtps_pd(self.0)) }
             } else {
                 unsafe { 
                     EucVecd4(
@@ -62,5 +67,12 @@ impl Into<EucVecd4> for EucVecf4 {
                 }
             }
         }
+    }
+}
+
+impl From<[f32;4]> for EucVecf4 {
+    #[inline(always)]
+    fn from(x: [f32;4]) -> Self {
+        unsafe { Self(_mm_loadu_ps(&x as *const [f32;4] as *const f32)) }
     }
 }

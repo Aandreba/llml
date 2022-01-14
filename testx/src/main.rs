@@ -1,8 +1,9 @@
-use llml::{EucVecf4, EucVecd4, EucVecd3, EucVecf3};
+use llml::{Matf2, EucVecf2};
 
 fn main () {
-    let alpha= EucVecd4::new(1., 2., 3., 4.);
-    let beta : EucVecf4 = alpha.into();
-
-    println!("{:?} {:?}", alpha, beta);
+    unsafe {
+        let alpha = Matf2::new([1., 2., 3., 4.]);
+        let beta = EucVecf2::new(9., 8.);
+        print!("{:?}", alpha * beta);
+    }
 }

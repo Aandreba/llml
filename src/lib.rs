@@ -1,6 +1,9 @@
 #![feature(once_cell, concat_idents, core_intrinsics, set_ptr_value, portable_simd, trivial_bounds, stdsimd)]
 #![cfg_attr(any(target_arch = "x86", target_arch = "x86_64"), feature(stdarch))]
 
+#![feature(extern_types, simd_ffi)]
+//#![cfg_attr(target_feature = "avf512fp16", feature(extern_types))]
+
 use cfg_if::cfg_if;
 
 macro_rules! flat_mod {
@@ -19,27 +22,6 @@ macro_rules! import_derives {
 
         #[cfg(feature = "llml_rand")]
         use randerive::{Rand};
-    };
-}
-
-macro_rules! map_to_trait {
-    ($lhs:ident, $trait:ident, $fn:ident, $f:expr) => {
-        map_to_trait!($lhs, $trait, $fn, Self, $f);
-    };
-
-    ($lhs:ident, $trait:ident, $fn:ident, $o:ident, $f:expr) => {
-        map_to_trait!($lhs, $trait, Self, $fn, $o, $f);
-    };
-
-    ($lhs:ident, $trait:ident, $rhs:ident, $fn:ident, $o:ident, $f:expr) => {
-        impl $trait<$rhs> for $lhs {
-            type Output = $o;
-
-            #[inline(always)]
-            fn $fn (self, rhs: $rhs) -> $o {
-                unsafe { $f(self, rhs) }
-            }
-        }
     };
 }
 
