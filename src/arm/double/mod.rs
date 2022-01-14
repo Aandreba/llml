@@ -1,1 +1,1 @@
-flat_mod!(mat2);
+flat_mod!(mat2, mat3);

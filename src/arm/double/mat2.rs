@@ -14,6 +14,36 @@ impl Matd2 {
     }
 
     #[inline(always)]
+    pub fn x (&self) -> EucVecd2 {
+        self.0.0
+    }
+
+    #[inline(always)]
+    pub fn xx (&self) -> f64 {
+        self.0.x()
+    }
+
+    #[inline(always)]
+    pub fn xy (&self) -> f64 {
+        self.0.y()
+    }
+
+    #[inline(always)]
+    pub fn y (&self) -> EucVecd2 {
+        self.0.1
+    }
+
+    #[inline(always)]
+    pub fn yx (&self) -> f64 {
+        self.0.z()
+    }
+
+    #[inline(always)]
+    pub fn yy (&self) -> f64 {
+        self.0.w()
+    }
+
+    #[inline(always)]
     pub fn tr (self) -> f64 {
         self.0.x()  +self.0.w()
     }

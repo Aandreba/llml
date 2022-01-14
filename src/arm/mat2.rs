@@ -1,5 +1,5 @@
 arm_use!();
-use crate::{EucVecf4, EucVecf2, traits::Zero};
+use crate::{EucVecf4, EucVecf2, traits::Zero, EucVecd2};
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
 
 #[derive(Debug, Clone, Copy)]
@@ -14,8 +14,38 @@ impl Matf2 {
     }
 
     #[inline(always)]
+    pub fn x (&self) -> EucVecf2 {
+        unsafe { EucVecf2(vget_low_f32(self.0.0)) }
+    }
+
+    #[inline(always)]
+    pub fn xx (&self) -> f32 {
+        self.0.x()
+    }
+
+    #[inline(always)]
+    pub fn xy (&self) -> f32 {
+        self.0.y()
+    }
+
+    #[inline(always)]
+    pub fn y (&self) -> EucVecf2 {
+        unsafe { EucVecf2(vget_high_f32(self.0.0)) }
+    }
+
+    #[inline(always)]
+    pub fn yx (&self) -> f32 {
+        self.0.z()
+    }
+
+    #[inline(always)]
+    pub fn yy (&self) -> f32 {
+        self.0.w()
+    }
+
+    #[inline(always)]
     pub fn tr (self) -> f32 {
-        self.0.x()  +self.0.w()
+        self.0.x() + self.0.w()
     }
 
     #[inline(always)]

@@ -1,5 +1,5 @@
 arm_use!();
-use crate::EucVecf3;
+use crate::{EucVecf3, EucVecf2, EucVecf4, Matf2, traits::Zero};
 use std::ops::{Add, Sub, Mul, Div, Neg};
 
 macro_rules! impl_matf3 {
@@ -81,6 +81,172 @@ impl Matf3 {
             EucVecf3::new(a[6], a[7], a[8])
         )
     }
+
+    #[inline]
+    pub fn from_scalar (x: f32) -> Self {
+        Matf3(
+            EucVecf3::from_scalar(x),
+            EucVecf3::from_scalar(x),
+            EucVecf3::from_scalar(x)
+        )
+    }
+
+    #[inline(always)]
+    pub fn x (&self) -> EucVecf3 {
+        self.0
+    }
+
+    #[inline(always)]
+    pub fn xx (&self) -> f32 {
+        self.0.x()
+    }
+
+    #[inline(always)]
+    pub fn xy (&self) -> f32 {
+        self.0.y()
+    }
+
+    #[inline(always)]
+    pub fn xz (&self) -> f32 {
+        self.0.z()
+    }
+
+    #[inline(always)]
+    pub fn y (&self) -> EucVecf3 {
+        self.1
+    }
+
+    #[inline(always)]
+    pub fn yx (&self) -> f32 {
+        self.1.x()
+    }
+
+    #[inline(always)]
+    pub fn yy (&self) -> f32 {
+        self.1.y()
+    }
+
+    #[inline(always)]
+    pub fn yz (&self) -> f32 {
+        self.1.z()
+    }
+
+    #[inline(always)]
+    pub fn z (&self) -> EucVecf3 {
+        self.2
+    }
+
+    #[inline(always)]
+    pub fn zx (&self) -> f32 {
+        self.2.x()
+    }
+
+    #[inline(always)]
+    pub fn zy (&self) -> f32 {
+        self.2.y()
+    }
+
+    #[inline(always)]
+    pub fn zz (&self) -> f32 {
+        self.2.z()
+    }
+
+    #[inline(always)]
+    pub fn tr (self) -> f32 {
+        EucVecf3::new(self.0.x(), self.1.y(), self.2.z()).sum()
+    }
+
+    #[inline(always)]
+    pub fn det (self) -> f32 {
+        // Negation
+        let neg = -self.0;
+
+        // Subdets 1 & 2
+        let v0 = EucVecf4::new(self.0.x(), neg.y(), neg.x(), self.0.y());
+        let v1 = EucVecf4::new(self.1.y(), self.1.x(), self.1.z(), self.1.z());
+        let v2 = EucVecf4::new(self.2.z(), self.2.z(), self.2.y(), self.2.x());
+        let m1 = v0 * v1 * v2;
+
+        let s1;
+        unsafe {
+            let v1 = vget_low_f32(m1.0);
+            let v2 = vget_high_f32(m1.0);
+            s1 = vadd_f32(v1, v2);
+        }
+
+        // Subdet 3
+        let v5 = EucVecf2::new(self.0.z(), neg.z());
+        let v6 = EucVecf2::new(self.1.x(), self.1.y());
+        let v7 = EucVecf2::new(self.2.y(), self.2.x());
+        let m2 = v5 * v6 * v7;
+
+        unsafe {
+            vaddvq_f32(vcombine_f32(s1, m2.0))
+        }
+    }
+
+    /// Performs the inverse of the matrix, returning ```None``` if it doesn't have one
+    #[inline(always)]
+    pub fn inv (self) -> Option<Self> {
+        let det = self.det();
+        if det.is_zero() {
+            return None
+        }
+
+        Some(unsafe { self._inv(det) })
+    }
+
+    /// Performs the inverse without checking if the determinant is zero.\
+    /// The use of this method is prefered if you're certain the matrix has an inverse,
+    /// since it could be faster
+    #[inline(always)]
+    pub unsafe fn inv_unsafe (self) -> Self {
+        self._inv(self.det())
+    }
+
+    #[inline(always)]
+    unsafe fn _inv (self, det: f32) -> Self {
+        let det = vld1q_dup_f32(&det);
+
+        // Row #1
+        let v1 = EucVecf3::new(self.1.y(), self.0.z(), self.0.y());
+        let v2 = EucVecf3::new(self.2.z(), self.2.y(), self.1.z());
+        let m1 = v1 * v2;
+
+        let v1 = EucVecf3::new(self.1.z(), self.0.y(), self.0.z());
+        let v2 = EucVecf3::new(self.2.y(), self.2.z(), self.1.y());
+        let m2 = v1 * v2;
+
+        let s1 = vdivq_f32(vsubq_f32(m1.0, m2.0), det);
+
+        // Row #2
+        let v1 = EucVecf3::new(self.1.z(), self.0.x(), self.0.z());
+        let v2 = EucVecf3::new(self.2.x(), self.2.z(), self.1.x());
+        let m1 = v1 * v2;
+
+        let v1 = EucVecf3::new(self.1.x(), self.0.z(), self.0.x());
+        let v2 = EucVecf3::new(self.2.z(), self.2.x(), self.1.z());
+        let m2 = v1 * v2;
+
+        let s2 = vdivq_f32(vsubq_f32(m1.0, m2.0), det);
+
+        // Row #3
+        let v1 = EucVecf3::new(self.1.x(), self.0.y(), self.0.x());
+        let v2 = EucVecf3::new(self.2.y(), self.2.x(), self.1.y());
+        let m1 = v1 * v2;
+
+        let v1 = EucVecf3::new(self.1.y(), self.0.x(), self.0.y());
+        let v2 = EucVecf3::new(self.2.x(), self.2.y(), self.1.x());
+        let m2 = v1 * v2;
+
+        let s3 = vdivq_f32(vsubq_f32(m1.0, m2.0), det);
+
+        Self(
+            EucVecf3(s1),
+            EucVecf3(s2),
+            EucVecf3(s3)
+        )
+    }
 }
 
 impl Mul<EucVecf3> for Matf3 {
@@ -99,28 +265,23 @@ impl Mul<EucVecf3> for Matf3 {
 impl Mul for Matf3 {
     type Output = Self;
 
-    //#[inline(always)]
+    #[inline(always)]
     fn mul(self, rhs: Self) -> Self::Output {
-        let sv1 = EucVecf3::new(self.0.x(), self.1.x(), self.2.x());
-        let sv2 = EucVecf3::new(self.0.y(), self.1.y(), self.2.y());
-        let sv3 = EucVecf3::new(self.0.z(), self.1.z(), self.2.z());
-
-        let v1 = sv1 * rhs.0.x();
-        let v2 = sv2 * rhs.0.y();
-        let v3 = sv3 * rhs.0.z();
+        let v1 = rhs.0 * self.0.x();
+        let v2 = rhs.1 * self.0.y();
+        let v3 = rhs.2 * self.0.z();
         let s1 = v1 + v2 + v3;
 
-        let v1 = sv1 * rhs.1.x();
-        let v2 = sv2 * rhs.1.y();
-        let v3 = sv3 * rhs.1.z();
+        let v1 = rhs.0 * self.1.x();
+        let v2 = rhs.1 * self.1.y();
+        let v3 = rhs.2 * self.1.z();
         let s2 = v1 + v2 + v3;
 
-        let v1 = sv1 * rhs.2.x();
-        let v2 = sv2 * rhs.2.y();
-        let v3 = sv3 * rhs.2.z();
+        let v1 = rhs.0 * self.2.x();
+        let v2 = rhs.1 * self.2.y();
+        let v3 = rhs.2 * self.2.z();
         let s3 = v1 + v2 + v3;
 
-        todo!()
-        //Self(s1, s2, s3)
+        Self(s1, s2, s3)
     }
 }
