@@ -14,6 +14,11 @@ impl EucVecd4 {
     }
 
     #[inline(always)]
+    pub fn from_scalar (x: f64) -> Self {
+        unsafe { Self(_mm256_set1_pd(x)) }
+    }
+
+    #[inline(always)]
     pub fn x (&self) -> f64 {
         unsafe { _mm256_cvtsd_f64(self.0) }
     }
@@ -65,5 +70,14 @@ impl Into<EucVecf4> for EucVecd4 {
     #[inline(always)]
     fn into (self) -> EucVecf4 {
         unsafe { EucVecf4(_mm256_cvtpd_ps(self.0)) }
+    }
+}
+
+impl From<[f64;4]> for EucVecd4 {
+    #[inline(always)]
+    fn from(x: [f64;4]) -> Self {
+        unsafe {
+            Self(_mm256_loadu_pd(&x as *const [f64;4] as *const f64))
+        }
     }
 }

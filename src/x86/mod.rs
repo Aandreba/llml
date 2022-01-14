@@ -111,6 +111,47 @@ macro_rules! impl_arith_sse {
     }
 }
 
+macro_rules! trait_map {
+    ($target:ident, $ty:ident, $($trait:ident, $fun:ident),+) => {
+        $(
+            impl $trait for $target {
+                type Output = Self;
+
+                #[inline(always)]
+                fn $fun (self, rhs: Self) -> Self::Output {
+                    Self(self.0.$fun(rhs.0))
+                }
+            }
+
+            trait_map_scal!($target, $ty, $trait, $fun);
+        )*
+    };
+}
+
+macro_rules! trait_map_scal {
+    ($target:ident, $ty:ident, $($trait:ident, $fun:ident),+) => {
+        $(
+            impl $trait<$ty> for $target {
+                type Output = Self;
+
+                #[inline(always)]
+                fn $fun (self, rhs: $ty) -> Self::Output {
+                    Self(self.0.$fun(rhs))
+                }
+            }
+
+            impl $trait<$target> for $ty {
+                type Output = $target;
+
+                #[inline(always)]
+                fn $fun (self, rhs: $target) -> Self::Output {
+                    $target(self.$fun(rhs.0))
+                }
+            }
+        )*
+    };
+}
+
 x86_use!();
 flat_mod!(vec2, vec3, vec4);
 flat_mod!(mat);

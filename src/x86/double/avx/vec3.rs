@@ -1,6 +1,6 @@
 x86_use!();
 use std::ops::{Add, Sub, Mul, Div, Neg};
-use crate::{EucVecd2, EucVecf4, EucVecf3};
+use crate::{EucVecd2, EucVecf3};
 
 #[derive(Debug)]
 #[repr(transparent)]
@@ -11,6 +11,11 @@ impl EucVecd3 {
     #[inline(always)]
     pub fn new (x: f64, y: f64, z: f64) -> Self {
         unsafe { Self(_mm256_set_pd(0., z, y, x)) }
+    }
+
+    #[inline(always)]
+    pub fn from_scalar (x: f64) -> Self {
+        Self::new(x, x, x)
     }
 
     #[inline(always)]
