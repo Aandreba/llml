@@ -265,9 +265,17 @@ macro_rules! impl_vec3 {
                 self.dot(self).sqrt()
             }
 
-            #[inline]
+            #[inline(always)]
             pub fn cross (self, rhs: Self) -> Self {
-                todo!()
+                let v1 = EucVecf3::new(self.y(), self.z(), self.x());
+                let v2 = EucVecf3::new(rhs.z(), rhs.x(), rhs.y());
+                let m1 = v1 * v2;
+
+                let v1 = EucVecf3::new(self.z(), self.x(), self.y());
+                let v2 = EucVecf3::new(rhs.y(), rhs.z(), rhs.x());
+                let m2 = v1 * v2;
+                
+                m1 - m2
             }
 
             #[inline(always)]

@@ -2,7 +2,7 @@ arm_use!();
 use core::mem::transmute;
 use std::ptr::{addr_of};
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
-use crate::{EucVecd2};
+use crate::{EucVecd2, EucVecd4};
 
 macro_rules! impl_vec3_vs {
     ($target:ident, $ty:ident, $tag:ident) => {
@@ -63,7 +63,17 @@ macro_rules! impl_vec3_vs {
 
             #[inline(always)]
             pub fn cross (self, rhs: Self) -> Self {
-                todo!()
+                let v1 = EucVecd4::new(self.y(), self.z(), self.x(), self.z());
+                let v2 = EucVecd4::new(rhs.z(), rhs.x(), rhs.y(), rhs.y());
+                let m1 = v1 * v2;
+
+                let v1 = EucVecd2::new(self.x(), self.y());
+                let v2 = EucVecd2::new(rhs.z(), rhs.x());
+                let m2 = v1 * v2;
+                
+                let v1 = EucVecd3(m1.0, m1.z());
+                let v2 = EucVecd3::new(m1.w(), m2.x(), m2.y());
+                v1 - v2
             }
 
             #[inline(always)]
