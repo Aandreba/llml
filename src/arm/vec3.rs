@@ -51,8 +51,24 @@ macro_rules! impl_vec3_vs {
             }
 
             #[inline(always)]
+            #[deprecated(since="0.2.0", note="use ```self.dot(self)``` instead")]
+            pub fn norm2 (self) -> $ty {
+                self.dot(self)
+            }
+
+            #[inline(always)]
+            pub fn norm (self) -> $ty {
+                self.dot(self).sqrt()
+            }
+
+            #[inline(always)]
             pub fn cross (self, rhs: Self) -> Self {
                 todo!()
+            }
+
+            #[inline(always)]
+            pub fn sqrt (self) -> Self {
+                Self(self.0.sqrt(), self.1.sqrt())
             }
         }
 

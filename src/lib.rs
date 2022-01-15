@@ -21,10 +21,11 @@ macro_rules! import_derives {
         use serde::{Serialize, Deserialize};
 
         #[cfg(feature = "llml_rand")]
-        use randerive::{Rand};
+        use randerive::Rand;
     };
 }
 
+import_derives!();
 pub mod traits;
 
 cfg_if! {
@@ -37,7 +38,17 @@ cfg_if! {
     }
 }
 
-#[cfg(feature = "llml_derive")]
-pub mod derive {
-    pub use llml_derive_crate::*;
+/// Polar coordinates
+#[repr(C)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "llml_serde", derive(Serialize, Deserialize))]
+pub struct Polar<T> {
+    pub radius: T,
+    pub angle: T
+}
+
+impl<T> Polar<T> {
+    pub fn new (radius: T, angle: T) -> Self {
+        Self { radius, angle }
+    }
 }

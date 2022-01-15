@@ -1,4 +1,5 @@
 arm_use!();
+
 use crate::{EucVecf3, EucVecf2, EucVecf4, Matf2, traits::Zero, EucVecd2, EucVecd3, EucVecd4};
 use std::ops::{Add, Sub, Mul, Div, Neg};
 
@@ -87,6 +88,15 @@ impl Matd3 {
     }
 
     #[inline(always)]
+    pub fn transp (self) -> Self {
+        Self::new([
+            self.xx(), self.yx(), self.zx(),
+            self.xy(), self.yy(), self.zy(),
+            self.xz(), self.yz(), self.zz()
+        ])
+    }
+
+    #[inline(always)]
     pub fn x (&self) -> EucVecd3 {
         EucVecd3(self.0.0, self.0.z())
     }
@@ -153,13 +163,35 @@ impl Matd3 {
 
     #[inline(always)]
     pub fn det (self) -> f64 {
-        todo!()
+        // Negation
+        let neg = -self.0;
+
+        // Subdets 1 & 2
+        let v0 = EucVecd4::new(self.xx(), neg.y(), neg.x(), self.xy());
+        let v1 = EucVecd4::new(self.yy(), self.yx(), self.yz(), self.yz());
+        let v2 = EucVecd4::new(self.zz(), self.zz(), self.zy(), self.zx());
+
+        let m1 = v0 * v1 * v2;
+        let s1 = m1.0 + m1.1;
+
+        // Subdet 3
+        let v5 = EucVecd2::new(self.xz(), neg.z());
+        let v6 = EucVecd2::new(self.yx(), self.yy());
+        let v7 = EucVecd2::new(self.zy(), self.zx());
+
+        let m2 = v5 * v6 * v7;
+        s1.sum() + m2.sum()
     }
 
     /// Performs the inverse of the matrix, returning ```None``` if it doesn't have one
     #[inline(always)]
     pub fn inv (self) -> Option<Self> {
-        todo!()
+        let det = self.det();
+        if det.is_zero() {
+            return None
+        }
+
+        unsafe { Some(self._inv(det)) }
     }
 
     /// Performs the inverse without checking if the determinant is zero.\
@@ -167,7 +199,39 @@ impl Matd3 {
     /// since it could be faster
     #[inline(always)]
     pub unsafe fn inv_unsafe (self) -> Self {
-        todo!()
+        self._inv(self.det())
+    }
+
+    #[inline(always)]
+    unsafe fn _inv (self, det: f64) -> Self {
+        // Section #1
+        let v1 = EucVecd4::new(self.yy(), self.xz(), self.xy(), self.yz());
+        let v2 = EucVecd4::new(self.zz(), self.zy(), self.yz(), self.zx());
+        let m1 = v1 * v2;
+
+        let v1 = EucVecd4::new(self.yz(), self.xy(), self.xz(), self.yx());
+        let v2 = EucVecd4::new(self.zy(), self.zz(), self.yy(), self.zz());
+        let m2 = v1 * v2;
+
+        let s1 = (m1 - m2) / det;
+
+        // Section #2
+        let v1 = EucVecd4::new(self.xx(), self.xz(), self.yx(), self.xy());
+        let v2 = EucVecd4::new(self.zz(), self.yx(), self.zy(), self.zx());
+        let m1 = v1 * v2;
+
+        let v1 = EucVecd4::new(self.xz(), self.xx(), self.yy(), self.xx());
+        let v2 = EucVecd4::new(self.zx(), self.yz(), self.zx(), self.zy());
+        let m2 = v1 * v2;
+
+        let s2 = (m1 - m2) / det;
+
+        // Section #3
+        let v1 : EucVecd2 = self.0.0 * EucVecd2::new(self.yy(), self.yx());
+        let s3 = (v1.x() - v1.y()) / det;
+        
+        // Result
+        Self(s1, s2, s3)
     }
 }
 
@@ -187,11 +251,21 @@ impl Mul<EucVecd3> for Matd3 {
     }
 }
 
+// TODO Optimize\
+// In particular, Vec -> Mat m3 multiplcation could be joined into a single EucVecd3
 impl Mul for Matd3 {
     type Output = Self;
 
     #[inline(always)]
     fn mul(self, rhs: Self) -> Self::Output {
-        todo!()
+        let m1 = self * EucVecd3::new(rhs.xx(), rhs.yx(), rhs.zx());
+        let m2 = self * EucVecd3::new(rhs.xy(), rhs.yy(), rhs.zy());
+        let m3 = self * EucVecd3::new(rhs.xz(), rhs.yz(), rhs.zz());
+
+        Self (
+            EucVecd4::new(m1.x(), m2.x(), m3.x(), m1.y()),
+            EucVecd4::new(m2.y(), m3.y(), m1.z(), m2.z()),
+            m3.z()
+        )
     }
 }

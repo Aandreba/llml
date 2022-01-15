@@ -170,6 +170,24 @@ macro_rules! impl_vec2 {
             pub fn dot (self, rhs: Self) -> $ty {
                 (self * rhs).sum()
             }
+
+            #[inline(always)]
+            #[deprecated(since="0.2.0", note="use ```self.dot(self)``` instead")]
+            pub fn norm2 (self) -> $ty {
+                self.dot(self)
+            }
+
+            #[inline(always)]
+            pub fn norm (self) -> $ty {
+                self.x().hypot(self.y())
+            }
+
+            #[inline(always)]
+            pub fn sqrt (self) -> Self {
+                unsafe {
+                    Self(concat_idents!(vsqrt, $($tag,)? _, $ty)(self.0))
+                }
+            }
         }
 
         impl Into<[$ty;2]> for $target {
@@ -236,9 +254,27 @@ macro_rules! impl_vec3 {
                 (self * rhs).sum()
             }
 
+            #[inline(always)]
+            #[deprecated(since="0.2.0", note="use ```self.dot(self)``` instead")]
+            pub fn norm2 (self) -> $ty {
+                self.dot(self)
+            }
+
+            #[inline(always)]
+            pub fn norm (self) -> $ty {
+                self.dot(self).sqrt()
+            }
+
             #[inline]
             pub fn cross (self, rhs: Self) -> Self {
                 todo!()
+            }
+
+            #[inline(always)]
+            pub fn sqrt (self) -> Self {
+                unsafe {
+                    Self(concat_idents!(vsqrt, $($tag,)? _, $ty)(self.0))
+                }
             }
         }
 
@@ -310,6 +346,24 @@ macro_rules! impl_vec4 {
             pub fn dot (self, rhs: Self) -> $ty {
                 (self * rhs).sum()
             }
+
+            #[inline(always)]
+            #[deprecated(since="0.2.0", note="use ```self.dot(self)``` instead")]
+            pub fn norm2 (self) -> $ty {
+                self.dot(self)
+            }
+
+            #[inline(always)]
+            pub fn norm (self) -> $ty {
+                self.dot(self).sqrt()
+            }
+
+            #[inline(always)]
+            pub fn sqrt (self) -> Self {
+                unsafe {
+                    Self(concat_idents!(vsqrt, $($tag,)? _, $ty)(self.0))
+                }
+            }
         }
 
         impl Into<[$ty;4]> for $target {
@@ -334,6 +388,13 @@ macro_rules! impl_mat2 {
             Mul, mul,
             Div, div
         );
+
+        impl $target {
+            #[inline(always)]
+            pub fn transp (self) -> Self {
+                Self::new(self.xx(), self.yx(), self.xy(), self.yy())
+            }
+        }
     };
 
     ($target:ident, $ty:ident, $($trait:ident, $fun:ident),+) => {

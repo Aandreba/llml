@@ -49,6 +49,22 @@ macro_rules! impl_vec4_vv {
             pub fn dot (self, rhs: Self) -> $ty {
                 (self * rhs).sum()
             }
+
+            #[inline(always)]
+            #[deprecated(since="0.2.0", note="use ```self.dot(self)``` instead")]
+            pub fn norm2 (self) -> $ty {
+                self.dot(self)
+            }
+
+            #[inline(always)]
+            pub fn norm (self) -> $ty {
+                self.dot(self).sqrt()
+            }
+
+            #[inline(always)]
+            pub fn sqrt (self) -> Self {
+                Self(self.0.sqrt(), self.1.sqrt())
+            }
         }
 
         impl Neg for $target {

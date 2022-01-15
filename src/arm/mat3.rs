@@ -92,6 +92,15 @@ impl Matf3 {
     }
 
     #[inline(always)]
+    pub fn transp (self) -> Self {
+        Self::new([
+            self.xx(), self.yx(), self.zx(),
+            self.xy(), self.yy(), self.zy(),
+            self.xz(), self.yz(), self.zz()
+        ])
+    }
+
+    #[inline(always)]
     pub fn x (&self) -> EucVecf3 {
         self.0
     }

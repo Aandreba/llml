@@ -1,6 +1,5 @@
 use std::ops::Neg;
 use crate::{Complxd, Complxf};
-
 use super::{Sqrt, Zero};
 
 // MACRO DEFS
