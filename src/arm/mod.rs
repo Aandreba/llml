@@ -12,6 +12,7 @@ macro_rules! wrap {
     ($($name:ident, $og:ident),+) => {
         $(
             #[derive(Debug)]
+            #[cfg_attr()]
             #[repr(transparent)]
             pub struct $name (pub(crate) $og);
 
@@ -321,8 +322,9 @@ macro_rules! impl_vec4 {
 
         impl $target {
             #[inline]
-            pub fn new (x: $ty, y: $ty, z: $ty, w: $ty) -> Self {
-                unsafe { Self(transmute([x, y, z, w])) }
+            pub fn new (x: [$ty;4]) -> Self {
+                todo!()
+                //unsafe { Self(transmute(a)) }
             }
 
             #[inline]
@@ -400,7 +402,7 @@ macro_rules! impl_mat2 {
         impl $target {
             #[inline(always)]
             pub fn transp (self) -> Self {
-                Self::new(self.xx(), self.yx(), self.xy(), self.yy())
+                Self::new([self.xx(), self.yx(), self.xy(), self.yy()])
             }
         }
     };

@@ -1,6 +1,6 @@
-arm_use!();
-use crate::{EucVecf3, EucVecf2, EucVecf4, Matf2, traits::Zero};
-use std::ops::{Add, Sub, Mul, Div, Neg};
+x86_use!();
+use crate::{EucVecf3, EucVecf2, EucVecf4, traits::Zero, _mm_high_ps, _mm_low_ps, _mm_sum_ps, _mm_low_high_ps, _mm_combine_ps};
+use std::ops::{Add, Sub, Mul, Div};
 
 macro_rules! impl_matf3 {
     () => {
@@ -40,10 +40,10 @@ macro_rules! impl_matf3_scal {
                 #[inline(always)]
                 fn $fun (self, rhs: f32) -> Self::Output {
                     unsafe {
-                        let rhs = vld1q_dup_f32(&rhs);
-                        let x = concat_idents!(v, $fun, q_f32)(self.0.0, rhs);
-                        let y = concat_idents!(v, $fun, q_f32)(self.1.0, rhs);
-                        let z = concat_idents!(v, $fun, q_f32)(self.2.0, rhs);
+                        let rhs = _mm_set1_ps(rhs);
+                        let x = concat_idents!(_mm_, $fun, _ps)(self.0.0, rhs);
+                        let y = concat_idents!(_mm_, $fun, _ps)(self.1.0, rhs);
+                        let z = concat_idents!(_mm_, $fun, _ps)(self.2.0, rhs);
                         Self(EucVecf3(x), EucVecf3(y), EucVecf3(z))
                     }
                 }
@@ -55,10 +55,10 @@ macro_rules! impl_matf3_scal {
                 #[inline(always)]
                 fn $fun (self, rhs: Matf3) -> Self::Output {
                     unsafe {
-                        let sf = vld1q_dup_f32(&self);
-                        let x = concat_idents!(v, $fun, q_f32)(sf, rhs.0.0);
-                        let y = concat_idents!(v, $fun, q_f32)(sf, rhs.1.0);
-                        let z = concat_idents!(v, $fun, q_f32)(sf, rhs.2.0);
+                        let sf = _mm_set1_ps(self);
+                        let x = concat_idents!(_mm_, $fun, _ps)(sf, rhs.0.0);
+                        let y = concat_idents!(_mm_, $fun, _ps)(sf, rhs.1.0);
+                        let z = concat_idents!(_mm_, $fun, _ps)(sf, rhs.2.0);
                         Matf3(EucVecf3(x), EucVecf3(y), EucVecf3(z))
                     }
                 }
@@ -67,7 +67,7 @@ macro_rules! impl_matf3_scal {
     };
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C, align(64))]
 pub struct Matf3 (pub(crate) EucVecf3, pub(crate) EucVecf3, pub(crate) EucVecf3);
 impl_matf3!();
@@ -76,9 +76,9 @@ impl Matf3 {
     #[inline]
     pub fn new (a: [f32;9]) -> Self {
         Matf3(
-            EucVecf3::new(a[0], a[1], a[2]),
-            EucVecf3::new(a[3], a[4], a[5]),
-            EucVecf3::new(a[6], a[7], a[8])
+            EucVecf3::new([a[0], a[1], a[2]]),
+            EucVecf3::new([a[3], a[4], a[5]]),
+            EucVecf3::new([a[6], a[7], a[8]])
         )
     }
 
@@ -162,7 +162,7 @@ impl Matf3 {
 
     #[inline(always)]
     pub fn tr (self) -> f32 {
-        EucVecf3::new(self.0.x(), self.1.y(), self.2.z()).sum()
+        EucVecf3::new([self.0.x(), self.1.y(), self.2.z()]).sum()
     }
 
     #[inline(always)]
@@ -178,19 +178,18 @@ impl Matf3 {
 
         let s1;
         unsafe {
-            let v1 = vget_low_f32(m1.0);
-            let v2 = vget_high_f32(m1.0);
-            s1 = vadd_f32(v1, v2);
+            let (v1, v2) = _mm_low_high_ps(m1.0);
+            s1 = _mm_add_ps(v1, v2);
         }
 
         // Subdet 3
-        let v5 = EucVecf2::new(self.0.z(), neg.z());
-        let v6 = EucVecf2::new(self.1.x(), self.1.y());
-        let v7 = EucVecf2::new(self.2.y(), self.2.x());
+        let v5 = EucVecf2::new([self.0.z(), neg.z()]);
+        let v6 = EucVecf2::new([self.1.x(), self.1.y()]);
+        let v7 = EucVecf2::new([self.2.y(), self.2.x()]);
         let m2 = v5 * v6 * v7;
 
         unsafe {
-            vaddvq_f32(vcombine_f32(s1, m2.0))
+            _mm_sum_ps(_mm_combine_ps(s1, m2.0))
         }
     }
 
@@ -215,40 +214,41 @@ impl Matf3 {
 
     #[inline(always)]
     unsafe fn _inv (self, det: f32) -> Self {
-        let det = vld1q_dup_f32(&det);
+        // TODO
+        let det = _mm_set1_ps(det);
 
         // Row #1
-        let v1 = EucVecf3::new(self.1.y(), self.0.z(), self.0.y());
-        let v2 = EucVecf3::new(self.2.z(), self.2.y(), self.1.z());
+        let v1 = EucVecf3::new([self.1.y(), self.0.z(), self.0.y()]);
+        let v2 = EucVecf3::new([self.2.z(), self.2.y(), self.1.z()]);
         let m1 = v1 * v2;
 
-        let v1 = EucVecf3::new(self.1.z(), self.0.y(), self.0.z());
-        let v2 = EucVecf3::new(self.2.y(), self.2.z(), self.1.y());
+        let v1 = EucVecf3::new([self.1.z(), self.0.y(), self.0.z()]);
+        let v2 = EucVecf3::new([self.2.y(), self.2.z(), self.1.y()]);
         let m2 = v1 * v2;
 
-        let s1 = vdivq_f32(vsubq_f32(m1.0, m2.0), det);
+        let s1 = _mm_div_ps(_mm_sub_ps(m1.0, m2.0), det);
 
         // Row #2
-        let v1 = EucVecf3::new(self.1.z(), self.0.x(), self.0.z());
-        let v2 = EucVecf3::new(self.2.x(), self.2.z(), self.1.x());
+        let v1 = EucVecf3::new([self.1.z(), self.0.x(), self.0.z()]);
+        let v2 = EucVecf3::new([self.2.x(), self.2.z(), self.1.x()]);
         let m1 = v1 * v2;
 
-        let v1 = EucVecf3::new(self.1.x(), self.0.z(), self.0.x());
-        let v2 = EucVecf3::new(self.2.z(), self.2.x(), self.1.z());
+        let v1 = EucVecf3::new([self.1.x(), self.0.z(), self.0.x()]);
+        let v2 = EucVecf3::new([self.2.z(), self.2.x(), self.1.z()]);
         let m2 = v1 * v2;
 
-        let s2 = vdivq_f32(vsubq_f32(m1.0, m2.0), det);
+        let s2 = _mm_div_ps(_mm_sub_ps(m1.0, m2.0), det);
 
         // Row #3
-        let v1 = EucVecf3::new(self.1.x(), self.0.y(), self.0.x());
-        let v2 = EucVecf3::new(self.2.y(), self.2.x(), self.1.y());
+        let v1 = EucVecf3::new([self.1.x(), self.0.y(), self.0.x()]);
+        let v2 = EucVecf3::new([self.2.y(), self.2.x(), self.1.y()]);
         let m1 = v1 * v2;
 
-        let v1 = EucVecf3::new(self.1.y(), self.0.x(), self.0.y());
-        let v2 = EucVecf3::new(self.2.x(), self.2.y(), self.1.x());
+        let v1 = EucVecf3::new([self.1.y(), self.0.x(), self.0.y()]);
+        let v2 = EucVecf3::new([self.2.x(), self.2.y(), self.1.x()]);
         let m2 = v1 * v2;
 
-        let s3 = vdivq_f32(vsubq_f32(m1.0, m2.0), det);
+        let s3 = _mm_div_ps(_mm_sub_ps(m1.0, m2.0), det);
 
         Self(
             EucVecf3(s1),
@@ -263,9 +263,9 @@ impl Mul<EucVecf3> for Matf3 {
 
     #[inline(always)]
     fn mul (self, rhs: EucVecf3) -> Self::Output {
-        let m1 = EucVecf3::new(self.0.x(), self.1.x(), self.2.x()) * rhs.x();
-        let m2 = EucVecf3::new(self.0.y(), self.1.y(), self.2.y()) * rhs.y();
-        let m3 = EucVecf3::new(self.0.z(), self.1.z(), self.2.z()) * rhs.z();
+        let m1 = EucVecf3::new([self.0.x(), self.1.x(), self.2.x()]) * rhs.x();
+        let m2 = EucVecf3::new([self.0.y(), self.1.y(), self.2.y()]) * rhs.y();
+        let m3 = EucVecf3::new([self.0.z(), self.1.z(), self.2.z()]) * rhs.z();
 
         m1 + m2 + m3
     }

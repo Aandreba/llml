@@ -10,9 +10,11 @@ pub struct EucVecf3 (pub(crate) __m128);
 impl_arith_sse!(EucVecf3, f32);
 
 impl EucVecf3 {
+    const DIV_MASK : __m128 = unsafe { *(&[u32::MAX, u32::MAX, u32::MAX, 0] as *const [u32;4] as *const __m128) };
+
     #[inline(always)]
-    pub fn new (x: f32, y: f32, z: f32) -> Self {
-        unsafe { Self(_mm_set_ps(0., z, y, x)) }
+    pub fn new (a: [f32;3]) -> Self {
+        unsafe { Self(_mm_set_ps(0., a[2], a[1], a[0])) }
     }
 
     #[inline(always)]
@@ -43,6 +45,11 @@ impl EucVecf3 {
     #[inline(always)]
     pub fn dot (self, rhs: Self) -> f32 {
         (self * rhs).sum()
+    }
+
+    #[inline(always)]
+    pub fn norm (self) -> f32 {
+        self.dot(self).sqrt()
     }
 }
 

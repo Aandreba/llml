@@ -9,8 +9,8 @@ impl_arith_x2!(EucVecd4);
 
 impl EucVecd4 {
     #[inline(always)]
-    pub fn new (x: f64, y: f64, z: f64, w: f64) -> Self {
-        Self(EucVecd2::new(x, y), EucVecd2::new(z, w))
+    pub fn new (a: [f64;4]) -> Self {
+        Self(EucVecd2::new([a[0], a[1]]), EucVecd2::new([a[2], a[3]]))
     }
 
     #[inline(always)]
@@ -41,6 +41,22 @@ impl EucVecd4 {
     #[inline(always)]
     pub fn dot (self, rhs: Self) -> f64 {
         (self * rhs).sum()
+    }
+
+    #[inline(always)]
+    #[deprecated(since="0.2.0", note="use ```self.dot(self)``` instead")]
+    pub fn norm2 (self) -> f64 {
+        self.dot(self)
+    }
+
+    #[inline(always)]
+    pub fn norm (self) -> f64 {
+        self.dot(self).sqrt()
+    }
+
+    #[inline(always)]
+    pub fn unit (self) -> Self {
+        self / self.norm()
     }
 }
 

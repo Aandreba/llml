@@ -6,31 +6,29 @@ Implementation of basic math data types with high level frontend and low level b
 
 # Current implementation
 ✔️ -> Implemented\
-🟧 -> Implemented, not released yet\
 ⚠️ -> Implementation expected\
 ❌ -> Not implemented
 
-## Single precision
-### Complex number
+## Complex number
 |                    | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
 | ----------------   | ------------ | -------------- | ---- | ----- |
-| Addition           | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Subtraction        | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Multiplication     | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Division           | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Conjugate          | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Polar Coordinates  | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Square Root        | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Exponential        | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Natural Logarithm  | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Sine               | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Cosine             | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Tangent            | ✔️           | ⚠️            | ⚠️   | ⚠️   |
+| Addition           | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Subtraction        | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Multiplication     | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Division           | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Conjugate          | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Polar Coordinates  | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Square Root        | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Exponential        | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Natural Logarithm  | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Sine               | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Cosine             | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Tangent            | ✔️           | ✔️            | ⚠️   | ⚠️   |
 | Hyperbolic Sine    | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
 | Hyperbolic Cosine  | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
 | Hyperbolic Tangent | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
 
-### Quaternion
+## Quaternion
 |                    | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
 | ----------------   | ------------ | -------------- | ---- | ----- |
 | Addition           | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
@@ -49,79 +47,70 @@ Implementation of basic math data types with high level frontend and low level b
 | Hyperbolic Cosine  | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
 | Hyperbolic Tangent | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
 
-### Affine Transform 2D
-|                    | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
-| ----------------   | ------------ | -------------- | ---- | ----- |
-| Addition           | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
-| Subtraction        | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
-| Tranformation      | 🟧           | ⚠️            | ⚠️   | 🟧   |
-
-### Vector 2
+## Vector 2
 |                  | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
 | ---------------- | ------------ | -------------- | ---- | ----- |
-| Addition         | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Subtraction      | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Multiplication   | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Division         | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Dot product      | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Sum              | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Norm             | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Norm<sup>2</sup> | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Unit             | ✔️           | ✔️            | ⚠️   | ✔️   |
+| Addition         | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Subtraction      | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Multiplication   | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Division         | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Dot product      | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Sum              | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Norm             | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Unit             | ✔️           | ✔️            | ⚠️   | ⚠️   |
 
-### Vector 3
+## Vector 3
 |                    | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
 | ------------------ | ------------ | -------------- | ---- | ----- |
-| Addition           | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Subtraction        | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Multiplication     | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Division           | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Dot product        | ✔️           | ⚠️            | ⚠️   | ✔️   |
+| Addition           | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Subtraction        | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Multiplication     | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Division           | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Negation           | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Dot product        | ✔️           | ✔️            | ⚠️   | ⚠️   |
 | Cross product      | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Sum                | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Norm               | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Norm<sup>2</sup>   | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Unit               | ✔️           | ⚠️            | ⚠️   | ✔️   |
+| Sum                | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Norm               | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Unit               | ✔️           | ✔️            | ⚠️   | ⚠️   |
 
-### Vector 4
+## Vector 4
 |                  | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
 | ---------------- | ------------ | -------------- | ---- | ----- |
-| Addition         | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Subtraction      | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Multiplication   | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Division         | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Dot product      | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Sum              | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Norm             | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Norm<sup>2</sup> | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Unit             | ✔️           | ⚠️            | ⚠️   | ✔️   |
+| Addition         | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Subtraction      | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Multiplication   | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Division         | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Negation         | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Dot product      | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Sum              | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Norm             | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Unit             | ✔️           | ✔️            | ⚠️   | ⚠️   |
 
-### Matrix 2
+## Matrix 2
+|                  | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
+| ---------------- | ------------ | -------------- | ---- | ----- |
+| Addition         | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Subtraction      | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Multiplication   | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Division         | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Negation         | ⚠️           | ✔️            | ⚠️   | ⚠️   |
+| Transposed       | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Inverse          | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Trace            | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Determinant      | ✔️           | ✔️            | ⚠️   | ⚠️   |
+
+## Matrix 3
 |                  | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
 | ---------------- | ------------ | -------------- | ---- | ----- |
 | Addition         | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 | Subtraction      | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 | Multiplication   | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 | Division         | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Transposed       | ✔️           | ✔️            | ⚠️   | ✔️   |
+| Negation         | ⚠️           | ⚠️            | ⚠️   | ⚠️   |
+| Transposed       | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 | Inverse          | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Trace            | ✔️           | ✔️            | ⚠️   | ✔️   |
+| Trace            | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 | Determinant      | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 
-### Matrix 3
-|                  | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
-| ---------------- | ------------ | -------------- | ---- | ----- |
-| Addition         | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Subtraction      | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Multiplication   | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Division         | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Transposed       | ✔️           | ✔️            | ⚠️   | ✔️   |
-| Inverse          | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-| Trace            | ✔️           | ⚠️            | ⚠️   | ✔️   |
-| Determinant      | ✔️           | ⚠️            | ⚠️   | ⚠️   |
-
-### Matrix 4
-4x4 matrices are yet to be implemented, but are expected to be in the future
-
-## Double precision
-Double precision arithmetic is to be implemented on all architectures, except on Naive 
+## Matrix 4
+4x4 matrices are yet to be implemented, but are expected to be in the futur

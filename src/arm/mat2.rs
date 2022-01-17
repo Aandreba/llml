@@ -9,8 +9,8 @@ impl_mat2!(Matf2, f32);
 
 impl Matf2 {
     #[inline(always)]
-    pub fn new (xx: f32, xy: f32, yx: f32, yy: f32) -> Self {
-        Self(EucVecf4::new(xx, xy, yx, yy))
+    pub fn new (a: [f32;4]) -> Self {
+        Self(EucVecf4::new(a))
     }
 
     #[inline(always)]

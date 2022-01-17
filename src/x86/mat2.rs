@@ -1,16 +1,47 @@
 x86_use!();
 
 use cfg_if::cfg_if;
-use crate::{EucVecf4, EucVecf2, traits::Zero};
+use crate::{EucVecf4, EucVecf2, traits::Zero, _mm_low_ps, _mm_high_ps};
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct Matf2 (pub(crate) EucVecf4);
 
 impl Matf2 {
+    #[inline]
     pub fn new (a: [f32;4]) -> Self {
         Self(a.into())
+    }
+
+    #[inline(always)]
+    pub fn x (&self) -> EucVecf2 {
+        unsafe { EucVecf2(_mm_low_ps(self.0.0)) }
+    }
+
+    #[inline(always)]
+    pub fn xx (&self) -> f32 {
+        self.0.x()
+    }
+
+    #[inline(always)]
+    pub fn xy (&self) -> f32 {
+        self.0.y()
+    }
+
+    #[inline(always)]
+    pub fn y (&self) -> EucVecf2 {
+        unsafe { EucVecf2(_mm_high_ps(self.0.0)) }
+    }
+
+    #[inline(always)]
+    pub fn yx (&self) -> f32 {
+        self.0.z()
+    }
+
+    #[inline(always)]
+    pub fn yy (&self) -> f32 {
+        self.0.w()
     }
 
     #[inline(always)]
@@ -35,16 +66,18 @@ impl Matf2 {
             return None
         }
 
-        unsafe {
-            let neg = EucVecf4(_mm_sub_ps(_mm_setzero_ps(), _mm_shuffle_ps(self.0.0, self.0.0, _MM_SHUFFLE(0, 0, 2, 1))));
-            Some(Self(EucVecf4::new(self.0.w(), neg.x(), neg.y(), self.0.x()) / det))
-        }
+        unsafe { Some(self._inv(det)) }
     }
 
     #[inline(always)]
     pub unsafe fn inv_unsafe (self) -> Self {
+        self._inv(self.det())
+    }
+
+    #[inline(always)]
+    unsafe fn _inv (self, det: f32) -> Self {
         let neg = EucVecf4(_mm_sub_ps(_mm_setzero_ps(), _mm_shuffle_ps(self.0.0, self.0.0, _MM_SHUFFLE(0, 0, 2, 1))));
-        Self(EucVecf4::new(self.0.w(), neg.x(), neg.y(), self.0.x()) / self.det())
+        Self(EucVecf4::new([self.0.w(), neg.x(), neg.y(), self.0.x()]) / det)
     }
 }
 

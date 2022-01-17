@@ -9,8 +9,8 @@ impl_mat2!(Matd2, f64);
 
 impl Matd2 {
     #[inline(always)]
-    pub fn new (xx: f64, xy: f64, yx: f64, yy: f64) -> Self {
-        Self(EucVecd4::new(xx, xy, yx, yy))
+    pub fn new (a: [f64;4]) -> Self {
+        Self(EucVecd4::new(a[0], a[1], a[2], a[3]))
     }
 
     #[inline(always)]
@@ -88,7 +88,7 @@ impl Mul<EucVecd2> for Matd2 {
 impl Mul for Matd2 {
     type Output = Matd2;
 
-    //#[inline(always)]
+    #[inline(always)]
     fn mul (self, rhs: Self) -> Self::Output {
         unsafe {
             let v1 : EucVecd4 = EucVecd4(EucVecd2(vdupq_n_f64(self.0.x())), EucVecd2(vdupq_n_f64(self.0.z())));

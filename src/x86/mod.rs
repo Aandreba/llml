@@ -28,14 +28,43 @@ macro_rules! impl_arith {
         impl_arith!($target, f64, d, $tag);
     };
 
-    ($target:ident, $ty:ident, $sub:ident, $tag:ident) => {        
+    ($target:ident, $ty:ident, $sub:ident, $tag:ident) => {         
         impl_arith!($target, $ty, $sub, Add, add, $tag);
         impl_arith!($target, $ty, $sub, Sub, sub, $tag);
         impl_arith!($target, $ty, $sub, Mul, mul, $tag);
-        impl_arith!($target, $ty, $sub, Div, div, $tag);
 
         impl Eq for $target {}
         impl Copy for $target {}
+
+        impl Div for $target {
+            type Output = Self;
+
+            #[inline(always)]
+            fn div (self, rhs: Self) -> Self::Output {
+                unsafe {
+                    let div = concat_idents!(_m, $tag, _div_p, $sub)(self.0, rhs.0);
+                    Self(concat_idents!(_m, $tag, _and_p, $sub)(Self::DIV_MASK, div))
+                }
+            }
+        }
+
+        impl Div<$ty> for $target {
+            type Output = Self;
+
+            #[inline(always)]
+            fn div (self, rhs: $ty) -> Self::Output {
+                self.div(Self::from_scalar(rhs))
+            }
+        }
+
+        impl Div<$target> for $ty {
+            type Output = $target;
+
+            #[inline(always)]
+            fn div (self, rhs: $target) -> Self::Output {
+                $target::from_scalar(self).div(rhs)
+            }
+        }
 
         impl Neg for $target {
             type Output = Self;
@@ -100,6 +129,19 @@ macro_rules! impl_arith_sse {
     ($target:ident, $ty:ident, $sub:ident) => {
         impl_arith!($target, $ty);
 
+        impl $target {
+            #[inline(always)]
+            #[deprecated(since="0.2.0", note="use ```self.dot(self)``` instead")]
+            pub fn norm2 (self) -> $ty {
+                self.dot(self)
+            }
+
+            #[inline(always)]
+            pub fn unit (self) -> Self {
+                self / self.norm()
+            }
+        }
+
         impl PartialEq for $target {
             #[inline(always)]
             fn eq (&self, rhs: &Self) -> bool {
@@ -154,10 +196,18 @@ macro_rules! trait_map_scal {
 
 x86_use!();
 flat_mod!(vec2, vec3, vec4);
-flat_mod!(mat);
+flat_mod!(mat2);
 
 #[cfg(target_feature = "sse2")]
 flat_mod!(double);
+
+cfg_if! {
+    if #[cfg(target_feature = "avx")] {
+        flat_mod!(avx);
+    } else {
+        flat_mod!(sse);
+    }
+}
 
 #[inline(always)]
 pub(crate) unsafe fn _mm_sum_ps (lhs: __m128) -> f32 {
@@ -171,4 +221,25 @@ pub(crate) unsafe fn _mm_sum_ps (lhs: __m128) -> f32 {
     let sums = _mm_add_ps(sums, shuf);
     
     _mm_cvtss_f32(sums)
+}
+
+#[inline(always)]
+pub(crate) unsafe fn _mm_combine_ps (a: __m128, b: __m128) -> __m128 {
+    _mm_shuffle_ps(a, b, _MM_SHUFFLE(1, 0, 1, 0))
+}
+
+#[inline(always)]
+pub(crate) unsafe fn _mm_low_ps (a: __m128) -> __m128 {
+    _mm_movehl_ps(_mm_setzero_ps(), a)
+}
+
+#[inline(always)]
+pub(crate) unsafe fn _mm_high_ps (a: __m128) -> __m128 {
+    _mm_shuffle_ps(a, _mm_setzero_ps(), _MM_SHUFFLE(3, 2, 1, 0))
+}
+
+#[inline(always)]
+pub(crate) unsafe fn _mm_low_high_ps (a: __m128) -> (__m128, __m128) {
+    let zero = _mm_setzero_ps();
+    (_mm_movehl_ps(zero, a), _mm_shuffle_ps(a, zero, _MM_SHUFFLE(3, 2, 1, 0)))
 }

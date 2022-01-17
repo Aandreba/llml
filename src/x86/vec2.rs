@@ -1,6 +1,6 @@
 x86_use!();
-use std::ops::{Add, Sub, Mul, Div, Neg};
 
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
 use crate::EucVecd2;
 
 #[derive(Debug)]
@@ -9,9 +9,11 @@ pub struct EucVecf2 (pub(crate) __m128);
 impl_arith_sse!(EucVecf2, f32);
 
 impl EucVecf2 {
+    const DIV_MASK : __m128 = unsafe { *(&[u32::MAX, u32::MAX, 0, 0] as *const [u32;4] as *const __m128) };
+
     #[inline(always)]
-    pub fn new (x: f32, y: f32) -> Self {
-        unsafe { Self(_mm_set_ps(0., 0., y, x)) }
+    pub fn new (a: [f32;2]) -> Self {
+        unsafe { Self(_mm_set_ps(0., 0., a[1], a[0])) }
     }
 
     #[inline(always)]
@@ -37,6 +39,11 @@ impl EucVecf2 {
     #[inline(always)]
     pub fn dot (self, rhs: Self) -> f32 {
         (self * rhs).sum()
+    }
+
+    #[inline(always)]
+    pub fn norm (self) -> f32 {
+        self.x().hypot(self.y())
     }
 }
 
