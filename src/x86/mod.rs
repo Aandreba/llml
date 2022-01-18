@@ -195,6 +195,7 @@ macro_rules! trait_map_scal {
 }
 
 x86_use!();
+flat_mod!(complex);
 flat_mod!(vec2, vec3, vec4);
 flat_mod!(mat2);
 

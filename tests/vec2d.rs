@@ -61,6 +61,23 @@ fn unit () {
     assert_eq!(alpha.unit(), EucVecd2::new([alpha.x() / norm, alpha.y() / norm]))
 }
 
+#[test]
+fn sqrt () {
+    let alpha : EucVecd2 = random();
+    assert_eq!(alpha.sqrt(), EucVecd2::new([alpha.x().sqrt(), alpha.y().sqrt()]))
+}
+
+const RSQRT_EPSILON : f64 = 0.0003662109375 + f64::EPSILON;
+
+#[test]
+fn sqrt_fast () {
+    let alpha : EucVecd2 = random();
+    let fast = alpha.sqrt_fast();
+
+    assert!((fast.x() - alpha.x().sqrt()).abs() <= RSQRT_EPSILON);
+    assert!((fast.y() - alpha.y().sqrt()).abs() <= RSQRT_EPSILON);
+}
+
 fn get_vecs () -> (EucVecd2, EucVecd2) {
     (random(), random())
 }

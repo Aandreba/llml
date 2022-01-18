@@ -1,5 +1,6 @@
 use std::ops::Neg;
-use crate::{Complxd, Complxf};
+use crate::generics::{Complxf, Complxd};
+
 use super::{Sqrt, Zero};
 
 // MACRO DEFS
@@ -26,14 +27,8 @@ macro_rules! impl_complexable {
 }
 
 // TRAIT DEFS
-pub trait Complx<T> {
-    fn new (re: T, im: T) -> Self;
-    fn re (&self) -> T;
-    fn im (&self) -> T;
-}
-
 pub trait Complxable: Zero + PartialOrd + Neg<Output = Self> + Into<<Self as Complxable>::Output> {
-    type Output: Complx<Self>;
+    type Output;
 
     fn as_im (self) -> <Self as Complxable>::Output;
 

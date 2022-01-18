@@ -4,6 +4,8 @@
 #![feature(extern_types, simd_ffi)]
 //#![cfg_attr(target_feature = "avf512fp16", feature(extern_types))]
 
+use std::arch::x86_64::_mm256_cvtneps_pbh;
+
 use cfg_if::cfg_if;
 
 macro_rules! flat_mod {

@@ -1,6 +1,6 @@
 x86_use!();
 
-use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
+use std::{ops::{Add, Sub, Mul, Div, Neg}};
 use crate::EucVecd2;
 
 #[derive(Debug)]
@@ -44,6 +44,16 @@ impl EucVecf2 {
     #[inline(always)]
     pub fn norm (self) -> f32 {
         self.x().hypot(self.y())
+    }
+
+    #[inline(always)]
+    pub fn sqrt (self) -> Self {
+        unsafe { Self(_mm_sqrt_ps(self.0)) }
+    }
+
+    #[inline(always)]
+    pub fn sqrt_fast (self) -> Self {
+        unsafe { Self(_mm_rcp_ps(_mm_rsqrt_ps(self.0))) }
     }
 }
 

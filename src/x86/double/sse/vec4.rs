@@ -58,6 +58,16 @@ impl EucVecd4 {
     pub fn unit (self) -> Self {
         self / self.norm()
     }
+
+    #[inline(always)]
+    pub fn sqrt (self) -> Self {
+        Self(self.0.sqrt(), self.1.sqrt())
+    }
+
+    #[inline(always)]
+    pub fn sqrt_fast (self) -> Self {
+        Self(self.0.sqrt_fast(), self.1.sqrt_fast())
+    }
 }
 
 impl Into<EucVecf4> for EucVecd4 {

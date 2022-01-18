@@ -66,4 +66,4 @@ macro_rules! impl_arith_x2 {
 }
 
 flat_mod!(vec3, vec4);
-flat_mod!(mat2);
+flat_mod!(mat2, mat3);

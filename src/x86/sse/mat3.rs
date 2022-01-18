@@ -1,6 +1,6 @@
 x86_use!();
 use crate::{EucVecf3, EucVecf2, EucVecf4, traits::Zero, _mm_high_ps, _mm_low_ps, _mm_sum_ps, _mm_low_high_ps, _mm_combine_ps};
-use std::ops::{Add, Sub, Mul, Div};
+use std::ops::{Add, Sub, Mul, Div, Neg};
 
 macro_rules! impl_matf3 {
     () => {
@@ -71,6 +71,15 @@ macro_rules! impl_matf3_scal {
 #[repr(C, align(64))]
 pub struct Matf3 (pub(crate) EucVecf3, pub(crate) EucVecf3, pub(crate) EucVecf3);
 impl_matf3!();
+
+impl Neg for Matf3 {
+    type Output = Self;
+
+    #[inline(always)]
+    fn neg(self) -> Self::Output {
+        Self(-self.0, -self.1, -self.2)
+    }
+}
 
 impl Matf3 {
     #[inline]

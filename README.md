@@ -58,6 +58,7 @@ Implementation of basic math data types with high level frontend and low level b
 | Sum              | ✔️           | ✔️            | ⚠️   | ⚠️   |
 | Norm             | ✔️           | ✔️            | ⚠️   | ⚠️   |
 | Unit             | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Square Root      | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 
 ## Vector 3
 |                    | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
@@ -72,6 +73,7 @@ Implementation of basic math data types with high level frontend and low level b
 | Sum                | ✔️           | ✔️            | ⚠️   | ⚠️   |
 | Norm               | ✔️           | ✔️            | ⚠️   | ⚠️   |
 | Unit               | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Square Root      | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 
 ## Vector 4
 |                  | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |
@@ -85,6 +87,7 @@ Implementation of basic math data types with high level frontend and low level b
 | Sum              | ✔️           | ✔️            | ⚠️   | ⚠️   |
 | Norm             | ✔️           | ✔️            | ⚠️   | ⚠️   |
 | Unit             | ✔️           | ✔️            | ⚠️   | ⚠️   |
+| Square Root      | ✔️           | ⚠️            | ⚠️   | ⚠️   |
 
 ## Matrix 2
 |                  | SSE (x86/64) | Neon (aarch64) | Wasm | Naive |

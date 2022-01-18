@@ -44,6 +44,16 @@ impl EucVecd2 {
     pub fn norm (self) -> f64 {
         self.x().hypot(self.y())
     }
+
+    #[inline(always)]
+    pub fn sqrt (self) -> Self {
+        unsafe { Self(_mm_sqrt_pd(self.0)) }
+    }
+
+    #[inline(always)]
+    pub fn sqrt_fast (self) -> Self {
+        self.sqrt()
+    }
 }
 
 impl Into<EucVecf2> for EucVecd2 {

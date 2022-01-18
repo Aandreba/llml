@@ -64,7 +64,7 @@ macro_rules! impl_mat2_scal {
     };
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct Matd2 (pub(crate) EucVecd4);
 impl_mat2!(Matd2, f64);

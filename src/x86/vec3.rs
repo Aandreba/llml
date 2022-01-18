@@ -51,6 +51,16 @@ impl EucVecf3 {
     pub fn norm (self) -> f32 {
         self.dot(self).sqrt()
     }
+
+    #[inline(always)]
+    pub fn sqrt (self) -> Self {
+        unsafe { Self(_mm_sqrt_ps(self.0)) }
+    }
+
+    #[inline(always)]
+    pub fn sqrt_fast (self) -> Self {
+        unsafe { Self(_mm_rcp_ps(_mm_rsqrt_ps(self.0))) }
+    }
 }
 
 #[cfg(target_feature = "sse2")]

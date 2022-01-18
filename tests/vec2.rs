@@ -1,4 +1,4 @@
-use llml::{EucVecf2};
+use llml::{EucVecf2, traits::Sqrt};
 use rand::random;
 
 macro_rules! test_arith {
@@ -59,6 +59,23 @@ fn unit () {
 
     let norm = alpha.x().hypot(alpha.y());
     assert_eq!(alpha.unit(), EucVecf2::new([alpha.x() / norm, alpha.y() / norm]))
+}
+
+#[test]
+fn sqrt () {
+    let alpha : EucVecf2 = random();
+    assert_eq!(alpha.sqrt(), EucVecf2::new([alpha.x().sqrt(), alpha.y().sqrt()]))
+}
+
+const RSQRT_EPSILON : f32 = 0.0003662109375 + f32::EPSILON;
+
+#[test]
+fn sqrt_fast () {
+    let alpha : EucVecf2 = random();
+    let fast = alpha.sqrt_fast();
+
+    assert!((fast.x() - alpha.x().sqrt()).abs() <= RSQRT_EPSILON);
+    assert!((fast.y() - alpha.y().sqrt()).abs() <= RSQRT_EPSILON);
 }
 
 fn get_vecs () -> (EucVecf2, EucVecf2) {

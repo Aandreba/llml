@@ -1,6 +1,3 @@
 flat_mod!(
-    consts, mappings
+    consts, mappings, complex
 );
-
-#[cfg(target_arch = "aarch64")]
-flat_mod!(complex);
