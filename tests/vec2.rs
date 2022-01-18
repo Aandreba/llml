@@ -1,4 +1,4 @@
-use llml::{EucVecf2, traits::Sqrt};
+use llml::{EucVecf2, traits::Sqrt, EucVecd2};
 use rand::random;
 
 macro_rules! test_arith {
@@ -6,6 +6,17 @@ macro_rules! test_arith {
         let (alpha, beta) = get_vecs();
         assert_eq!(alpha $sy beta, EucVecf2::new([alpha.x() $sy beta.x(), alpha.y() $sy beta.y()]))
     }
+}
+
+#[test]
+fn eq () {
+    assert_eq!(EucVecf2::new([1., 2.]), EucVecf2::new([1., 2.]));
+    assert_ne!(EucVecf2::new([1., 2.]), EucVecf2::new([3., 3.]))
+}
+
+#[test]
+fn into () {
+    assert_eq!(Into::<EucVecd2>::into(EucVecf2::new([1., 2.])), EucVecd2::new([1., 2.]))
 }
 
 #[test]

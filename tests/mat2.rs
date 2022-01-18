@@ -1,4 +1,4 @@
-use llml::{Matf2};
+use llml::{Matf2, Matd2};
 use rand::random;
 
 macro_rules! test_arith {
@@ -9,6 +9,17 @@ macro_rules! test_arith {
             alpha.yx() $sy beta.yx(), alpha.yy() $sy beta.yy()
         ]));
     }
+}
+
+#[test]
+fn eq () {
+    assert_eq!(Matf2::new([1., 2., 3., 4.]), Matf2::new([1., 2., 3., 4.]));
+    assert_ne!(Matf2::new([1., 2., 3., 4.]), Matf2::new([5., 6., 7., 8.]))
+}
+
+#[test]
+fn into () {
+    assert_eq!(Into::<Matd2>::into(Matf2::new([1., 2., 3., 4.])), Matd2::new([1., 2., 3., 4.]))
 }
 
 #[test]

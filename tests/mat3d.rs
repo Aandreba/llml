@@ -1,4 +1,4 @@
-use llml::{Matd3};
+use llml::{Matd3, Matf3};
 use rand::random;
 
 macro_rules! test_arith {
@@ -10,6 +10,17 @@ macro_rules! test_arith {
             alpha.zx() $sy beta.zx(), alpha.zy() $sy beta.zy(), alpha.zz() $sy beta.zz(),
         ]));
     }
+}
+
+#[test]
+fn eq () {
+    assert_eq!(Matd3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.]), Matd3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.]));
+    assert_ne!(Matd3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.]), Matd3::new([1., 2., 3., 4., 5., 6., 7., 8., 8.]))
+}
+
+#[test]
+fn into () {
+    assert_eq!(Into::<Matf3>::into(Matd3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.])), Matf3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.]))
 }
 
 #[test]

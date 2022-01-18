@@ -1,5 +1,5 @@
 arm_use!();
-use crate::{EucVecf4, EucVecf2, traits::Zero, EucVecd2};
+use crate::{EucVecf4, EucVecf2, traits::Zero, EucVecd2, Matd2};
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -120,5 +120,12 @@ impl Neg for Matf2 {
     #[inline(always)]
     fn neg(self) -> Self::Output {
         Self(-self.0)
+    }
+}
+
+impl Into<Matd2> for Matf2 {
+    #[inline(always)]
+    fn into(self) -> Matd2 {
+        Matd2(self.0.into())
     }
 }

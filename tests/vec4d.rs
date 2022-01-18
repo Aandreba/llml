@@ -1,4 +1,4 @@
-use llml::{EucVecd4};
+use llml::{EucVecd4, EucVecf4};
 use rand::random;
 
 macro_rules! test_arith {
@@ -6,6 +6,17 @@ macro_rules! test_arith {
         let (alpha, beta) = get_vecs();
         assert_eq!(alpha $sy beta, EucVecd4::new([alpha.x() $sy beta.x(), alpha.y() $sy beta.y(), alpha.z() $sy beta.z(), alpha.w() $sy beta.w()]))
     }
+}
+
+#[test]
+fn eq () {
+    assert_eq!(EucVecd4::new([1., 2., 3., 4.]), EucVecd4::new([1., 2., 3., 4.]));
+    assert_ne!(EucVecd4::new([1., 2., 3., 4.]), EucVecd4::new([5., 6., 7., 8.]))
+}
+
+#[test]
+fn into () {
+    assert_eq!(Into::<EucVecf4>::into(EucVecd4::new([1., 2., 3., 4.])), EucVecf4::new([1., 2., 3., 4.]))
 }
 
 #[test]

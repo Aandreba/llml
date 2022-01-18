@@ -1,5 +1,5 @@
 arm_use!();
-use crate::{EucVecf3, EucVecf2, EucVecf4, Matf2, traits::Zero};
+use crate::{EucVecf3, EucVecf2, EucVecf4, Matf2, traits::Zero, Matd3};
 use std::ops::{Add, Sub, Mul, Div, Neg};
 
 macro_rules! impl_matf3 {
@@ -301,5 +301,15 @@ impl Mul for Matf3 {
         let s3 = v1 + v2 + v3;
 
         Self(s1, s2, s3)
+    }
+}
+
+impl Into<Matd3> for Matf3 {
+    #[inline(always)]
+    fn into(self) -> Matd3 {
+        let c1 = EucVecf4::new([self.xx(), self.xy(), self.xz(), self.yx()]).into();
+        let c2 = EucVecf4::new([self.yy(), self.yz(), self.zx(), self.zy()]).into();
+        let c3 = self.zz().into();
+        Matd3(c1, c2, c3)
     }
 }

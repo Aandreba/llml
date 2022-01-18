@@ -1,6 +1,6 @@
 arm_use!();
 
-use crate::{EucVecf3, EucVecf2, EucVecf4, Matf2, traits::Zero, EucVecd2, EucVecd3, EucVecd4};
+use crate::{EucVecf3, EucVecf2, EucVecf4, Matf2, traits::Zero, EucVecd2, EucVecd3, EucVecd4, Matf3};
 use std::ops::{Add, Sub, Mul, Div, Neg};
 
 macro_rules! impl_matd3 {
@@ -276,5 +276,12 @@ impl Mul for Matd3 {
             EucVecd4::new([m2.y(), m3.y(), m1.z(), m2.z()]),
             m3.z()
         )
+    }
+}
+
+impl Into<Matf3> for Matd3 {
+    #[inline(always)]
+    fn into(self) -> Matf3 {
+        Matf3(self.x().into(), self.y().into(), self.z().into())
     }
 }

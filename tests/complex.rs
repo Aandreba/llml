@@ -1,6 +1,16 @@
-use llml::{Complxf, traits::{ComplexSqrt, Sqrt}};
+use llml::{Complxf, traits::{ComplexSqrt, Sqrt}, Complxd};
 use rand::random;
 
+#[test]
+fn eq () {
+    assert_eq!(Complxf::new(1., 2.), Complxf::new(1., 2.));
+    assert_ne!(Complxf::new(1., 2.), Complxf::new(3., 3.))
+}
+
+#[test]
+fn into () {
+    assert_eq!(Into::<Complxd>::into(Complxf::new(1., 2.)), Complxd::new(1., 2.))
+}
 
 #[test]
 fn add () {
