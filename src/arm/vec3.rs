@@ -16,13 +16,13 @@ macro_rules! impl_vec3_vs {
 
         impl $target {
             #[inline]
-            pub fn new (x: $ty, y: $ty, z: $ty) -> Self {
-                unsafe { Self(transmute([x, y]), z) }
+            pub fn new (a: [$ty;3]) -> Self {
+                unsafe { Self(transmute([a[0], a[1]]), a[2]) }
             }
 
             #[inline]
             pub fn from_scalar (x: $ty) -> Self {
-                Self::new(x, x, x)
+                Self::new([x, x, x])
             }
 
             #[inline(always)]
@@ -62,23 +62,33 @@ macro_rules! impl_vec3_vs {
             }
 
             #[inline(always)]
+            pub fn unit (self) -> Self {
+                self / self.norm()
+            }
+
+            #[inline(always)]
             pub fn cross (self, rhs: Self) -> Self {
-                let v1 = EucVecd4::new(self.y(), self.z(), self.x(), self.z());
-                let v2 = EucVecd4::new(rhs.z(), rhs.x(), rhs.y(), rhs.y());
+                let v1 = EucVecd4::new([self.y(), self.z(), self.x(), self.z()]);
+                let v2 = EucVecd4::new([rhs.z(), rhs.x(), rhs.y(), rhs.y()]);
                 let m1 = v1 * v2;
 
-                let v1 = EucVecd2::new(self.x(), self.y());
-                let v2 = EucVecd2::new(rhs.z(), rhs.x());
+                let v1 = EucVecd2::new([self.x(), self.y()]);
+                let v2 = EucVecd2::new([rhs.z(), rhs.x()]);
                 let m2 = v1 * v2;
                 
                 let v1 = EucVecd3(m1.0, m1.z());
-                let v2 = EucVecd3::new(m1.w(), m2.x(), m2.y());
+                let v2 = EucVecd3::new([m1.w(), m2.x(), m2.y()]);
                 v1 - v2
             }
 
             #[inline(always)]
             pub fn sqrt (self) -> Self {
                 Self(self.0.sqrt(), self.1.sqrt())
+            }
+
+            #[inline(always)]
+            pub fn sqrt_fast (self) -> Self {
+                self.sqrt()
             }
         }
 
@@ -139,7 +149,7 @@ macro_rules! impl_vec3_vs {
 }
 
 wrap!(EucVecf3, float32x4_t);
-impl_vec3!(EucVecf3, f32, q, u32);
+impl_vec3!(EucVecf3, f32, q);
 
 #[derive(Debug, Clone, Copy)]
 #[repr(C, align(16))]

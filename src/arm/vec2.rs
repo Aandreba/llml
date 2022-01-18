@@ -8,8 +8,8 @@ wrap!(
     EucVecd2, float64x2_t
 );
 
-impl_vec2!(EucVecf2, f32, u32);
-impl_vec2!(EucVecd2, f64, q, u64);
+impl_vec2!(EucVecf2, f32);
+impl_vec2!(EucVecd2, f64, q);
 
 impl Into<EucVecf2> for EucVecd2 {
     #[inline(always)]

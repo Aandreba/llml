@@ -16,8 +16,8 @@ macro_rules! impl_vec4_vv {
 
         impl $target {
             #[inline]
-            pub fn new (x: $ty, y: $ty, z: $ty, w: $ty) -> Self {
-                unsafe { Self(transmute([x, y]), transmute([z, w])) }
+            pub fn new (a: [$ty;4]) -> Self {
+                unsafe { Self(transmute([a[0], a[1]]), transmute([a[2], a[3]])) }
             }
 
             #[inline(always)]
@@ -62,8 +62,18 @@ macro_rules! impl_vec4_vv {
             }
 
             #[inline(always)]
+            pub fn unit (self) -> Self {
+                self / self.norm()
+            }
+
+            #[inline(always)]
             pub fn sqrt (self) -> Self {
                 Self(self.0.sqrt(), self.1.sqrt())
+            }
+
+            #[inline(always)]
+            pub fn sqrt_fast (self) -> Self {
+                self.sqrt()
             }
         }
 
@@ -124,7 +134,7 @@ macro_rules! impl_vec4_vv {
 }
 
 wrap!(EucVecf4, float32x4_t);
-impl_vec4!(EucVecf4, f32, q, u32);
+impl_vec4!(EucVecf4, f32, q);
 
 #[derive(Debug, Clone, Copy)]
 #[repr(C, align(16))]

@@ -2,7 +2,7 @@ arm_use!();
 use crate::{EucVecf4, EucVecf2, traits::Zero, EucVecd2};
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct Matf2 (pub(crate) EucVecf4);
 impl_mat2!(Matf2, f32);
@@ -66,14 +66,14 @@ impl Matf2 {
             return None
         }
 
-        let vec = -EucVecf2::new(self.0.y(), self.0.z());
-        Some(Self(EucVecf4::new(self.0.w(), vec.x(), vec.y(), self.0.x()) / det))
+        let vec = -EucVecf2::new([self.0.y(), self.0.z()]);
+        Some(Self(EucVecf4::new([self.0.w(), vec.x(), vec.y(), self.0.x()]) / det))
     }
 
     #[inline(always)]
     pub unsafe fn inv_unsafe (self) -> Self {
-        let vec = -EucVecf2::new(self.0.y(), self.0.z());
-        Self(EucVecf4::new(self.0.w(), vec.x(), vec.y(), self.0.x()) / self.det())
+        let vec = -EucVecf2::new([self.0.y(), self.0.z()]);
+        Self(EucVecf4::new([self.0.w(), vec.x(), vec.y(), self.0.x()]) / self.det())
     }
 }
 

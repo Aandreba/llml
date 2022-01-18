@@ -2,7 +2,7 @@ arm_use!();
 use crate::{traits::Zero, EucVecd2, EucVecd4};
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct Matd2 (pub(crate) EucVecd4);
 impl_mat2!(Matd2, f64);
@@ -10,7 +10,7 @@ impl_mat2!(Matd2, f64);
 impl Matd2 {
     #[inline(always)]
     pub fn new (a: [f64;4]) -> Self {
-        Self(EucVecd4::new(a[0], a[1], a[2], a[3]))
+        Self(EucVecd4::new(a))
     }
 
     #[inline(always)]
@@ -50,7 +50,7 @@ impl Matd2 {
 
     #[inline(always)]
     pub fn det (self) -> f64 {
-        let m1 : EucVecd2 = self.0.0 * EucVecd2::new(self.0.1.y(), self.0.1.x());
+        let m1 : EucVecd2 = self.0.0 * EucVecd2::new([self.0.1.y(), self.0.1.x()]);
         m1.x() - m1.y()
     }
 
@@ -61,14 +61,14 @@ impl Matd2 {
             return None
         }
 
-        let vec = -EucVecd2::new(self.0.y(), self.0.z());
-        Some(Self(EucVecd4::new(self.0.w(), vec.x(), vec.y(), self.0.x()) / det))
+        let vec = -EucVecd2::new([self.0.y(), self.0.z()]);
+        Some(Self(EucVecd4::new([self.0.w(), vec.x(), vec.y(), self.0.x()]) / det))
     }
 
     #[inline(always)]
     pub unsafe fn inv_unsafe (self) -> Self {
-        let vec = -EucVecd2::new(self.0.y(), self.0.z());
-        Self(EucVecd4::new(self.0.w(), vec.x(), vec.y(), self.0.x()) / self.det())
+        let vec = -EucVecd2::new([self.0.y(), self.0.z()]);
+        Self(EucVecd4::new([self.0.w(), vec.x(), vec.y(), self.0.x()]) / self.det())
     }
 }
 
@@ -78,8 +78,8 @@ impl Mul<EucVecd2> for Matd2 {
     #[inline(always)]
     fn mul(self, rhs: EucVecd2) -> Self::Output {
         let mul = self.0 * EucVecd4(rhs, rhs);
-        let v1 = EucVecd2::new(mul.y(), mul.w()); // odd
-        let v2 = EucVecd2::new(mul.x(), mul.z()); // even
+        let v1 = EucVecd2::new([mul.y(), mul.w()]); // odd
+        let v2 = EucVecd2::new([mul.x(), mul.z()]); // even
         v1 + v2
     }
 }

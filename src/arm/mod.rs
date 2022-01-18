@@ -12,7 +12,6 @@ macro_rules! wrap {
     ($($name:ident, $og:ident),+) => {
         $(
             #[derive(Debug)]
-            #[cfg_attr()]
             #[repr(transparent)]
             pub struct $name (pub(crate) $og);
 
@@ -23,11 +22,11 @@ macro_rules! wrap {
 }
 
 macro_rules! impl_eq {
-    ($target:ident, $ty:ident, $eq:ident, $len:literal, $($tag:ident)?) => {
+    ($target:ident, $ty:ident, $len:literal, $($tag:ident)?) => {
         impl PartialEq for $target {
             #[inline(always)]
             fn eq (&self, other: &Self) -> bool {
-                unsafe { concat_idents!(vaddv, $($tag,)? _, $eq)(concat_idents!(vceq, $($tag,)? _, $ty)(self.0, other.0)) == $len }
+                unsafe { concat_idents!(vaddv, $($tag,)? _, $ty)(concat_idents!(vabd, $($tag,)? _, $ty)(self.0, other.0)) == 0. }
             }
         }
     };
@@ -123,17 +122,17 @@ macro_rules! impl_vec {
 }
 
 macro_rules! impl_vec2 {
-    ($($target:ident, $ty:ident, $eq:ident),+) => {
+    ($($target:ident, $ty:ident),+) => {
         $(
             impl_vec2!(1, $target, $ty, );
-            impl_eq!($target, $ty, $eq, 2, );
+            impl_eq!($target, $ty, 2, );
         )*
     };
 
-    ($($target:ident, $ty:ident, $tag:ident, $eq:ident),+) => {
+    ($($target:ident, $ty:ident, $tag:ident),+) => {
         $(
             impl_vec2!(1, $target, $ty, $tag);
-            impl_eq!($target, $ty, $eq, 2, $tag);
+            impl_eq!($target, $ty, 2, $tag);
         )*
     };
 
@@ -148,8 +147,8 @@ macro_rules! impl_vec2 {
 
         impl $target {
             #[inline]
-            pub fn new (x: $ty, y: $ty) -> Self {
-                unsafe { Self(transmute([x, y])) }
+            pub fn new (a: [$ty;2]) -> Self {
+                unsafe { Self(concat_idents!(vld1, $($tag,)? _, $ty)(a.as_ptr().cast())) }
             }
 
             #[inline]
@@ -184,10 +183,20 @@ macro_rules! impl_vec2 {
             }
 
             #[inline(always)]
+            pub fn unit (self) -> Self {
+                self / self.norm()
+            }
+
+            #[inline(always)]
             pub fn sqrt (self) -> Self {
                 unsafe {
                     Self(concat_idents!(vsqrt, $($tag,)? _, $ty)(self.0))
                 }
+            }
+
+            #[inline(always)]
+            pub fn sqrt_fast (self) -> Self {
+                self.sqrt()
             }
         }
 
@@ -201,17 +210,17 @@ macro_rules! impl_vec2 {
 }
 
 macro_rules! impl_vec3 {
-    ($($target:ident, $ty:ident, $eq:ident),+) => {
+    ($($target:ident, $ty:ident),+) => {
         $(
             impl_vec3!(1, $target, $ty,);
-            impl_eq!($target, $ty, $eq, 3,);
+            impl_eq!($target, $ty, 3,);
         )*
     };
 
-    ($($target:ident, $ty:ident, $tag:ident, $eq:ident),+) => {
+    ($($target:ident, $ty:ident, $tag:ident),+) => {
         $(
             impl_vec3!(1, $target, $ty, $tag);
-            impl_eq!($target, $ty, $eq, 3, $tag);
+            impl_eq!($target, $ty, 3, $tag);
         )*
     };
 
@@ -220,19 +229,48 @@ macro_rules! impl_vec3 {
             $target, $ty $(,$tag)?,
             Add, add,
             Sub, sub,
-            Mul, mul,
-            Div, div
+            Mul, mul
         );
+
+        impl Div for $target {
+            type Output = Self;
+
+            #[inline(always)]
+            fn div (self, rhs: Self) -> Self::Output {
+                unsafe {
+                    let div = concat_idents!(vdiv, $($tag,)? _, $ty)(self.0, rhs.0);
+                    Self(concat_idents!(vset, $($tag,)? _lane_, $ty)(0., div, 3))
+                }
+            }
+        }
+
+        impl Div<$ty> for $target {
+            type Output = Self;
+
+            #[inline(always)]
+            fn div (self, rhs: $ty) -> Self::Output {
+                self.div(Self::from_scalar(rhs))
+            }
+        }
+
+        impl Div<$target> for $ty {
+            type Output = $target;
+
+            #[inline(always)]
+            fn div (self, rhs: $target) -> Self::Output {
+                $target::from_scalar(self).div(rhs)
+            }
+        }
 
         impl $target {
             #[inline]
-            pub fn new (x: $ty, y: $ty, z: $ty) -> Self {
-                unsafe { Self(transmute([x, y, z, 0.])) }
+            pub fn new (a: [$ty;3]) -> Self {
+                unsafe { Self(transmute([a[0], a[1], a[2], 0.])) }
             }
 
             #[inline]
             pub fn from_scalar (x: $ty) -> Self {
-                Self::new(x, x, x)
+                Self::new([x, x, x])
             }
 
             #[inline(always)]
@@ -267,13 +305,18 @@ macro_rules! impl_vec3 {
             }
 
             #[inline(always)]
+            pub fn unit (self) -> Self {
+                self / self.norm()
+            }
+
+            #[inline(always)]
             pub fn cross (self, rhs: Self) -> Self {
-                let v1 = EucVecf3::new(self.y(), self.z(), self.x());
-                let v2 = EucVecf3::new(rhs.z(), rhs.x(), rhs.y());
+                let v1 = EucVecf3::new([self.y(), self.z(), self.x()]);
+                let v2 = EucVecf3::new([rhs.z(), rhs.x(), rhs.y()]);
                 let m1 = v1 * v2;
 
-                let v1 = EucVecf3::new(self.z(), self.x(), self.y());
-                let v2 = EucVecf3::new(rhs.y(), rhs.z(), rhs.x());
+                let v1 = EucVecf3::new([self.z(), self.x(), self.y()]);
+                let v2 = EucVecf3::new([rhs.y(), rhs.z(), rhs.x()]);
                 let m2 = v1 * v2;
                 
                 m1 - m2
@@ -284,6 +327,11 @@ macro_rules! impl_vec3 {
                 unsafe {
                     Self(concat_idents!(vsqrt, $($tag,)? _, $ty)(self.0))
                 }
+            }
+
+            #[inline(always)]
+            pub fn sqrt_fast (self) -> Self {
+                self.sqrt()
             }
         }
 
@@ -297,17 +345,17 @@ macro_rules! impl_vec3 {
 }
 
 macro_rules! impl_vec4 {
-    ($($target:ident, $ty:ident, $eq:ident),+) => {
+    ($($target:ident, $ty:ident),+) => {
         $(
             impl_vec4!(1, $target, $ty,);
-            impl_eq!($target, $ty, $eq, 4,);
+            impl_eq!($target, $ty, 4,);
         )*
     };
 
-    ($($target:ident, $ty:ident, $tag:ident, $eq:ident),+) => {
+    ($($target:ident, $ty:ident, $tag:ident),+) => {
         $(
             impl_vec4!(1, $target, $ty, $tag);
-            impl_eq!($target, $ty, $eq, 4, $tag);
+            impl_eq!($target, $ty, 4, $tag);
         )*
     };
 
@@ -323,8 +371,7 @@ macro_rules! impl_vec4 {
         impl $target {
             #[inline]
             pub fn new (x: [$ty;4]) -> Self {
-                todo!()
-                //unsafe { Self(transmute(a)) }
+                unsafe { Self(vld1q_f32(x.as_ptr().cast())) }
             }
 
             #[inline]
@@ -369,10 +416,20 @@ macro_rules! impl_vec4 {
             }
 
             #[inline(always)]
+            pub fn unit (self) -> Self {
+                self / self.norm()
+            }
+
+            #[inline(always)]
             pub fn sqrt (self) -> Self {
                 unsafe {
                     Self(concat_idents!(vsqrt, $($tag,)? _, $ty)(self.0))
                 }
+            }
+
+            #[inline(always)]
+            pub fn sqrt_fast (self) -> Self {
+                self.sqrt()
             }
         }
 
