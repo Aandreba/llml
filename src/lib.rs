@@ -29,7 +29,7 @@ macro_rules! import_derives {
 
 import_derives!();
 pub mod traits;
-pub mod generics;
+flat_mod!(generics);
 
 cfg_if! {
     if #[cfg(all(any(target_arch = "arm", target_arch = "aarch64"), target_feature = "neon"))] {
