@@ -1,5 +1,5 @@
 x86_use!();
-use crate::{traits::Zero, EucVecd2, EucVecd4};
+use crate::{traits::Zero, EucVecd2, EucVecd4, Matf2};
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
 
 macro_rules! impl_mat2 {
@@ -172,5 +172,12 @@ impl Neg for Matd2 {
     #[inline(always)]
     fn neg(self) -> Self::Output {
         Self(-self.0)
+    }
+}
+
+impl Into<Matf2> for Matd2 {
+    #[inline(always)]
+    fn into(self) -> Matf2 {
+        Matf2(self.0.into())
     }
 }

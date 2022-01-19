@@ -1,7 +1,7 @@
 x86_use!();
 
 use cfg_if::cfg_if;
-use crate::{EucVecf4, EucVecf2, traits::Zero, _mm_low_ps, _mm_high_ps};
+use crate::{EucVecf4, EucVecf2, traits::Zero, _mm_low_ps, _mm_high_ps, Matd2};
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -152,5 +152,12 @@ impl Mul for Matf2 {
             let m2 = _mm_mul_ps(v3, v4);
             Self(EucVecf4(_mm_add_ps(m1, m2)))
         }
+    }
+}
+
+impl Into<Matd2> for Matf2 {
+    #[inline(always)]
+    fn into(self) -> Matd2 {
+        Matd2(self.0.into())
     }
 }
