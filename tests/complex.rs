@@ -1,4 +1,4 @@
-use llml::{Complxf, traits::{ComplexSqrt, Sqrt}, Complxd};
+use llml::others::{Complxf, Complxd, ComplexSqrt};
 use rand::random;
 
 #[test]

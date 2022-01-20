@@ -1,6 +1,8 @@
 x86_use!();
-use crate::{traits::Zero, EucVecd2, EucVecd4, Matf2};
+use crate::{traits::Zero, mat::Matf2, vec::EucVecd2};
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
+
+use super::EucVecd4;
 
 macro_rules! impl_mat2 {
     ($target:ident, $ty:ident) => {
@@ -73,6 +75,12 @@ impl Matd2 {
     #[inline(always)]
     pub fn new (a: [f64;4]) -> Self {
         Self(EucVecd4::new(a))
+    }
+
+    #[inline]
+    pub fn of_rot (a: f64) -> Self {
+        let (sin, cos) = a.sin_cos();
+        Self::new([cos, -sin, sin, cos])
     }
 
     #[inline(always)]

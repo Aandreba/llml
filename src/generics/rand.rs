@@ -1,6 +1,6 @@
 use rand::{prelude::*, distributions::Standard};
+use crate::{vec::{EucVecf3, EucVecf4, EucVecd3, EucVecd4, EucVecd2, EucVecf2}, mat::{Matf2, Matf3, Matd2, Matd3}};
 use super::{Complxf, Complxd};
-use crate::*;
 
 macro_rules! impl_rand {
     ($($target:ident),+) => {

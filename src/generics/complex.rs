@@ -1,7 +1,7 @@
 use std::ops::{Add, Sub, Mul, Div, Neg};
 use crate::traits::{ComplexSqrt, Zero};
-use crate::{EucVecf2, EucVecd2};
-use crate::Polar;
+use crate::vec::{EucVecf2, EucVecd2};
+use crate::polar::Polar;
 
 macro_rules! declare {
     ($($name:ident, $og:ident, $ogbig:ident, $ty:ident, $($tag:ident)?),+) => {
@@ -212,7 +212,7 @@ declare!(
 impl Into<Complxd> for Complxf {
     #[inline(always)]
     fn into(self) -> Complxd {
-        Complxd(self.0.into())
+        Complxd(Into::<EucVecd2>::into(self.0))
     }
 }
 

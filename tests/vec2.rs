@@ -1,4 +1,4 @@
-use llml::{EucVecf2, traits::Sqrt, EucVecd2};
+use llml::vec::{EucVecf2, EucVecd2};
 use rand::random;
 
 macro_rules! test_arith {

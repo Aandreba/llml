@@ -2,7 +2,10 @@ x86_use!();
 use cfg_if::cfg_if;
 
 use std::ops::{Add, Sub, Mul, Div, Neg};
-use crate::{_mm_sum_ps, EucVecd4, EucVecd2};
+
+use crate::vec::EucVecd2;
+
+use super::{_mm_sum_ps, EucVecd4};
 
 #[derive(Debug)]
 #[repr(transparent)]

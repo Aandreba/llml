@@ -1,4 +1,5 @@
-use llml::{Matd2, Matf2};
+use llml::mat::{Matd2, Matf2};
+use llml::others::*;
 use rand::random;
 
 macro_rules! test_arith {
@@ -20,6 +21,12 @@ fn eq () {
 #[test]
 fn into () {
     assert_eq!(Into::<Matf2>::into(Matd2::new([1., 2., 3., 4.])), Matf2::new([1., 2., 3., 4.]))
+}
+
+#[test]
+fn of_rot () {
+    let angle : f64 = random();
+    assert_eq!(Matd2::of_rot(angle), Matd2::new([angle.cos(), -angle.sin(), angle.sin(), angle.cos()]));
 }
 
 #[test]

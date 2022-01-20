@@ -1,4 +1,4 @@
-use llml::{EucVecd4, EucVecf4};
+use llml::vec::{EucVecd4, EucVecf4};
 use rand::random;
 
 macro_rules! test_arith {

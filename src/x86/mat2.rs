@@ -1,8 +1,9 @@
 x86_use!();
 
 use cfg_if::cfg_if;
-use crate::{EucVecf4, EucVecf2, traits::Zero, _mm_low_ps, _mm_high_ps, Matd2};
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
+use crate::{x86::{_mm_low_ps, _mm_high_ps}, others::Zero};
+use super::{vec4::EucVecf4, vec2::EucVecf2, Matd2};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
@@ -12,6 +13,12 @@ impl Matf2 {
     #[inline]
     pub fn new (a: [f32;4]) -> Self {
         Self(a.into())
+    }
+
+    #[inline]
+    pub fn of_rot (a: f32) -> Self {
+        let (sin, cos) = a.sin_cos();
+        Self::new([cos, -sin, sin, cos])
     }
 
     #[inline(always)]

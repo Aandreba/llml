@@ -1,6 +1,8 @@
 x86_use!();
-use crate::{traits::Zero, EucVecd2, EucVecd3, EucVecd4, Matf3};
+use crate::{traits::Zero, vec::EucVecd2, mat::Matf3};
 use std::ops::{Add, Sub, Mul, Div, Neg};
+
+use super::{EucVecd4, EucVecd3};
 
 macro_rules! impl_matd3 {
     () => {
@@ -93,6 +95,22 @@ impl Matd3 {
             EucVecd4::new([a[4], a[5], a[6], a[7]]),
             a[8]
         )
+    }
+
+    /// Returns a matrix thet represents the specified rotation (in radians)
+    pub fn of_rot (roll: f64, pitch: f64, yaw: f64) -> Self {
+        let (sy, cy) = roll.sin_cos();
+        let (sb, cb) = pitch.sin_cos();
+        let (sa, ca) = yaw.sin_cos();
+
+        let sbsy = sb * sy;
+        let sbcy = sb * cy;
+
+        Self::new([
+            ca * cb, ca.mul_add(sbsy, -sa * cy), ca.mul_add(sbcy, sa * sy), 
+            sa * cb, sa.mul_add(sbsy, ca * cy), sa.mul_add(sbcy, -ca * sy),
+            -sb, cb * sy, cb * cy
+        ])
     }
 
     #[inline(always)]

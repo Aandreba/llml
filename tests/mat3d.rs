@@ -1,4 +1,4 @@
-use llml::{Matd3, Matf3};
+use llml::mat::{Matd3, Matf3};
 use rand::random;
 
 macro_rules! test_arith {
@@ -21,6 +21,11 @@ fn eq () {
 #[test]
 fn into () {
     assert_eq!(Into::<Matf3>::into(Matd3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.])), Matf3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.]))
+}
+
+#[test]
+fn of_rot () {
+    todo!()
 }
 
 #[test]

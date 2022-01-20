@@ -1,6 +1,7 @@
 x86_use!();
 use std::{ops::Mul, intrinsics::transmute};
-use crate::{generics::{Complxf, Complxd}, _mm_combine_ps, EucVecf2, _mm_low_high_ps, EucVecf4, EucVecd2, EucVecd4};
+use crate::others::{Complxf, Complxd};
+use super::{vec2::EucVecf2, _mm_combine_ps, _mm_low_high_ps, EucVecd2};
 
 impl Mul for Complxf {
     type Output = Self;
@@ -17,7 +18,6 @@ impl Mul for Complxf {
         }
     }
 }
-
 
 impl Mul for Complxd {
     type Output = Self;

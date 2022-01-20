@@ -1,5 +1,5 @@
 x86_use!();
-use crate::{EucVecf3, EucVecf2, EucVecf4, traits::Zero, _mm_high_ps, _mm_low_ps, _mm_sum_ps, _mm_low_high_ps, _mm_combine_ps, Matd3};
+use crate::{traits::Zero, x86::{vec3::EucVecf3, vec2::EucVecf2, vec4::EucVecf4, _mm_low_high_ps, _mm_sum_ps, _mm_combine_ps}, mat::Matd3};
 use std::ops::{Add, Sub, Mul, Div, Neg};
 
 macro_rules! impl_matf3 {
@@ -98,6 +98,22 @@ impl Matf3 {
             EucVecf3::from_scalar(x),
             EucVecf3::from_scalar(x)
         )
+    }
+
+    /// Returns a matrix thet represents the specified rotation (in radians)
+    pub fn from_rot (roll: f32, pitch: f32, yaw: f32) -> Self {
+        let (sy, cy) = roll.sin_cos();
+        let (sb, cb) = pitch.sin_cos();
+        let (sa, ca) = yaw.sin_cos();
+
+        let sbsy = sb * sy;
+        let sbcy = sb * cy;
+
+        Self::new([
+            ca * cb, ca.mul_add(sbsy, -sa * cy), ca.mul_add(sbcy, sa * sy), 
+            sa * cb, sa.mul_add(sbsy, ca * cy), sa.mul_add(sbcy, -ca * sy),
+            -sb, cb * sy, cb * cy
+        ])
     }
 
     #[inline(always)]

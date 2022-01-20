@@ -1,5 +1,5 @@
 x86_use!();
-use crate::{EucVecd2, EucVecf4};
+use crate::{x86::vec4::EucVecf4, vec::EucVecd2};
 use std::ops::{Add, Sub, Mul, Div, Neg};
 
 #[derive(Debug)]
