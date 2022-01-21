@@ -23,7 +23,7 @@ impl Matf2 {
 
     #[inline(always)]
     pub fn x (&self) -> EucVecf2 {
-        unsafe { EucVecf2(_mm_low_ps(self.0.0)) }
+        unsafe { EucVecf2(_mm_high_ps(self.0.0)) }
     }
 
     #[inline(always)]
@@ -38,7 +38,7 @@ impl Matf2 {
 
     #[inline(always)]
     pub fn y (&self) -> EucVecf2 {
-        unsafe { EucVecf2(_mm_high_ps(self.0.0)) }
+        unsafe { EucVecf2(_mm_low_ps(self.0.0)) }
     }
 
     #[inline(always)]
@@ -169,6 +169,13 @@ impl Mul for Matf2 {
             let m2 = _mm_mul_ps(v3, v4);
             Self(EucVecf4(_mm_add_ps(m1, m2)))
         }
+    }
+}
+
+impl Into<[f32;4]> for Matf2 {
+    #[inline(always)]
+    fn into(self) -> [f32;4] {
+        self.0.into()
     }
 }
 

@@ -15,8 +15,8 @@ impl EucVecd4 {
     }
 
     #[inline(always)]
-    pub fn from_scalar (x: f64) -> Self {
-        Self(EucVecd2::from_scalar(x), EucVecd2::from_scalar(x))
+    pub fn from_scal (x: f64) -> Self {
+        Self(EucVecd2::from_scal(x), EucVecd2::from_scal(x))
     }
 
     #[inline(always)]

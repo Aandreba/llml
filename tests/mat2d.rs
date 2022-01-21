@@ -1,5 +1,4 @@
 use llml::mat::{Matd2, Matf2};
-use llml::others::*;
 use llml::vec::EucVecd4;
 use rand::random;
 
@@ -13,6 +12,17 @@ macro_rules! test_arith {
     }
 }
 
+#[cfg(feature = "llml_serde")]
+#[test]
+fn serde () {
+    let alpha : Matd2 = random();
+    let json = serde_json::to_string(&alpha).unwrap();
+    let beta : Matd2 = serde_json::from_str(json.as_str()).unwrap();
+    
+    let diff : [f64;4] = (alpha - beta).into();
+    assert!(diff.into_iter().sum::<f64>() <= f64::EPSILON * 4.);
+}
+
 #[test]
 fn eq () {
     assert_eq!(Matd2::new([1., 2., 3., 4.]), Matd2::new([1., 2., 3., 4.]));
@@ -21,11 +31,12 @@ fn eq () {
 
 #[test]
 fn into () {
-    assert_eq!(Into::<Matf2>::into(Matd2::new([1., 2., 3., 4.])), Matf2::new([1., 2., 3., 4.]))
+    assert_eq!(Into::<Matf2>::into(Matd2::new([1., 2., 3., 4.])), Matf2::new([1., 2., 3., 4.]));
+    assert_eq!(Into::<[f64;4]>::into(Matd2::new([1., 2., 3., 4.])), [1., 2., 3., 4.])
 }
 
 #[test]
-fn of_rot () {
+fn rot () {
     let angle : f64 = random();
     assert_eq!(Matd2::from_rot(angle), Matd2::new([angle.cos(), -angle.sin(), angle.sin(), angle.cos()]));
 }

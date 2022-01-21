@@ -1,4 +1,4 @@
-use serde::ser::{Serialize, SerializeStruct, Serializer};
+use serde::ser::{Serialize, SerializeStruct};
 use crate::{vec::*, mat::*};
 
 macro_rules! serialize_len2 {
@@ -21,7 +21,7 @@ macro_rules! serialize_len3 {
         $(
             impl Serialize for $target {
                 fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
-                   let mut s = serializer.serialize_struct(stringify!($target), 2)?;
+                   let mut s = serializer.serialize_struct(stringify!($target), 3)?;
                    s.serialize_field("x", &self.x())?;
                    s.serialize_field("y", &self.y())?;
                    s.serialize_field("z", &self.z())?;
@@ -37,7 +37,7 @@ macro_rules! serialize_len4 {
         $(
             impl Serialize for $target {
                 fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
-                   let mut s = serializer.serialize_struct(stringify!($target), 2)?;
+                   let mut s = serializer.serialize_struct(stringify!($target), 4)?;
                    s.serialize_field("x", &self.x())?;
                    s.serialize_field("y", &self.y())?;
                    s.serialize_field("z", &self.z())?;

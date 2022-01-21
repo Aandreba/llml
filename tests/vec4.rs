@@ -8,6 +8,16 @@ macro_rules! test_arith {
     }
 }
 
+#[cfg(feature = "llml_serde")]
+#[test]
+fn serde () {
+    let alpha : EucVecf4 = random();
+    let json = serde_json::to_string(&alpha).unwrap();
+    let beta : EucVecf4 = serde_json::from_str(json.as_str()).unwrap();
+
+    assert!((alpha - beta).abs().sum() <= f32::EPSILON * 4.);
+}
+
 #[test]
 fn eq () {
     assert_eq!(EucVecf4::new([1., 2., 3., 4.]), EucVecf4::new([1., 2., 3., 4.]));
@@ -24,7 +34,7 @@ fn into () {
 #[test]
 fn from_scalar () {
     let alpha : f32 = random();
-    assert_eq!(EucVecf4::from_scalar(alpha), EucVecf4::new([alpha, alpha, alpha, alpha]))
+    assert_eq!(EucVecf4::from_scal(alpha), EucVecf4::new([alpha, alpha, alpha, alpha]))
 }
 
 #[test]

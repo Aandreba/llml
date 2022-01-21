@@ -1,6 +1,6 @@
 x86_use!();
 use crate::{traits::Zero, x86::{vec3::EucVecf3, vec2::EucVecf2, vec4::EucVecf4, _mm_low_high_ps, _mm_sum_ps, _mm_combine_ps}, mat::Matd3};
-use std::ops::{Add, Sub, Mul, Div, Neg};
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
 
 macro_rules! impl_matf3 {
     () => {
@@ -310,6 +310,13 @@ impl Mul for Matf3 {
         let s3 = v1 + v2 + v3;
 
         Self(s1, s2, s3)
+    }
+}
+
+impl Into<[f32;9]> for Matf3 {
+    #[inline(always)]
+    fn into(self) -> [f32;9] {
+        unsafe { transmute([Into::<[f32;3]>::into(self.0), self.1.into(), self.2.into()]) }
     }
 }
 

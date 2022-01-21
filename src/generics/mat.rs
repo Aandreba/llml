@@ -1,5 +1,29 @@
 use crate::mat::{Matf2, Matd2, Matf3, Matd3};
 
+macro_rules! impl_default2 {
+    ($($target:ident, $ty:ty),+) => {
+        $(
+            impl Default for $target {
+                fn default () -> Self {
+                    $target::new(<[$ty;4]>::default())
+                }
+            }
+        )*
+    };
+}
+
+macro_rules! impl_default3 {
+    ($($target:ident, $ty:ty),+) => {
+        $(
+            impl Default for $target {
+                fn default () -> Self {
+                    $target::new(<[$ty;9]>::default())
+                }
+            }
+        )*
+    };
+}
+
 macro_rules! impl_rot2 {
     ($ty:ident) => {
         #[inline]
@@ -33,18 +57,17 @@ macro_rules! impl_rot3 {
     };
 }
 
-impl Matf2 {
-    impl_rot2!(f32);
-}
+impl_default2!(
+    Matf2, f32,
+    Matd2, f64
+);
 
-impl Matd2 {
-    impl_rot2!(f64);
-}
+impl_default3!(
+    Matf3, f32,
+    Matd3, f64
+);
 
-impl Matf3 {
-    impl_rot3!(f32);
-}
-
-impl Matd3 {
-    impl_rot3!(f64);
-}
+impl Matf2 { impl_rot2!(f32); }
+impl Matd2 { impl_rot2!(f64); }
+impl Matf3 { impl_rot3!(f32); }
+impl Matd3 { impl_rot3!(f64); }

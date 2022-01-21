@@ -10,14 +10,6 @@ macro_rules! flat_mod {
     };
 }
 
-macro_rules! mmod {
-    ($($i:ident),+) => {
-        $(
-            pub(crate) mod $i;
-        )*
-    };
-}
-
 macro_rules! import_derives {
     () => {
         #[cfg(feature = "llml_serde")]

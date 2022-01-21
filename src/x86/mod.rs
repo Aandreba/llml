@@ -53,7 +53,7 @@ macro_rules! impl_arith {
 
             #[inline(always)]
             fn div (self, rhs: $ty) -> Self::Output {
-                self.div(Self::from_scalar(rhs))
+                self.div(Self::from_scal(rhs))
             }
         }
 
@@ -62,7 +62,7 @@ macro_rules! impl_arith {
 
             #[inline(always)]
             fn div (self, rhs: $target) -> Self::Output {
-                $target::from_scalar(self).div(rhs)
+                $target::from_scal(self).div(rhs)
             }
         }
 
@@ -102,7 +102,7 @@ macro_rules! impl_arith {
 
             #[inline(always)]
             fn $fun (self, rhs: $ty) -> Self::Output {
-                self.$fun(Self::from_scalar(rhs))
+                self.$fun(Self::from_scal(rhs))
             }
         }
 
@@ -111,7 +111,7 @@ macro_rules! impl_arith {
 
             #[inline(always)]
             fn $fun (self, rhs: $target) -> Self::Output {
-                $target::from_scalar(self).$fun(rhs)
+                $target::from_scal(self).$fun(rhs)
             }
         }
     }

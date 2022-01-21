@@ -11,6 +11,17 @@ macro_rules! test_arith {
     }
 }
 
+#[cfg(feature = "llml_serde")]
+#[test]
+fn serde () {
+    let alpha : Matf2 = random();
+    let json = serde_json::to_string(&alpha).unwrap();
+    let beta : Matf2 = serde_json::from_str(json.as_str()).unwrap();
+
+    let diff : [f32;4] = (alpha - beta).into();
+    assert!(diff.into_iter().sum::<f32>() <= f32::EPSILON * 4.);
+}
+
 #[test]
 fn eq () {
     assert_eq!(Matf2::new([1., 2., 3., 4.]), Matf2::new([1., 2., 3., 4.]));
@@ -19,11 +30,12 @@ fn eq () {
 
 #[test]
 fn into () {
-    assert_eq!(Into::<Matd2>::into(Matf2::new([1., 2., 3., 4.])), Matd2::new([1., 2., 3., 4.]))
+    assert_eq!(Into::<Matd2>::into(Matf2::new([1., 2., 3., 4.])), Matd2::new([1., 2., 3., 4.]));
+    assert_eq!(Into::<[f32;4]>::into(Matf2::new([1., 2., 3., 4.])), [1., 2., 3., 4.])
 }
 
 #[test]
-fn of_rot () {
+fn rot () {
     let angle : f32 = random();
     assert_eq!(Matf2::of_rot(angle), Matf2::new([angle.cos(), -angle.sin(), angle.sin(), angle.cos()]));
 }

@@ -1,6 +1,6 @@
 x86_use!();
 use crate::{traits::Zero, mat::Matf2, vec::EucVecd2};
-use std::{ops::{Add, Sub, Mul, Div, Neg}};
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
 
 use super::EucVecd4;
 
@@ -184,6 +184,13 @@ impl Neg for Matd2 {
     #[inline(always)]
     fn neg(self) -> Self::Output {
         Self(-self.0)
+    }
+}
+
+impl Into<[f64;4]> for Matd2 {
+    #[inline(always)]
+    fn into(self) -> [f64;4] {
+        self.0.into()
     }
 }
 

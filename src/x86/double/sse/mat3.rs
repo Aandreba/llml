@@ -1,6 +1,6 @@
 x86_use!();
 use crate::{traits::Zero, vec::EucVecd2, mat::Matf3};
-use std::ops::{Add, Sub, Mul, Div, Neg};
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
 
 use super::{EucVecd4, EucVecd3};
 
@@ -295,6 +295,12 @@ impl Mul for Matd3 {
             EucVecd4::new([m2.y(), m3.y(), m1.z(), m2.z()]),
             m3.z()
         )
+    }
+}
+
+impl Into<[f64;9]> for Matd3 {
+    fn into(self) -> [f64;9] {
+        unsafe { transmute([Into::<[f64;3]>::into(self.x()), self.y().into(), self.z().into()]) }
     }
 }
 

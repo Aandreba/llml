@@ -18,6 +18,16 @@ macro_rules! declare {
                 }
 
                 #[inline(always)]
+                pub fn from_re (re: $ty) -> Self {
+                    Self($og::new([re, 0.]))
+                }
+
+                #[inline(always)]
+                pub fn from_im (im: $ty) -> Self {
+                    Self($og::new([0., im]))
+                }
+
+                #[inline(always)]
                 pub fn re (&self) -> $ty {
                     self.0.x()
                 }

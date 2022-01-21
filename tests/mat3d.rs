@@ -12,6 +12,17 @@ macro_rules! test_arith {
     }
 }
 
+#[cfg(feature = "llml_serde")]
+#[test]
+fn serde () {
+    let alpha : Matd3 = random();
+    let json = serde_json::to_string(&alpha).unwrap();
+    let beta : Matd3 = serde_json::from_str(json.as_str()).unwrap();
+    
+    let diff : [f64;9] = (alpha - beta).into();
+    assert!(diff.into_iter().sum::<f64>() <= f64::EPSILON * 9.);
+}
+
 #[test]
 fn eq () {
     assert_eq!(Matd3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.]), Matd3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.]));
@@ -20,12 +31,22 @@ fn eq () {
 
 #[test]
 fn into () {
-    assert_eq!(Into::<Matf3>::into(Matd3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.])), Matf3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.]))
+    assert_eq!(Into::<Matf3>::into(Matd3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.])), Matf3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.]));
+    assert_eq!(Into::<[f64;9]>::into(Matd3::new([1., 2., 3., 4., 5., 6., 7., 8., 9.])), [1., 2., 3., 4., 5., 6., 7., 8., 9.])
 }
 
 #[test]
-fn of_rot () {
-    todo!()
+fn rot () {
+    let (sin, cos) = 1f64.sin_cos();
+    let alpha = Matd3::from_rot(1., -std::f64::consts::PI, std::f64::consts::FRAC_PI_2);
+    let beta = Matd3::new([
+        0., cos, sin,
+        1., 0., 0.,
+        0., sin, -cos
+    ]);
+
+    let diff : [f64;9] = (alpha - beta).into();
+    assert!(diff.into_iter().sum::<f64>() <= f64::EPSILON * 9.);
 }
 
 #[test]

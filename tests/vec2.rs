@@ -15,7 +15,7 @@ fn serde () {
     let json = serde_json::to_string(&alpha).unwrap();
     let beta : EucVecf2 = serde_json::from_str(json.as_str()).unwrap();
 
-    assert_eq!(alpha, beta);
+    assert!((alpha - beta).abs().sum() <= f32::EPSILON * 2.);
 }
 
 #[test]
@@ -34,7 +34,7 @@ fn into () {
 #[test]
 fn from_scalar () {
     let alpha : f32 = random();
-    assert_eq!(EucVecf2::from_scalar(alpha), EucVecf2::new([alpha, alpha]))
+    assert_eq!(EucVecf2::from_scal(alpha), EucVecf2::new([alpha, alpha]))
 }
 
 #[test]
