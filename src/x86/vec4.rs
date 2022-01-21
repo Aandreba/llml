@@ -1,7 +1,7 @@
 x86_use!();
 use cfg_if::cfg_if;
 
-use std::ops::{Add, Sub, Mul, Div, Neg};
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
 
 use crate::vec::EucVecd2;
 
@@ -14,6 +14,7 @@ impl_arith_sse!(EucVecf4, f32);
 
 impl EucVecf4 {
     const DIV_MASK : __m128 = unsafe { *(&[u32::MAX, u32::MAX, u32::MAX, u32::MAX] as *const [u32;4] as *const __m128) };
+    const ABS_MASK : __m128 = unsafe { *(&[i32::MAX, i32::MAX, i32::MAX, i32::MAX] as *const [i32;4] as *const __m128) };
 
     #[inline(always)]
     pub fn new (a: [f32;4]) -> Self {
@@ -61,6 +62,11 @@ impl EucVecf4 {
     }
 
     #[inline(always)]
+    pub fn abs (self) -> Self {
+        unsafe { Self(_mm_and_ps(Self::ABS_MASK, self.0)) }
+    }
+
+    #[inline(always)]
     pub fn sqrt (self) -> Self {
         unsafe { Self(_mm_sqrt_ps(self.0)) }
     }
@@ -68,6 +74,13 @@ impl EucVecf4 {
     #[inline(always)]
     pub fn sqrt_fast (self) -> Self {
         unsafe { Self(_mm_rcp_ps(_mm_rsqrt_ps(self.0))) }
+    }
+}
+
+impl Into<[f32;4]> for EucVecf4 {
+    #[inline(always)]
+    fn into (self) -> [f32;4] {
+        unsafe { transmute(self.0) }
     }
 }
 
@@ -87,12 +100,5 @@ impl Into<EucVecd4> for EucVecf4 {
                 }
             }
         }
-    }
-}
-
-impl From<[f32;4]> for EucVecf4 {
-    #[inline(always)]
-    fn from(x: [f32;4]) -> Self {
-        unsafe { Self(_mm_loadu_ps(&x as *const [f32;4] as *const f32)) }
     }
 }

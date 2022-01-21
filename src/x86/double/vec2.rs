@@ -1,5 +1,5 @@
 x86_use!();
-use std::ops::{Add, Sub, Mul, Div, Neg};
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
 use crate::x86::vec2::EucVecf2;
 
 #[derive(Debug)]
@@ -9,6 +9,7 @@ impl_arith_sse!(EucVecd2, f64);
 
 impl EucVecd2 {
     const DIV_MASK : __m128d = unsafe { *(&[u64::MAX, u64::MAX] as *const [u64;2] as *const __m128d) };
+    const ABS_MASK : __m128d = unsafe { *(&[i64::MAX, i64::MAX] as *const [i64;2] as *const __m128d) };
 
     #[inline(always)]
     pub fn new (a: [f64;2]) -> Self {
@@ -46,6 +47,11 @@ impl EucVecd2 {
     }
 
     #[inline(always)]
+    pub fn abs (self) -> Self {
+        unsafe { Self(_mm_and_pd(Self::ABS_MASK, self.0)) }
+    }
+    
+    #[inline(always)]
     pub fn sqrt (self) -> Self {
         unsafe { Self(_mm_sqrt_pd(self.0)) }
     }
@@ -53,6 +59,13 @@ impl EucVecd2 {
     #[inline(always)]
     pub fn sqrt_fast (self) -> Self {
         self.sqrt()
+    }
+}
+
+impl Into<[f64;2]> for EucVecd2 {
+    #[inline(always)]
+    fn into (self) -> [f64;2] {
+        unsafe { transmute(self.0) }
     }
 }
 

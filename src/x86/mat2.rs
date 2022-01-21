@@ -52,6 +52,16 @@ impl Matf2 {
     }
 
     #[inline(always)]
+    pub fn scal_mul (self, rhs: Self) -> Self {
+        Self(self.0 * rhs.0)
+    }
+
+    #[inline(always)]
+    pub fn scal_div (self, rhs: Self) -> Self {
+        Self(self.0 / rhs.0)
+    }
+
+    #[inline(always)]
     pub fn tr (self) -> f32 {
         self.0.x() + self.0.w()
     }

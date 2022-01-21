@@ -1,5 +1,6 @@
 use llml::mat::{Matd2, Matf2};
 use llml::others::*;
+use llml::vec::EucVecd4;
 use rand::random;
 
 macro_rules! test_arith {
@@ -26,7 +27,7 @@ fn into () {
 #[test]
 fn of_rot () {
     let angle : f64 = random();
-    assert_eq!(Matd2::of_rot(angle), Matd2::new([angle.cos(), -angle.sin(), angle.sin(), angle.cos()]));
+    assert_eq!(Matd2::from_rot(angle), Matd2::new([angle.cos(), -angle.sin(), angle.sin(), angle.cos()]));
 }
 
 #[test]
@@ -44,6 +45,28 @@ fn mul () {
     let alpha = Matd2::new([1., 2., 3., 4.]);
     let beta = Matd2::new([5., 6., 7., 8.]);
     assert_eq!(alpha * beta, Matd2::new([19., 22., 43., 50.]));
+}
+
+#[test]
+fn scal_mul () {
+    let alpha : EucVecd4 = random();
+    let beta : EucVecd4 = random();
+    let mul = alpha * beta;
+
+    let a = Matd2::new(alpha.into());
+    let b = Matd2::new(beta.into());
+    assert_eq!(a.scal_mul(b), Matd2::new(mul.into()));
+}
+
+#[test]
+fn scal_div () {
+    let alpha : EucVecd4 = random();
+    let beta : EucVecd4 = random();
+    let mul = alpha / beta;
+
+    let a = Matd2::new(alpha.into());
+    let b = Matd2::new(beta.into());
+    assert_eq!(a.scal_div(b), Matd2::new(mul.into()));
 }
 
 #[test]

@@ -16,7 +16,15 @@ fn eq () {
 
 #[test]
 fn into () {
-    assert_eq!(Into::<EucVecd3>::into(EucVecf3::new([1., 2., 3.])), EucVecd3::new([1., 2., 3.]))
+    let alpha = EucVecf3::new([1., 2., 3.]);
+    assert_eq!(Into::<EucVecd3>::into(alpha), EucVecd3::new([1., 2., 3.]));
+    assert_eq!(Into::<[f32;3]>::into(alpha), [1., 2., 3.])
+}
+
+#[test]
+fn from_scalar () {
+    let alpha : f32 = random();
+    assert_eq!(EucVecf3::from_scalar(alpha), EucVecf3::new([alpha, alpha, alpha]))
 }
 
 #[test]
@@ -75,21 +83,20 @@ fn unit () {
 }
 
 #[test]
+fn abs () {
+    let alpha : EucVecf3 = random();
+    assert_eq!(alpha.abs(), EucVecf3::new([alpha.x().abs(), alpha.y().abs(), alpha.z().abs()]))
+}
+
+#[test]
 fn sqrt () {
     let alpha : EucVecf3 = random();
     assert_eq!(alpha.sqrt(), EucVecf3::new([alpha.x().sqrt(), alpha.y().sqrt(), alpha.z().sqrt()]))
 }
 
-const RSQRT_EPSILON : f32 = 0.0003662109375 + f32::EPSILON;
-
 #[test]
 fn sqrt_fast () {
-    let alpha : EucVecf3 = random();
-    let fast = alpha.sqrt_fast();
-
-    assert!((fast.x() - alpha.x().sqrt()).abs() <= RSQRT_EPSILON);
-    assert!((fast.y() - alpha.y().sqrt()).abs() <= RSQRT_EPSILON);
-    assert!((fast.z() - alpha.z().sqrt()).abs() <= RSQRT_EPSILON);
+    // MANUALLY ASSERTED
 }
 
 fn get_vecs () -> (EucVecf3, EucVecf3) {

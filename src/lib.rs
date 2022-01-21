@@ -1,4 +1,4 @@
-#![feature(once_cell, concat_idents, core_intrinsics, set_ptr_value, portable_simd, trivial_bounds, stdsimd)]
+#![feature(once_cell, concat_idents, core_intrinsics, set_ptr_value, portable_simd, trivial_bounds, stdsimd, generic_const_exprs)]
 #![cfg_attr(any(target_arch = "x86", target_arch = "x86_64"), feature(stdarch))]
 
 macro_rules! flat_mod {

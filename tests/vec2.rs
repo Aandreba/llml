@@ -8,6 +8,16 @@ macro_rules! test_arith {
     }
 }
 
+#[cfg(feature = "llml_serde")]
+#[test]
+fn serde () {
+    let alpha : EucVecf2 = random();
+    let json = serde_json::to_string(&alpha).unwrap();
+    let beta : EucVecf2 = serde_json::from_str(json.as_str()).unwrap();
+
+    assert_eq!(alpha, beta);
+}
+
 #[test]
 fn eq () {
     assert_eq!(EucVecf2::new([1., 2.]), EucVecf2::new([1., 2.]));
@@ -16,7 +26,15 @@ fn eq () {
 
 #[test]
 fn into () {
-    assert_eq!(Into::<EucVecd2>::into(EucVecf2::new([1., 2.])), EucVecd2::new([1., 2.]))
+    let alpha = EucVecf2::new([1., 2.]);
+    assert_eq!(Into::<EucVecd2>::into(alpha), EucVecd2::new([1., 2.]));
+    assert_eq!(Into::<[f32;2]>::into(alpha), [1., 2.])
+}
+
+#[test]
+fn from_scalar () {
+    let alpha : f32 = random();
+    assert_eq!(EucVecf2::from_scalar(alpha), EucVecf2::new([alpha, alpha]))
 }
 
 #[test]
@@ -70,6 +88,12 @@ fn unit () {
 
     let norm = alpha.x().hypot(alpha.y());
     assert_eq!(alpha.unit(), EucVecf2::new([alpha.x() / norm, alpha.y() / norm]))
+}
+
+#[test]
+fn abs () {
+    let alpha : EucVecf2 = random();
+    assert_eq!(alpha.abs(), EucVecf2::new([alpha.x().abs(), alpha.y().abs()]))
 }
 
 #[test]

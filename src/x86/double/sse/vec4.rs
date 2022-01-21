@@ -1,6 +1,7 @@
 x86_use!();
 use crate::{x86::vec4::EucVecf4, vec::EucVecd2};
 use std::ops::{Add, Sub, Mul, Div, Neg};
+use std::mem::transmute;
 
 #[derive(Debug)]
 #[repr(C, align(32))]
@@ -11,6 +12,11 @@ impl EucVecd4 {
     #[inline(always)]
     pub fn new (a: [f64;4]) -> Self {
         Self(EucVecd2::new([a[0], a[1]]), EucVecd2::new([a[2], a[3]]))
+    }
+
+    #[inline(always)]
+    pub fn from_scalar (x: f64) -> Self {
+        Self(EucVecd2::from_scalar(x), EucVecd2::from_scalar(x))
     }
 
     #[inline(always)]
@@ -60,6 +66,11 @@ impl EucVecd4 {
     }
 
     #[inline(always)]
+    pub fn abs (self) -> Self {
+        Self(self.0.abs(), self.1.abs())
+    }
+
+    #[inline(always)]
     pub fn sqrt (self) -> Self {
         Self(self.0.sqrt(), self.1.sqrt())
     }
@@ -67,6 +78,13 @@ impl EucVecd4 {
     #[inline(always)]
     pub fn sqrt_fast (self) -> Self {
         Self(self.0.sqrt_fast(), self.1.sqrt_fast())
+    }
+}
+
+impl Into<[f64;4]> for EucVecd4 {
+    #[inline(always)]
+    fn into (self) -> [f64;4] {
+        unsafe { transmute(self) }
     }
 }
 

@@ -77,12 +77,6 @@ impl Matd2 {
         Self(EucVecd4::new(a))
     }
 
-    #[inline]
-    pub fn of_rot (a: f64) -> Self {
-        let (sin, cos) = a.sin_cos();
-        Self::new([cos, -sin, sin, cos])
-    }
-
     #[inline(always)]
     pub fn x (&self) -> EucVecd2 {
         self.0.0
@@ -116,6 +110,16 @@ impl Matd2 {
     #[inline(always)]
     pub fn tr (self) -> f64 {
         self.0.x()  +self.0.w()
+    }
+
+    #[inline(always)]
+    pub fn scal_mul (self, rhs: Self) -> Self {
+        Self(self.0 * rhs.0)
+    }
+
+    #[inline(always)]
+    pub fn scal_div (self, rhs: Self) -> Self {
+        Self(self.0 / rhs.0)
     }
 
     #[inline(always)]

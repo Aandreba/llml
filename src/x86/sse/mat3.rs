@@ -91,31 +91,6 @@ impl Matf3 {
         )
     }
 
-    #[inline]
-    pub fn from_scalar (x: f32) -> Self {
-        Matf3(
-            EucVecf3::from_scalar(x),
-            EucVecf3::from_scalar(x),
-            EucVecf3::from_scalar(x)
-        )
-    }
-
-    /// Returns a matrix thet represents the specified rotation (in radians)
-    pub fn from_rot (roll: f32, pitch: f32, yaw: f32) -> Self {
-        let (sy, cy) = roll.sin_cos();
-        let (sb, cb) = pitch.sin_cos();
-        let (sa, ca) = yaw.sin_cos();
-
-        let sbsy = sb * sy;
-        let sbcy = sb * cy;
-
-        Self::new([
-            ca * cb, ca.mul_add(sbsy, -sa * cy), ca.mul_add(sbcy, sa * sy), 
-            sa * cb, sa.mul_add(sbsy, ca * cy), sa.mul_add(sbcy, -ca * sy),
-            -sb, cb * sy, cb * cy
-        ])
-    }
-
     #[inline(always)]
     pub fn transp (self) -> Self {
         Self::new([
@@ -183,6 +158,24 @@ impl Matf3 {
     #[inline(always)]
     pub fn zz (&self) -> f32 {
         self.2.z()
+    }
+
+    #[inline(always)]
+    pub fn scal_mul (self, rhs: Self) -> Self {
+        Self (
+            self.0 * rhs.0,
+            self.1 * rhs.1,
+            self.2 * rhs.2
+        )
+    }
+
+    #[inline(always)]
+    pub fn scal_div (self, rhs: Self) -> Self {
+        Self (
+            self.0 / rhs.0,
+            self.1 / rhs.1,
+            self.2 / rhs.2
+        )
     }
 
     #[inline(always)]

@@ -1,4 +1,4 @@
-use llml::mat::{Matf2, Matd2};
+use llml::{mat::{Matf2, Matd2}, vec::EucVecf4};
 use rand::random;
 
 macro_rules! test_arith {
@@ -43,6 +43,28 @@ fn mul () {
     let alpha = Matf2::new([1., 2., 3., 4.]);
     let beta = Matf2::new([5., 6., 7., 8.]);
     assert_eq!(alpha * beta, Matf2::new([19., 22., 43., 50.]));
+}
+
+#[test]
+fn scal_mul () {
+    let alpha : EucVecf4 = random();
+    let beta : EucVecf4 = random();
+    let mul = alpha * beta;
+
+    let a = Matf2::new(alpha.into());
+    let b = Matf2::new(beta.into());
+    assert_eq!(a.scal_mul(b), Matf2::new(mul.into()));
+}
+
+#[test]
+fn scal_div () {
+    let alpha : EucVecf4 = random();
+    let beta : EucVecf4 = random();
+    let mul = alpha * beta;
+
+    let a = Matf2::new(alpha.into());
+    let b = Matf2::new(beta.into());
+    assert_eq!(a.scal_mul(b), Matf2::new(mul.into()));
 }
 
 #[test]

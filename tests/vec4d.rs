@@ -16,7 +16,15 @@ fn eq () {
 
 #[test]
 fn into () {
-    assert_eq!(Into::<EucVecf4>::into(EucVecd4::new([1., 2., 3., 4.])), EucVecf4::new([1., 2., 3., 4.]))
+    let alpha = EucVecd4::new([1., 2., 3., 4.]);
+    assert_eq!(Into::<EucVecf4>::into(alpha), EucVecf4::new([1., 2., 3., 4.]));
+    assert_eq!(Into::<[f64;4]>::into(alpha), [1., 2., 3., 4.])
+}
+
+#[test]
+fn from_scalar () {
+    let alpha : f64 = random();
+    assert_eq!(EucVecd4::from_scalar(alpha), EucVecd4::new([alpha, alpha, alpha, alpha]))
 }
 
 #[test]
@@ -51,7 +59,6 @@ fn sum () {
     assert_eq!(alpha.sum(), alpha.x() + alpha.y() + alpha.z() + alpha.w())
 }
 
-
 #[test]
 fn dot () {
     let alpha = EucVecd4::new([1., 2., 3., 4.]);
@@ -71,6 +78,12 @@ fn unit () {
 
     let norm = (alpha.x() * alpha.x() + alpha.y() * alpha.y() + alpha.z() * alpha.z() + alpha.w() * alpha.w()).sqrt();
     assert_eq!(alpha.unit(), EucVecd4::new([alpha.x() / norm, alpha.y() / norm, alpha.z() / norm, alpha.w() / norm]))
+}
+
+#[test]
+fn abs () {
+    let alpha : EucVecd4 = random();
+    assert_eq!(alpha.abs(), EucVecd4::new([alpha.x().abs(), alpha.y().abs(), alpha.z().abs(), alpha.w().abs()]))
 }
 
 #[test]

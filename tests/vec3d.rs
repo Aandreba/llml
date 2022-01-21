@@ -16,7 +16,15 @@ fn eq () {
 
 #[test]
 fn into () {
-    assert_eq!(Into::<EucVecf3>::into(EucVecd3::new([1., 2., 3.])), EucVecf3::new([1., 2., 3.]))
+    let alpha = EucVecd3::new([1., 2., 3.]);
+    assert_eq!(Into::<EucVecf3>::into(alpha), EucVecf3::new([1., 2., 3.]));
+    assert_eq!(Into::<[f64;3]>::into(alpha), [1., 2., 3.])
+}
+
+#[test]
+fn from_scalar () {
+    let alpha : f64 = random();
+    assert_eq!(EucVecd3::from_scalar(alpha), EucVecd3::new([alpha, alpha, alpha]))
 }
 
 #[test]
@@ -72,6 +80,12 @@ fn unit () {
 
     let norm = (alpha.x() * alpha.x() + alpha.y() * alpha.y() + alpha.z() * alpha.z()).sqrt();
     assert_eq!(alpha.unit(), EucVecd3::new([alpha.x() / norm, alpha.y() / norm, alpha.z() / norm]))
+}
+
+#[test]
+fn abs () {
+    let alpha : EucVecd3 = random();
+    assert_eq!(alpha.abs(), EucVecd3::new([alpha.x().abs(), alpha.y().abs(), alpha.z().abs()]))
 }
 
 #[test]

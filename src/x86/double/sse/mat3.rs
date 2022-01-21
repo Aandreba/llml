@@ -97,22 +97,6 @@ impl Matd3 {
         )
     }
 
-    /// Returns a matrix thet represents the specified rotation (in radians)
-    pub fn of_rot (roll: f64, pitch: f64, yaw: f64) -> Self {
-        let (sy, cy) = roll.sin_cos();
-        let (sb, cb) = pitch.sin_cos();
-        let (sa, ca) = yaw.sin_cos();
-
-        let sbsy = sb * sy;
-        let sbcy = sb * cy;
-
-        Self::new([
-            ca * cb, ca.mul_add(sbsy, -sa * cy), ca.mul_add(sbcy, sa * sy), 
-            sa * cb, sa.mul_add(sbsy, ca * cy), sa.mul_add(sbcy, -ca * sy),
-            -sb, cb * sy, cb * cy
-        ])
-    }
-
     #[inline(always)]
     pub fn transp (self) -> Self {
         Self::new([
@@ -180,6 +164,24 @@ impl Matd3 {
     #[inline(always)]
     pub fn zz (&self) -> f64 {
         self.2
+    }
+
+    #[inline(always)]
+    pub fn scal_mul (self, rhs: Self) -> Self {
+        Self (
+            self.0 * rhs.0,
+            self.1 * rhs.1,
+            self.2 * rhs.2
+        )
+    }
+
+    #[inline(always)]
+    pub fn scal_div (self, rhs: Self) -> Self {
+        Self (
+            self.0 / rhs.0,
+            self.1 / rhs.1,
+            self.2 / rhs.2
+        )
     }
 
     #[inline(always)]

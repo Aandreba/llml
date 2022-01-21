@@ -1,6 +1,6 @@
 x86_use!();
 use crate::{x86::vec3::EucVecf3, vec::EucVecd2};
-use std::ops::{Add, Sub, Mul, Div, Neg};
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
 
 #[derive(Debug)]
 #[repr(C, align(32))]
@@ -11,6 +11,11 @@ impl EucVecd3 {
     #[inline(always)]
     pub fn new (a: [f64;3]) -> Self {
         Self(EucVecd2::new([a[0], a[1]]), a[2])
+    }
+
+    #[inline(always)]
+    pub fn from_scalar (x: f64) -> Self {
+        Self(EucVecd2::from_scalar(x), x)
     }
 
     #[inline(always)]
@@ -55,6 +60,11 @@ impl EucVecd3 {
     }
 
     #[inline(always)]
+    pub fn abs (self) -> Self {
+        Self(self.0.abs(), self.1.abs())
+    }
+
+    #[inline(always)]
     pub fn sqrt (self) -> Self {
         Self(self.0.sqrt(), self.1.sqrt())
     }
@@ -62,6 +72,13 @@ impl EucVecd3 {
     #[inline(always)]
     pub fn sqrt_fast (self) -> Self {
         Self(self.0.sqrt_fast(), self.1.sqrt())
+    }
+}
+
+impl Into<[f64;3]> for EucVecd3 {
+    #[inline(always)]
+    fn into (self) -> [f64;3] {
+        [self.x(), self.y(), self.1]
     }
 }
 

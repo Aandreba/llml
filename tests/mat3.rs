@@ -1,4 +1,4 @@
-use llml::mat::{Matf3, Matd3};
+use llml::{mat::{Matf3, Matd3}};
 use rand::random;
 
 macro_rules! test_arith {
@@ -24,8 +24,15 @@ fn into () {
 }
 
 #[test]
-fn of_rot () {
-    todo!()
+fn rot () {
+    let (sin, cos) = 1f32.sin_cos();
+    let alpha = Matf3::from_rot(1., -std::f32::consts::PI, std::f32::consts::FRAC_PI_2);
+    
+    assert_eq!(alpha, Matf3::new([
+        0., cos, sin,
+        1., 0., 0.,
+        0., sin, -cos
+    ]))
 }
 
 #[test]
@@ -57,6 +64,50 @@ fn mul () {
         201., 216., 231.,
         318., 342., 366.
     ]));
+}
+
+#[test]
+fn scal_mul () {
+    let alpha : [f32;9] = random();
+    let beta : [f32;9] = random();
+    let mul = [
+        alpha[0] * beta[0],
+        alpha[1] * beta[1],
+        alpha[2] * beta[2],
+        alpha[3] * beta[3],
+        alpha[4] * beta[4],
+        alpha[5] * beta[5],
+        alpha[6] * beta[6],
+        alpha[7] * beta[7],
+        alpha[8] * beta[8],
+    ];
+
+    let a = Matf3::new(alpha);
+    let b = Matf3::new(beta);
+
+    assert_eq!(a.scal_mul(b), Matf3::new(mul))
+}
+
+#[test]
+fn scal_div () {
+    let alpha : [f32;9] = random();
+    let beta : [f32;9] = random();
+    let mul = [
+        alpha[0] / beta[0],
+        alpha[1] / beta[1],
+        alpha[2] / beta[2],
+        alpha[3] / beta[3],
+        alpha[4] / beta[4],
+        alpha[5] / beta[5],
+        alpha[6] / beta[6],
+        alpha[7] / beta[7],
+        alpha[8] / beta[8],
+    ];
+
+    let a = Matf3::new(alpha);
+    let b = Matf3::new(beta);
+
+    assert_eq!(a.scal_div(b), Matf3::new(mul))
 }
 
 #[test]

@@ -9,6 +9,7 @@ impl_arith_sse!(EucVecf2, f32);
 
 impl EucVecf2 {
     const DIV_MASK : __m128 = unsafe { *(&[u32::MAX, u32::MAX, 0, 0] as *const [u32;4] as *const __m128) };
+    const ABS_MASK : __m128 = unsafe { *(&[i32::MAX, i32::MAX, 0, 0] as *const [i32;4] as *const __m128) };
 
     #[inline(always)]
     pub fn new (a: [f32;2]) -> Self {
@@ -46,6 +47,11 @@ impl EucVecf2 {
     }
 
     #[inline(always)]
+    pub fn abs (self) -> Self {
+        unsafe { Self(_mm_and_ps(Self::ABS_MASK, self.0)) }
+    }
+
+    #[inline(always)]
     pub fn sqrt (self) -> Self {
         unsafe { Self(_mm_sqrt_ps(self.0)) }
     }
@@ -53,6 +59,13 @@ impl EucVecf2 {
     #[inline(always)]
     pub fn sqrt_fast (self) -> Self {
         unsafe { Self(_mm_rcp_ps(_mm_rsqrt_ps(self.0))) }
+    }
+}
+
+impl Into<[f32;2]> for EucVecf2 {
+    #[inline(always)]
+    fn into (self) -> [f32;2] {
+        unsafe { *(&self as *const Self as *const [f32;2]) }
     }
 }
 

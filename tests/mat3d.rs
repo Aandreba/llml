@@ -60,6 +60,50 @@ fn mul () {
 }
 
 #[test]
+fn scal_mul () {
+    let alpha : [f64;9] = random();
+    let beta : [f64;9] = random();
+    let mul = [
+        alpha[0] * beta[0],
+        alpha[1] * beta[1],
+        alpha[2] * beta[2],
+        alpha[3] * beta[3],
+        alpha[4] * beta[4],
+        alpha[5] * beta[5],
+        alpha[6] * beta[6],
+        alpha[7] * beta[7],
+        alpha[8] * beta[8],
+    ];
+
+    let a = Matd3::new(alpha);
+    let b = Matd3::new(beta);
+
+    assert_eq!(a.scal_mul(b), Matd3::new(mul))
+}
+
+#[test]
+fn scal_div () {
+    let alpha : [f64;9] = random();
+    let beta : [f64;9] = random();
+    let mul = [
+        alpha[0] / beta[0],
+        alpha[1] / beta[1],
+        alpha[2] / beta[2],
+        alpha[3] / beta[3],
+        alpha[4] / beta[4],
+        alpha[5] / beta[5],
+        alpha[6] / beta[6],
+        alpha[7] / beta[7],
+        alpha[8] / beta[8],
+    ];
+
+    let a = Matd3::new(alpha);
+    let b = Matd3::new(beta);
+
+    assert_eq!(a.scal_div(b), Matd3::new(mul))
+}
+
+#[test]
 fn neg () {
     let alpha : Matd3 = random();
     assert_eq!(-alpha, Matd3::new([
