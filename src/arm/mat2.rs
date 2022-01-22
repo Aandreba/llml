@@ -1,6 +1,8 @@
 arm_use!();
-use crate::{EucVecf4, EucVecf2, traits::Zero, EucVecd2, Matd2};
+use crate::{vec::{EucVecf4, EucVecf2}, mat::Matd2, others::Zero};
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
+
+use super::EucVecd4;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
@@ -123,9 +125,16 @@ impl Neg for Matf2 {
     }
 }
 
+impl Into<[f32;4]> for Matf2 {
+    #[inline(always)]
+    fn into(self) -> [f32;4] {
+        self.0.into()
+    }
+}
+
 impl Into<Matd2> for Matf2 {
     #[inline(always)]
     fn into(self) -> Matd2 {
-        Matd2(self.0.into())
+        Matd2(Into::<EucVecd4>::into(self.0))
     }
 }

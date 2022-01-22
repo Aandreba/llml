@@ -37,7 +37,7 @@ fn into () {
 #[test]
 fn rot () {
     let angle : f32 = random();
-    assert_eq!(Matf2::of_rot(angle), Matf2::new([angle.cos(), -angle.sin(), angle.sin(), angle.cos()]));
+    assert_eq!(Matf2::from_rot(angle), Matf2::new([angle.cos(), -angle.sin(), angle.sin(), angle.cos()]));
 }
 
 #[test]

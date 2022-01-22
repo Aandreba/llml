@@ -1,7 +1,7 @@
 arm_use!();
 use core::mem::transmute;
 use std::ptr::addr_of;
-use std::{ops::{Add, Sub, Mul, Div, Neg, Index, IndexMut}};
+use std::{ops::{Add, Sub, Mul, Div, Neg}};
 
 wrap!(
     EucVecf2, float32x2_t,

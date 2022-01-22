@@ -1,5 +1,7 @@
 use std::{ops::Mul, intrinsics::transmute};
-use crate::{Complxf, EucVecf2, EucVecd2, Complxd};
+use crate::others::{Complxf, Complxd};
+use super::{EucVecf2, EucVecd2};
+
 arm_use!();
 
 impl Mul for Complxf {

@@ -1,6 +1,8 @@
 arm_use!();
-use crate::{EucVecf3, EucVecf2, EucVecf4, Matf2, traits::Zero, Matd3};
-use std::ops::{Add, Sub, Mul, Div, Neg};
+use crate::{vec::{EucVecf3, EucVecf2, EucVecf4}, mat::{Matd3}, others::Zero};
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
+
+use super::EucVecd4;
 
 macro_rules! impl_matf3 {
     () => {
@@ -91,15 +93,6 @@ impl Matf3 {
         )
     }
 
-    #[inline]
-    pub fn from_scalar (x: f32) -> Self {
-        Matf3(
-            EucVecf3::from_scalar(x),
-            EucVecf3::from_scalar(x),
-            EucVecf3::from_scalar(x)
-        )
-    }
-
     #[inline(always)]
     pub fn transp (self) -> Self {
         Self::new([
@@ -167,6 +160,24 @@ impl Matf3 {
     #[inline(always)]
     pub fn zz (&self) -> f32 {
         self.2.z()
+    }
+
+    #[inline(always)]
+    pub fn scal_mul (self, rhs: Self) -> Self {
+        Self(
+            self.0 * rhs.0,
+            self.1 * rhs.1,
+            self.2 * rhs.2
+        )
+    }
+
+    #[inline(always)]
+    pub fn scal_div (self, rhs: Self) -> Self {
+        Self(
+            self.0 / rhs.0,
+            self.1 / rhs.1,
+            self.2 / rhs.2
+        )
     }
 
     #[inline(always)]
@@ -304,11 +315,18 @@ impl Mul for Matf3 {
     }
 }
 
+impl Into<[f32;9]> for Matf3 {
+    #[inline(always)]
+    fn into(self) -> [f32;9] {
+        unsafe { transmute([Into::<[f32;3]>::into(self.x()), self.y().into(), self.z().into()]) }
+    }
+}
+
 impl Into<Matd3> for Matf3 {
     #[inline(always)]
     fn into(self) -> Matd3 {
-        let c1 = EucVecf4::new([self.xx(), self.xy(), self.xz(), self.yx()]).into();
-        let c2 = EucVecf4::new([self.yy(), self.yz(), self.zx(), self.zy()]).into();
+        let c1 : EucVecd4 = EucVecf4::new([self.xx(), self.xy(), self.xz(), self.yx()]).into();
+        let c2 : EucVecd4 = EucVecf4::new([self.yy(), self.yz(), self.zx(), self.zy()]).into();
         let c3 = self.zz().into();
         Matd3(c1, c2, c3)
     }

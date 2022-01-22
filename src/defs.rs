@@ -2,7 +2,7 @@ macro_rules! import {
     ($($i:ident),+) => {
         $(
             #[cfg(all(any(target_arch = "arm", target_arch = "aarch64"), target_feature = "neon"))]
-            pub use super::arm::$i;
+            pub use crate::arm::$i;
 
             #[cfg(all(any(target_arch = "x86", target_arch = "x86_64"), target_feature = "sse"))]
             pub use crate::x86::$i;

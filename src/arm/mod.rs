@@ -106,7 +106,7 @@ macro_rules! impl_vec {
 
             #[inline(always)]
             fn $fun (self, rhs: $ty) -> Self::Output {
-                self.$fun(Self::from_scalar(rhs))
+                self.$fun(Self::from_scal(rhs))
             }
         }
 
@@ -115,7 +115,7 @@ macro_rules! impl_vec {
 
             #[inline(always)]
             fn $fun (self, rhs: $target) -> Self::Output {
-                $target::from_scalar(self).$fun(rhs)
+                $target::from_scal(self).$fun(rhs)
             }
         }
     };
@@ -152,7 +152,7 @@ macro_rules! impl_vec2 {
             }
 
             #[inline]
-            pub fn from_scalar (x: $ty) -> Self {
+            pub fn from_scal (x: $ty) -> Self {
                 unsafe { Self(concat_idents!(vld1, $($tag,)? _dup_, $ty)(&x)) }
             }
 
@@ -164,6 +164,11 @@ macro_rules! impl_vec2 {
             #[inline(always)]
             pub fn y (&self) -> $ty {
                 unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 1) }
+            }
+
+            #[inline(always)]
+            pub fn abs (self) -> Self {
+                unsafe { Self(concat_idents!(vabs, $($tag,)? _, $ty)(self.0)) }
             }
 
             #[inline(always)]
@@ -249,7 +254,7 @@ macro_rules! impl_vec3 {
 
             #[inline(always)]
             fn div (self, rhs: $ty) -> Self::Output {
-                self.div(Self::from_scalar(rhs))
+                self.div(Self::from_scal(rhs))
             }
         }
 
@@ -258,7 +263,7 @@ macro_rules! impl_vec3 {
 
             #[inline(always)]
             fn div (self, rhs: $target) -> Self::Output {
-                $target::from_scalar(self).div(rhs)
+                $target::from_scal(self).div(rhs)
             }
         }
 
@@ -269,7 +274,7 @@ macro_rules! impl_vec3 {
             }
 
             #[inline]
-            pub fn from_scalar (x: $ty) -> Self {
+            pub fn from_scal (x: $ty) -> Self {
                 Self::new([x, x, x])
             }
 
@@ -286,6 +291,11 @@ macro_rules! impl_vec3 {
             #[inline(always)]
             pub fn z (&self) -> $ty {
                 unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 2) }
+            }
+
+            #[inline(always)]
+            pub fn abs (self) -> Self {
+                unsafe { Self(concat_idents!(vabs, $($tag,)? _, $ty)(self.0)) }
             }
 
             #[inline(always)]
@@ -375,7 +385,7 @@ macro_rules! impl_vec4 {
             }
 
             #[inline]
-            pub fn from_scalar (x: f32) -> Self {
+            pub fn from_scal (x: f32) -> Self {
                 unsafe { Self(vld1q_dup_f32(&x)) }
             }
 
@@ -397,6 +407,11 @@ macro_rules! impl_vec4 {
             #[inline(always)]
             pub fn w (&self) -> $ty {
                 unsafe { concat_idents!(vget, $($tag,)? _lane, _, $ty)(self.0, 3) }
+            }
+
+            #[inline(always)]
+            pub fn abs (self) -> Self {
+                unsafe { Self(concat_idents!(vabs, $($tag,)? _, $ty)(self.0)) }
             }
 
             #[inline(always)]
@@ -457,6 +472,16 @@ macro_rules! impl_mat2 {
         );
 
         impl $target {
+            #[inline(always)]
+            pub fn scal_mul (self, rhs: Self) -> Self {
+                Self(self.0 * rhs.0)
+            }
+
+            #[inline(always)]
+            pub fn scal_div (self, rhs: Self) -> Self {
+                Self(self.0 / rhs.0)
+            }
+
             #[inline(always)]
             pub fn transp (self) -> Self {
                 Self::new([self.xx(), self.yx(), self.xy(), self.yy()])

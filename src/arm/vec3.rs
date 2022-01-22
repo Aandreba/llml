@@ -2,7 +2,7 @@ arm_use!();
 use core::mem::transmute;
 use std::ptr::{addr_of};
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
-use crate::{EucVecd2, EucVecd4};
+use crate::arm::{EucVecd2, EucVecd4};
 
 macro_rules! impl_vec3_vs {
     ($target:ident, $ty:ident, $tag:ident) => {
@@ -17,11 +17,11 @@ macro_rules! impl_vec3_vs {
         impl $target {
             #[inline]
             pub fn new (a: [$ty;3]) -> Self {
-                unsafe { Self(transmute([a[0], a[1]]), a[2]) }
+                Self(EucVecd2::new([a[0], a[1]]), a[2])
             }
 
             #[inline]
-            pub fn from_scalar (x: $ty) -> Self {
+            pub fn from_scal (x: $ty) -> Self {
                 Self::new([x, x, x])
             }
 
@@ -38,6 +38,11 @@ macro_rules! impl_vec3_vs {
             #[inline(always)]
             pub fn z (&self) -> $ty {
                 self.1
+            }
+
+            #[inline(always)]
+            pub fn abs (self) -> Self {
+                Self(self.0.abs(), self.1.abs())
             }
 
             #[inline(always)]

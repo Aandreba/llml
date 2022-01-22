@@ -1,8 +1,8 @@
 arm_use!();
 use core::mem::transmute;
-use std::ptr::{addr_of, addr_of_mut};
-use std::{ops::{Add, Sub, Mul, Div, Neg, Index, IndexMut}};
-use crate::EucVecd2;
+use std::ptr::{addr_of};
+use std::{ops::{Add, Sub, Mul, Div, Neg}};
+use crate::vec::EucVecd2;
 
 macro_rules! impl_vec4_vv {
     ($target:ident, $ty:ident, $tag:ident) => {
@@ -17,7 +17,12 @@ macro_rules! impl_vec4_vv {
         impl $target {
             #[inline]
             pub fn new (a: [$ty;4]) -> Self {
-                unsafe { Self(transmute([a[0], a[1]]), transmute([a[2], a[3]])) }
+                Self(EucVecd2::new([a[0], a[1]]), EucVecd2::new([a[2], a[3]]))
+            }
+
+            #[inline]
+            pub fn from_scal (a: $ty) -> Self {
+                Self(EucVecd2::from_scal(a), EucVecd2::from_scal(a))
             }
 
             #[inline(always)]
@@ -38,6 +43,11 @@ macro_rules! impl_vec4_vv {
             #[inline(always)]
             pub fn w (&self) -> $ty {
                 self.1.y()
+            }
+
+            #[inline(always)]
+            pub fn abs (self) -> Self {
+                Self(self.0.abs(), self.1.abs())
             }
 
             #[inline(always)]

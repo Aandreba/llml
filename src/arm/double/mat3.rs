@@ -1,7 +1,7 @@
 arm_use!();
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
 
-use crate::{EucVecf3, EucVecf2, EucVecf4, Matf2, traits::Zero, EucVecd2, EucVecd3, EucVecd4, Matf3};
-use std::ops::{Add, Sub, Mul, Div, Neg};
+use crate::{arm::{EucVecd4, EucVecd3, EucVecd2, Matf3}, others::Zero};
 
 macro_rules! impl_matd3 {
     () => {
@@ -157,6 +157,24 @@ impl Matd3 {
     }
 
     #[inline(always)]
+    pub fn scal_mul (self, rhs: Self) -> Self {
+        Self(
+            self.0 * rhs.0,
+            self.1 * rhs.1,
+            self.2 * rhs.2
+        )
+    }
+
+    #[inline(always)]
+    pub fn scal_div (self, rhs: Self) -> Self {
+        Self(
+            self.0 / rhs.0,
+            self.1 / rhs.1,
+            self.2 / rhs.2
+        )
+    }
+
+    #[inline(always)]
     pub fn tr (self) -> f64 {
         EucVecd3::new([self.xx(), self.yy(), self.zz()]).sum()
     }
@@ -276,6 +294,13 @@ impl Mul for Matd3 {
             EucVecd4::new([m2.y(), m3.y(), m1.z(), m2.z()]),
             m3.z()
         )
+    }
+}
+
+impl Into<[f64;9]> for Matd3 {
+    #[inline(always)]
+    fn into(self) -> [f64;9] {
+        unsafe { transmute([Into::<[f64;3]>::into(self.x()), self.y().into(), self.z().into()]) }
     }
 }
 
