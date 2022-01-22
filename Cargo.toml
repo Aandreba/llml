@@ -6,7 +6,7 @@ description = "Implementation of basic math data types with high level frontend 
 readme = "README.md"
 repository = "https://github.com/Aandreba/llml"
 license = "MIT OR Apache-2.0"
-keywords = ["asm", "assembly", "sse", "instrinsics", "simd"]
+keywords = ["sse", "instrinsics", "simd", "neon", "math"]
 categories = ["data-structures", "hardware-support", "mathematics"]
 
 [features]

@@ -27,7 +27,8 @@ As of today, LLML supports up to **SSE3** for x86/x86_64, and **Neon** for ARM/a
 - Basic arithmetic (**Addition**, **Subtraction**, **Negation**, **Multiplication** & **Division**)
 - **Summation** (```sum```), **norm** and **unit** vector
 - **Dot product** (```dot```) and **cross product** (```cross```)
-- **Square root** (```sqrt```) and **fast square root**  (```sqrt_fast```, only faster in x86/x86_64)
+- **Square root** (```sqrt```) and **fast square root**  (```sqrt_fast```, only faster in ```f32``` x86/and x86_64)
+- **Absolute** value
 
 ### Matrices of 2x2 & 3x3 for ```f32``` and ```f64```
 - Scalar arithmetic (**Addition**, **Subtraction**, **Negation**, **Multiplication**, **Division**)
