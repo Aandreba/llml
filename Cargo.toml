@@ -27,7 +27,6 @@ randerive = { version = "1.2.0", optional = true }
 criterion = "0.3"
 rand = "0.8.4"
 serde_json = "1.0"
-glam = "0.20.2"
 
 [[bench]]
 name = "vec3"

@@ -50,6 +50,17 @@ impl EucVecf3 {
     }
 
     #[inline(always)]
+    // from [here](http://threadlocalmutex.com/?p=8)
+    pub fn cross (self, rhs: Self) -> Self {
+        unsafe {
+            let a_yzx = _mm_shuffle_ps(self.0, self.0, _MM_SHUFFLE(3, 0, 2, 1));
+            let b_yzx = _mm_shuffle_ps(rhs.0, rhs.0, _MM_SHUFFLE(3, 0, 2, 1));
+            let c = _mm_sub_ps(_mm_mul_ps(self.0, b_yzx), _mm_mul_ps(a_yzx, rhs.0));
+            Self(_mm_shuffle_ps(c, c, _MM_SHUFFLE(3, 0, 2, 1)))
+        }
+    }
+
+    #[inline(always)]
     pub fn norm (self) -> f32 {
         self.dot(self).sqrt()
     }

@@ -10,19 +10,21 @@ macro_rules! import {
     };
 }
 
+/// Euclidian vector types
 pub mod vec {
     import!(EucVecf2, EucVecf3, EucVecf4);
     import!(EucVecd2, EucVecd3, EucVecd4);
 }
 
+/// Matrix types
 pub mod mat {
     import!(Matf2, Matf3);
     import!(Matd2, Matd3);
 }
 
+/// Other data types & traits
 pub mod others {
     pub use crate::generics::Complxf;
     pub use crate::generics::Complxd;
-    pub use crate::polar::Polar;
     pub use crate::traits::*;
 }

@@ -1,64 +1,97 @@
-use std::ops::Neg;
-use crate::generics::{Complxf, Complxd};
+use crate::others::{Complxd, Complxf};
 
-use super::{Sqrt, Zero};
-
-// MACRO DEFS
-macro_rules! impl_complexable {
-    ($($target:ident, $complx:ident),+) => {
+macro_rules! impl_complx_type {
+    ($($target:ident, $ty:ty),+) => {
         $(
-            impl Complxable for $target {
-                type Output = $complx;
+            impl ComplxType<$ty> for $target {
+                fn re (&self) -> $ty {
+                    <$target>::re(self)
+                }
 
-                #[inline(always)]
-                fn as_im (self) -> <Self as Complxable>::Output {
-                    $complx::new($target::zero(), self)
+                fn im (&self) -> $ty {
+                    <$target>::im(self)
                 }
             }
+        )*
+    }
+}
 
-            impl Into<$complx> for $target {
+macro_rules! impl_sqrtc {
+    ($($target:ident, $ty:ty),+) => {
+        $(
+            impl ComplexSqrt for $ty {
+                type Output = $target;
+
                 #[inline(always)]
-                fn into (self) -> $complx {
-                    $complx::new(self, $target::zero())
+                fn sqrtc (self) -> Self::Output {
+                    $target::sqrtc(self)
                 }
             }
         )*
     };
 }
 
-// TRAIT DEFS
-pub trait Complxable: Zero + PartialOrd + Neg<Output = Self> + Into<<Self as Complxable>::Output> {
-    type Output;
+macro_rules! impl_powc {
+    ($($target:ident, $ty:ty),+) => {
+        $(
+            impl ComplexPow<$target> for $ty {
+                type Output = $target;
 
-    fn as_im (self) -> <Self as Complxable>::Output;
+                #[inline(always)]
+                fn expi (self) -> Self::Output {
+                    $target::expi(self)
+                }
 
-    #[inline(always)]
-    fn as_re (self) -> <Self as Complxable>::Output {
-        self.into()
+                #[inline(always)]
+                fn powci (self, rhs: $ty) -> Self::Output {
+                    $target::powci(self, rhs)
+                }
+
+                #[inline(always)]
+                fn powc (self, rhs: $target) -> Self::Output {
+                    self.powf(rhs.re()) * self.powci(rhs.im())
+                }
+            }
+        )*
+    };
+}
+
+macro_rules! impl_all {
+    ($($target:ident, $ty:ty),+) => {
+        $(
+            impl_complx_type!($target, $ty);
+            impl_sqrtc!($target, $ty);
+            impl_powc!($target, $ty);
+        )*
     }
 }
 
-pub trait ComplexSqrt: Complxable {
-    type Output: Complxable;
-
-    fn sqrtc (self) -> <<Self as ComplexSqrt>::Output as Complxable>::Output;
+pub trait ComplxType<T>: Copy {
+    fn re (&self) -> T;
+    fn im (&self) -> T;
 }
 
-// TRAIT IMPLS
-impl_complexable!(
-    f32, Complxf,
-    f64, Complxd
+pub trait ComplexSqrt<T = Self> {
+    type Output: ComplxType<T>;
+
+    /// Computes the square root of the value, returning the complex result
+    fn sqrtc (self) -> Self::Output;
+}
+
+pub trait ComplexPow<Rhs: ComplxType<T>, T = Self> {
+    type Output: ComplxType<T>;
+
+    /// Computes ```exp(self * i)```
+    fn expi (self) -> Self::Output;
+
+    /// Computes ```pow(self, rhs * i)```
+    fn powci (self, rhs: T) -> Self::Output;
+
+    /// Computes ```pow(self, rhs)```, where ```rhs``` is a complex number
+    fn powc (self, rhs: Rhs) -> Self::Output;
+}
+
+impl_all!(
+    Complxf, f32,
+    Complxd, f64
 );
-
-impl<T: Complxable + Sqrt> ComplexSqrt for T where <T as Sqrt>::Output: Complxable {
-    type Output = <T as Sqrt>::Output;
-
-    #[inline(always)]
-    fn sqrtc (self) -> <<Self as ComplexSqrt>::Output as Complxable>::Output {
-        if self < Self::zero() {
-            return (-self).sqrt().as_im()
-        }
-
-        self.sqrt().as_re()
-    }
-}

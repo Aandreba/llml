@@ -79,6 +79,13 @@ fn dot () {
 }
 
 #[test]
+fn cross () {
+    let alpha = EucVecd3::new([1., 2., 3.]);
+    let beta = EucVecd3::new([4., 5., 6.]);
+    assert_eq!(alpha.cross(beta), EucVecd3::new([-3., 6., -3.]))
+}
+
+#[test]
 fn norm () {
     let alpha : EucVecd3 = random();
     assert_eq!(alpha.norm(), (alpha.x() * alpha.x() + alpha.y() * alpha.y() + alpha.z() * alpha.z()).sqrt())

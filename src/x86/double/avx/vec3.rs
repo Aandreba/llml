@@ -46,6 +46,17 @@ impl EucVecd3 {
     pub fn dot (self, rhs: Self) -> f64 {
         (self * rhs).sum()
     }
+
+    #[inline(always)]
+    // from [here](http://threadlocalmutex.com/?p=8)
+    pub fn cross (self, rhs: Self) -> Self {
+        unsafe {
+            let a_yzx = _mm256_shuffle_pd(self.0, self.0, _MM_SHUFFLE(3, 0, 2, 1));
+            let b_yzx = _mm256_shuffle_pd(rhs.0, rhs.0, _MM_SHUFFLE(3, 0, 2, 1));
+            let c = _mm256_sub_pd(_mm256_mul_pd(self.0, b_yzx), _mm256_mul_pd(a_yzx, rhs.0));
+            Self(_mm256_shuffle_pd(c, c, _MM_SHUFFLE(3, 0, 2, 1)))
+        }
+    }
 }
 
 

@@ -1,12 +1,11 @@
 use std::ops::{Add, Sub, Mul, Div, Neg};
 use crate::traits::{ComplexSqrt, Zero};
 use crate::vec::{EucVecf2, EucVecd2};
-use crate::polar::Polar;
 
 macro_rules! declare {
     ($($name:ident, $og:ident, $ogbig:ident, $ty:ident, $($tag:ident)?),+) => {
         $(  
-            #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+            #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
             #[repr(transparent)]
             pub struct $name (pub(crate) $og);
             impl_arith!($name, $ty);
@@ -28,40 +27,54 @@ macro_rules! declare {
                 }
 
                 #[inline(always)]
+                /// Returns the real & imaginary parts unziped
+                pub fn unzip (self) -> ($ty, $ty) {
+                    (self.re(), self.im())
+                }
+
+                #[inline(always)]
+                /// Returns the real part of the complex number
                 pub fn re (&self) -> $ty {
                     self.0.x()
                 }
 
                 #[inline(always)]
+                /// Returns the real part of the complex number
                 pub fn im (&self) -> $ty {
                     self.0.y()
                 }
 
                 #[inline(always)]
+                /// Returns the complex conjugate (```re - im*i```)
                 pub fn conj (self) -> Self {
                     Self::new(self.re(), -self.im())
                 }
 
                 #[inline(always)]
+                /// Returns the radius of the complex number in polar coordinates (```hypot(re, im)```, ```sqrt(re^2 + im^2)```)
                 pub fn radius (self) -> $ty {
                     self.re().hypot(self.im())
                 }
 
+                /// Returns the angle of the complex number in polar coordinates (```atan2(im, re)```, ```atan(im/re)```)
                 #[inline(always)]
                 pub fn angle (self) -> $ty {
                     self.im().atan2(self.re())
                 }
 
                 #[inline(always)]
-                pub fn polar (self) -> Polar<$ty> {
-                    Polar::new(self.radius(), self.angle())
+                /// Returns the polar coordinates of the complex number as ```(radius, angle)```
+                pub fn polar (self) -> ($ty, $ty) {
+                    (self.radius(), self.angle())
                 }
 
+                /// Computes the **inverse** of the complex number
                 #[inline(always)]
                 pub fn inv (self) -> Self {
                     Self(self.conj().0 / self.0.dot(self.0))
                 }
 
+                /// Calculates the **square root** of the complex number
                 #[inline(always)]
                 pub fn sqrt (self) -> Self {
                     if self.im().is_zero() {
@@ -74,35 +87,45 @@ macro_rules! declare {
                     Self::new(res.x(), self.im().signum() * res.y())
                 }
 
+                /// Calculates the **exponential** of the complex number
                 #[inline(always)]
                 pub fn exp (self) -> Self {
                     self.re().exp() * Self::expi(self.im())
                 }
 
+                /// Calculates the **natural logarithm** of the complex number
                 #[inline(always)]
                 pub fn ln (self) -> Self {
-                    let polar = self.polar();
-                    Self::new(polar.radius.ln(), polar.angle)
+                    let (radius, angle) = self.polar();
+                    Self::new(radius.ln(), angle)
                 }
 
+                /// Calculates the **power series** of the complex number by an **integer**
                 #[inline(always)]
                 pub fn powi (self, exp: i32) -> Self {
-                    let polar = self.polar();
-                    polar.radius.powi(exp) * Self::expi(polar.angle * (exp as $ty))
+                    let (radius, angle) = self.polar();
+                    radius.powi(exp) * Self::expi(angle * (exp as $ty))
                 }
 
+                /// Calculates the **power series** of the complex number by a **real number**
                 #[inline(always)]
                 pub fn powf (self, exp: $ty) -> Self {
-                    let polar = self.polar();
-                    polar.radius.powf(exp) * Self::expi(polar.angle * (exp as $ty))
+                    let (radius, angle) = self.polar();
+                    radius.powf(exp) * Self::expi(angle * exp)
                 }
 
+                /// Calculates the **power series** of the complex number by another **complex number**
                 #[inline(always)]
                 pub fn powc (self, exp: Self) -> Self {
-                    todo!();
-                    //Self::exp(exp * self.ln()) // TODO
+                    let (r, theta) = self.polar();
+                    let (x, y) = exp.unzip();
+
+                    let v1 = $og::new(exp.into());
+                    let v2 = $og::new([theta, r.ln()]);
+                    r.powf(x) * Self::expi(v1.dot(v2)) / (y * theta).exp()
                 }
 
+                /// Calculates the **sine** of the complex number
                 #[inline(always)]
                 pub fn sin (self) -> Self {
                     let sin_cos = self.re().sin_cos();
@@ -111,6 +134,7 @@ macro_rules! declare {
                     Self(alpha * beta)
                 }
 
+                /// Calculates the **cosine** of the complex number
                 #[inline(always)]
                 pub fn cos (self) -> Self {
                     let sin_cos = self.re().sin_cos();
@@ -119,20 +143,32 @@ macro_rules! declare {
                     Self(alpha * beta)
                 }
 
+                /// Calculates the **tangent** of the complex number
                 #[inline(always)]
                 pub fn tan (self) -> Self {
-                    let two = 2. * self;
-                    let re = two.re();
-                    let im = two.im();
-
+                    let (re, im) = (2. * self).unzip();
                     let div = re.cos() + im.cosh();
                     Self::new(re.sin(), im.sinh()) / div
                 }
 
+                /// Computes the **square root** of the value, returning the complex result
+                #[inline(always)]
+                pub fn sqrtc (x: $ty) -> Self {
+                    if (x >= 0.) { return Self::from_re(x.sqrt()) }
+                    Self::from_im((-x).sqrt())
+                }
+
+                /// Computes ```exp(self * i)```
                 #[inline(always)]
                 pub fn expi (x: $ty) -> Self {
                     let sin_cos = x.sin_cos();
                     Self::new(sin_cos.1, sin_cos.0)
+                }
+
+                /// Computes ```pow(self, rhs * i)```
+                #[inline(always)]
+                pub fn powci (x: $ty, rhs: $ty) -> Self {
+                    Self::expi(rhs * x.ln())
                 }
             }
 
@@ -151,6 +187,20 @@ macro_rules! declare {
                 #[inline(always)]
                 fn div (self, rhs: Self) -> Self::Output {
                     self * rhs.inv()
+                }
+            }
+
+            impl Into<[$ty;2]> for $name {
+                #[inline(always)]
+                fn into (self) -> [$ty;2] {
+                    self.0.into()
+                }
+            }
+
+            impl Into<$og> for $name {
+                #[inline(always)]
+                fn into (self) -> $og {
+                    self.0
                 }
             }
         )*

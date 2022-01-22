@@ -1,5 +1,5 @@
-use llml::others::{Complxf, Complxd, ComplexSqrt};
-use rand::random;
+use llml::{others::{Complxf, Complxd, ComplexSqrt}, vec::EucVecf2};
+use rand::{random, thread_rng, Rng};
 
 #[test]
 fn eq () {
@@ -72,8 +72,35 @@ fn exp () {
 #[test]
 fn ln () {
     let alpha : Complxf = random();
-    let polar = alpha.polar();
-    assert_eq!(alpha.ln(), Complxf::new(polar.radius.ln(), polar.angle));
+    let (radius, angle) = alpha.polar();
+    assert_eq!(alpha.ln(), Complxf::new(radius.ln(), angle));
+}
+
+#[test]
+fn powi () {
+    let alpha : Complxf = random();
+    let beta : i32 = thread_rng().gen_range(-10..=10);
+
+    let diff : EucVecf2 = (alpha.powi(beta as i32) - Complxf::exp((beta as f32) * alpha.ln())).into();
+    assert!(diff.abs().sum() <= f32::EPSILON * 2.);
+}
+
+#[test]
+fn powf () {
+    let alpha : Complxf = random();
+    let beta : f32 = random();
+
+    let diff : EucVecf2 = (alpha.powf(beta) - Complxf::exp(beta * alpha.ln())).into();
+    assert!(diff.abs().sum() <= f32::EPSILON * 2.);
+}
+
+#[test]
+fn powc () {
+    let alpha : Complxf = random();
+    let beta : Complxf = random();
+
+    let diff : EucVecf2 = (alpha.powc(beta) - Complxf::exp(beta * alpha.ln())).into();
+    assert!(diff.abs().sum() <= f32::EPSILON * 2.);
 }
 
 #[test]

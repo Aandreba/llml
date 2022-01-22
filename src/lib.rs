@@ -21,7 +21,6 @@ macro_rules! import_derives {
 }
 
 pub(crate) mod generics;
-pub(crate) mod polar;
 pub(crate) mod traits;
 
 #[cfg(all(any(target_arch = "arm", target_arch = "aarch64"), target_feature = "neon"))]

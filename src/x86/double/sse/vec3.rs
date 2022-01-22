@@ -44,6 +44,15 @@ impl EucVecd3 {
     }
 
     #[inline(always)]
+    // from [here](http://threadlocalmutex.com/?p=8)
+    pub fn cross (self, rhs: Self) -> Self {
+        let a_yzx = Self(EucVecd2::new([self.y(), self.z()]), self.x());
+        let b_yzx = Self(EucVecd2::new([rhs.y(), rhs.z()]), rhs.x());
+        let c = (self * b_yzx) - (a_yzx * rhs);
+        Self(EucVecd2::new([c.y(), c.z()]), c.x())
+    }
+
+    #[inline(always)]
     #[deprecated(since="0.2.0", note="use ```self.dot(self)``` instead")]
     pub fn norm2 (self) -> f64 {
         self.dot(self)

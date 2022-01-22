@@ -39,4 +39,6 @@ macro_rules! map1_float {
     };
 }
 
-map1_float!(Sqrt, sqrt);
+map1_float!(
+    Sqrt, sqrt
+);
