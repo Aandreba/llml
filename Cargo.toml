@@ -1,19 +1,17 @@
 [package]
 name = "llml"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 description = "Implementation of basic math data types with high level frontend and low level backend"
 readme = "README.md"
 repository = "https://github.com/Aandreba/llml"
 license = "MIT OR Apache-2.0"
-keywords = ["asm", "assembly", "sse", "instrinsics", "simd"]
+keywords = ["sse", "instrinsics", "simd", "neon", "math"]
 categories = ["data-structures", "hardware-support", "mathematics"]
 
 [features]
-llml_serde = ["serde"]
+llml_serde = ["serde", "bytemuck"]
 llml_rand = ["rand", "randerive"]
-llml_derive = ["llml_derive_crate"]
-llml_naive = []
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -21,32 +19,15 @@ llml_naive = []
 cfg-if = "1.0.0"
 derive_more = "0.99.17"
 serde = { version = "1.0.132", features = ["derive"], optional = true }
+bytemuck = { version = "1.7.3", optional = true }
 rand = { version = "0.8.4", optional = true }
 randerive = { version = "1.2.0", optional = true }
-llml_derive_crate = { version = "0.1.0", path = "derive", optional = true }
 
 [dev-dependencies]
 criterion = "0.3"
 rand = "0.8.4"
 serde_json = "1.0"
-glam = "0.20.2"
-
-[[bench]]
-name = "vec2"
-harness = false
 
 [[bench]]
 name = "vec3"
-harness = false
-
-[[bench]]
-name = "vec4"
-harness = false
-
-[[bench]]
-name = "mat2"
-harness = false
-
-[[bench]]
-name = "mat3"
 harness = false

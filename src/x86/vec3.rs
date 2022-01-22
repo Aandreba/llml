@@ -1,66 +1,103 @@
-use std::{ops::{Add, Sub, Mul, Div}};
-use_arch_x86!(_mm_set_ps, _mm_shuffle_ps, _mm_movehl_ps, _mm_cvtss_f32, _MM_SHUFFLE);
+x86_use!();
 
-impl_vecf!(
-    EucVecf3, 
-    |x: Self| _mm_set_ps(0., x.z, x.y, x.x),
-    |x: __m128| {
-        let ptr = &x as *const __m128 as *const f32;
-        Self::new(*ptr, *ptr.add(1), *ptr.add(2))
-    }
-);
+use crate::vec::EucVecd2;
+use super::{_mm_sum_ps, EucVecd3};
+use cfg_if::cfg_if;
+use std::ops::{Add, Sub, Mul, Div, Neg};
+
+#[derive(Debug)]
+#[repr(transparent)]
+pub struct EucVecf3 (pub(crate) __m128);
+impl_arith_sse!(EucVecf3, f32);
 
 impl EucVecf3 {
-    /// Summation of all the values inside the vector
+    const DIV_MASK : __m128 = unsafe { *(&[u32::MAX, u32::MAX, u32::MAX, 0] as *const [u32;4] as *const __m128) };
+    const ABS_MASK : __m128 = unsafe { *(&[i32::MAX, i32::MAX, i32::MAX, 0] as *const [i32;4] as *const __m128) };
+
+    #[inline(always)]
+    pub fn new (a: [f32;3]) -> Self {
+        unsafe { Self(_mm_set_ps(0., a[2], a[1], a[0])) }
+    }
+
+    #[inline(always)]
+    pub fn from_scal (x: f32) -> Self {
+        unsafe { Self(_mm_set_ps(0., x, x, x)) }
+    }
+
+    #[inline(always)]
+    pub fn x (&self) -> f32 {
+        unsafe { _mm_cvtss_f32(self.0) }
+    }
+
+    #[inline(always)]
+    pub fn y (&self) -> f32 {
+        unsafe { _mm_cvtss_f32(_mm_shuffle_ps(self.0, self.0, _MM_SHUFFLE(1, 1, 1, 1))) }
+    }
+
+    #[inline(always)]
+    pub fn z (&self) -> f32 {
+        unsafe { _mm_cvtss_f32(_mm_shuffle_ps(self.0, self.0, _MM_SHUFFLE(2, 2, 2, 2))) }
+    }
+
     #[inline(always)]
     pub fn sum (self) -> f32 {
-        unsafe {
-            let mul = self.casted();
-
-            let shuf = _mm_shuffle_ps(mul, mul, _MM_SHUFFLE(2, 3, 0, 1));
-            let sums = _mm_add_ps(mul, shuf);
-            
-            let shuf = _mm_movehl_ps(shuf, sums);
-            let sums = _mm_add_ps(sums, shuf);
-            
-            return _mm_cvtss_f32(sums);
-        }
+        unsafe { _mm_sum_ps(self.0) }
     }
 
-    // Vector dot product
     #[inline(always)]
     pub fn dot (self, rhs: Self) -> f32 {
-        unsafe {
-            Self::raw_dot(self.casted(), rhs.casted())
-        }
+        (self * rhs).sum()
     }
 
-    // Vector cross product
     #[inline(always)]
+    // from [here](http://threadlocalmutex.com/?p=8)
     pub fn cross (self, rhs: Self) -> Self {
         unsafe {
-            let v1 = _mm_set_ps(0., self.x, rhs.x, self.y);
-            let v2 = _mm_set_ps(0., rhs.y, self.z, rhs.z);
-            let m1 = _mm_mul_ps(v1, v2);
-            
-            let v3 = _mm_set_ps(0., self.y, rhs.z, self.z);
-            let v4 = _mm_set_ps(0., rhs.x, self.x, rhs.y);
-            let m2 = _mm_mul_ps(v3, v4);
-
-            Self::unsafe_from(_mm_sub_ps(m1, m2))
+            let a_yzx = _mm_shuffle_ps(self.0, self.0, _MM_SHUFFLE(3, 0, 2, 1));
+            let b_yzx = _mm_shuffle_ps(rhs.0, rhs.0, _MM_SHUFFLE(3, 0, 2, 1));
+            let c = _mm_sub_ps(_mm_mul_ps(self.0, b_yzx), _mm_mul_ps(a_yzx, rhs.0));
+            Self(_mm_shuffle_ps(c, c, _MM_SHUFFLE(3, 0, 2, 1)))
         }
     }
 
     #[inline(always)]
-    pub(crate) unsafe fn raw_dot (alpha: __m128, beta: __m128) -> f32 {
-        let mul = _mm_mul_ps(alpha, beta);
+    pub fn norm (self) -> f32 {
+        self.dot(self).sqrt()
+    }
 
-        let shuf = _mm_shuffle_ps(mul, mul, _MM_SHUFFLE(2, 3, 0, 1));
-        let sums = _mm_add_ps(mul, shuf);
-        
-        let shuf = _mm_movehl_ps(shuf, sums);
-        let sums = _mm_add_ps(sums, shuf);
-        
-        return _mm_cvtss_f32(sums);
+    #[inline(always)]
+    pub fn abs (self) -> Self {
+        unsafe { Self(_mm_and_ps(Self::ABS_MASK, self.0)) }
+    }
+
+    #[inline(always)]
+    pub fn sqrt (self) -> Self {
+        unsafe { Self(_mm_sqrt_ps(self.0)) }
+    }
+
+    #[inline(always)]
+    pub fn sqrt_fast (self) -> Self {
+        unsafe { Self(_mm_rcp_ps(_mm_rsqrt_ps(self.0))) }
+    }
+}
+
+impl Into<[f32;3]> for EucVecf3 {
+    #[inline(always)]
+    fn into (self) -> [f32;3] {
+        unsafe { *(&self as *const Self as *const [f32;3]) }
+    }
+}
+
+#[cfg(target_feature = "sse2")]
+impl Into<EucVecd3> for EucVecf3 {
+    #[inline(always)]
+    fn into (self) -> EucVecd3 {
+        cfg_if! {
+            if #[cfg(target_feature = "avx")] { 
+                unsafe { EucVecd3(_mm256_cvtps_pd(self.0)) }
+            } else {
+                unsafe { EucVecd3(EucVecd2(_mm_cvtps_pd(self.0)), self.z().into()) }
+            }
+        }
     }
 }

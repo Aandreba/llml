@@ -1,19 +1,36 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use llml::vec::EucVecf3;
+use llml::{EucVecf3, Matf2, EucVecf2};
 use rand::random;
 
-fn dot (c: &mut Criterion) {
-    let alpha = EucVecf3::new(random(), random(), random());
-    let beta = EucVecf3::new(random(), random(), random());
+pub fn mul(c: &mut Criterion) {
+    let a1 = Matf2::new([
+        random(), random(), 
+        random(), random(),
+    ]);
 
-    c.bench_function("Naive Vec3f Dot", |b| {
-        b.iter(|| alpha.x * beta.x + alpha.y * beta.y + alpha.z * beta.z)
+    let a2 = Matf2::new([
+        random(), random(), 
+        random(), random(),
+    ]);
+
+    let b1 = glam::mat2(
+        glam::vec2(random(), random()), 
+        glam::vec2(random(), random()),
+    );
+
+    let b2 = glam::mat2(
+        glam::vec2(random(), random()), 
+        glam::vec2(random(), random()),
+    );
+
+    c.bench_function("glam", |b| {
+        b.iter(|| b1.determinant())
     });
 
-    c.bench_function("Optimized Vec3d Dot", |b| {
-        b.iter(|| alpha.dot(beta))
+    c.bench_function("llml", |b| {
+        b.iter(|| a1.det())
     });
 }
 
-criterion_group!(benches, dot);
+criterion_group!(benches, mul);
 criterion_main!(benches);
