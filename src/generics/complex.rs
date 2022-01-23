@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, Mul, Div, Neg};
+use std::ops::*;
 use crate::traits::{ComplexSqrt, Zero};
 use crate::vec::{EucVecf2, EucVecd2};
 
@@ -9,6 +9,22 @@ macro_rules! declare {
             #[repr(transparent)]
             pub struct $name (pub(crate) $og);
             impl_arith!($name, $ty);
+
+            impl_assign!(
+                $name,
+                AddAssign, add_assign, add,
+                SubAssign, sub_assign, sub,
+                MulAssign, mul_assign, mul,
+                DivAssign, div_assign, div
+            );
+
+            impl_assign!(
+                1, $name, $ty,
+                AddAssign, add_assign, add,
+                SubAssign, sub_assign, sub,
+                MulAssign, mul_assign, mul,
+                DivAssign, div_assign, div
+            );
 
             impl $name {
                 #[inline(always)]

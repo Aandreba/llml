@@ -1,4 +1,5 @@
-use crate::mat::{Matf2, Matd2, Matf3, Matd3};
+use crate::{mat::{Matf2, Matd2, Matf3, Matd3}, vec::*};
+use std::ops::*;
 
 macro_rules! impl_default2 {
     ($($target:ident, $ty:ty),+) => {
@@ -57,6 +58,27 @@ macro_rules! impl_rot3 {
     };
 }
 
+macro_rules! impl_assign_mat {
+    ($($target:ident, $ty:ty),+) => {
+        $(
+            impl_assign!(
+                $target, 
+                AddAssign, add_assign, add,
+                SubAssign, sub_assign, sub,
+                MulAssign, mul_assign, mul
+            );
+    
+            impl_assign!(
+                1, $target, $ty,
+                AddAssign, add_assign, add,
+                SubAssign, sub_assign, sub,
+                MulAssign, mul_assign, mul,
+                DivAssign, div_assign, div
+            );
+        )*
+    }
+}
+
 impl_default2!(
     Matf2, f32,
     Matd2, f64
@@ -64,6 +86,13 @@ impl_default2!(
 
 impl_default3!(
     Matf3, f32,
+    Matd3, f64
+);
+
+impl_assign_mat!(
+    Matf2, f32,
+    Matf3, f32,
+    Matd2, f64,
     Matd3, f64
 );
 
