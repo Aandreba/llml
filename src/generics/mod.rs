@@ -8,6 +8,7 @@ macro_rules! impl_assign {
     (1, $target:ident, $rhs:ty, $($assign:ident, $assign_fun:ident, $fun:ident),+) => {
         $(
             impl $assign<$rhs> for $target {
+                #[inline(always)]
                 fn $assign_fun (&mut self, rhs: $rhs) {
                     *self = self.$fun(rhs);
                 }
