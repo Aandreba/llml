@@ -1,7 +1,6 @@
 x86_use!();
 use crate::{traits::Zero, mat::Matf2, vec::EucVecd2};
 use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
-
 use super::EucVecd4;
 
 macro_rules! impl_mat2 {
@@ -66,7 +65,7 @@ macro_rules! impl_mat2_scal {
     };
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct Matd2 (pub(crate) EucVecd4);
 impl_mat2!(Matd2, f64);

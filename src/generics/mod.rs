@@ -17,7 +17,7 @@ macro_rules! impl_assign {
     }
 }
 
-flat_mod!(complex, vec, mat);
+flat_mod!(debug, complex, vec, mat);
 
 #[cfg(feature="llml_rand")]
 pub mod rand;

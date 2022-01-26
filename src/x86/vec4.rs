@@ -1,13 +1,9 @@
 x86_use!();
 use cfg_if::cfg_if;
-
 use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
-
 use crate::vec::EucVecd2;
-
 use super::{_mm_sum_ps, EucVecd4};
 
-#[derive(Debug)]
 #[repr(transparent)]
 pub struct EucVecf4 (pub(crate) __m128);
 impl_arith_sse!(EucVecf4, f32);

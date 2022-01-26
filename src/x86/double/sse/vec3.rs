@@ -2,7 +2,6 @@ x86_use!();
 use crate::{x86::vec3::EucVecf3, vec::EucVecd2};
 use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
 
-#[derive(Debug)]
 #[repr(C, align(32))]
 pub struct EucVecd3 (pub(crate) EucVecd2, pub(crate) f64);
 impl_arith_x2!(EucVecd3);

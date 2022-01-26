@@ -4,7 +4,7 @@ use std::{ops::{Add, Sub, Mul, Div, Neg}};
 
 use super::EucVecd4;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct Matf2 (pub(crate) EucVecf4);
 impl_mat2!(Matf2, f32);

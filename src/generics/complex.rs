@@ -5,7 +5,7 @@ use crate::vec::{EucVecf2, EucVecd2};
 macro_rules! declare {
     ($($name:ident, $og:ident, $ogbig:ident, $ty:ident, $($tag:ident)?),+) => {
         $(  
-            #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+            #[derive(Default, Clone, Copy, PartialEq, Eq)]
             #[repr(transparent)]
             pub struct $name (pub(crate) $og);
             impl_arith!($name, $ty);

@@ -11,7 +11,6 @@ macro_rules! arm_use {
 macro_rules! wrap {
     ($($name:ident, $og:ident),+) => {
         $(
-            #[derive(Debug)]
             #[repr(transparent)]
             pub struct $name (pub(crate) $og);
 

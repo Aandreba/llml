@@ -1,7 +1,6 @@
 x86_use!();
 use crate::{traits::Zero, vec::EucVecd2, mat::Matf3};
 use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
-
 use super::{EucVecd4, EucVecd3};
 
 macro_rules! impl_matd3 {
@@ -69,7 +68,7 @@ macro_rules! impl_matd3_scal {
     };
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 #[repr(C, align(64))]
 pub struct Matd3 (
     pub(crate) EucVecd4, pub(crate) EucVecd4, 

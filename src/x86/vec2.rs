@@ -2,7 +2,6 @@ x86_use!();
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
 use super::EucVecd2;
 
-#[derive(Debug)]
 #[repr(transparent)]
 pub struct EucVecf2 (pub(crate) __m128);
 impl_arith_sse!(EucVecf2, f32);

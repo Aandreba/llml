@@ -68,7 +68,7 @@ macro_rules! impl_matd3_scal {
     };
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 #[repr(C, align(64))]
 pub struct Matd3 (
     pub(crate) EucVecd4, pub(crate) EucVecd4, 

@@ -146,7 +146,7 @@ macro_rules! impl_vec4_vv {
 wrap!(EucVecf4, float32x4_t);
 impl_vec4!(EucVecf4, f32, q);
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 #[repr(C, align(16))]
 pub struct EucVecd4 (pub(crate) EucVecd2, pub(crate) EucVecd2);
 impl Eq for EucVecd4 {}

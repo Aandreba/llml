@@ -1,9 +1,8 @@
 arm_use!();
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
-
 use crate::{arm::{EucVecd4, EucVecd2, Matf2}, others::Zero};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct Matd2 (pub(crate) EucVecd4);
 impl_mat2!(Matd2, f64);

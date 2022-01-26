@@ -3,7 +3,6 @@ use crate::{x86::vec4::EucVecf4, vec::EucVecd2};
 use std::ops::{Add, Sub, Mul, Div, Neg};
 use std::mem::transmute;
 
-#[derive(Debug)]
 #[repr(C, align(32))]
 pub struct EucVecd4 (pub(crate) EucVecd2, pub(crate) EucVecd2);
 impl_arith_x2!(EucVecd4);

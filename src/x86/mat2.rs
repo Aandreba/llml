@@ -5,7 +5,7 @@ use std::{ops::{Add, Sub, Mul, Div, Neg}};
 use crate::{x86::{_mm_low_ps, _mm_high_ps}, others::Zero};
 use super::{vec4::EucVecf4, vec2::EucVecf2, Matd2};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct Matf2 (pub(crate) EucVecf4);
 

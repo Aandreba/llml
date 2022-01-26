@@ -18,6 +18,7 @@ fn serde () {
     let json = serde_json::to_string(&alpha).unwrap();
     let beta : Matf2 = serde_json::from_str(json.as_str()).unwrap();
 
+    println!("{beta:#?}");
     let diff : [f32;4] = (alpha - beta).into();
     assert!(diff.into_iter().sum::<f32>() <= f32::EPSILON * 4.);
 }

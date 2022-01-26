@@ -2,7 +2,6 @@ x86_use!();
 use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
 use crate::x86::vec2::EucVecf2;
 
-#[derive(Debug)]
 #[repr(transparent)]
 pub struct EucVecd2 (pub(crate) __m128d);
 impl_arith_sse!(EucVecd2, f64);
