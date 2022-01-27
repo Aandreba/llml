@@ -1,12 +1,12 @@
 x86_use!();
 use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
-use crate::x86::vec2::EucVecf2;
+use crate::x86::vec2::EucVec2f;
 
 #[repr(transparent)]
-pub struct EucVecd2 (pub(crate) __m128d);
-impl_arith_sse!(EucVecd2, f64);
+pub struct EucVec2d (pub(crate) __m128d);
+impl_arith_sse!(EucVec2d, f64);
 
-impl EucVecd2 {
+impl EucVec2d {
     const DIV_MASK : __m128d = unsafe { *(&[u64::MAX, u64::MAX] as *const [u64;2] as *const __m128d) };
     const ABS_MASK : __m128d = unsafe { *(&[i64::MAX, i64::MAX] as *const [i64;2] as *const __m128d) };
 
@@ -61,16 +61,16 @@ impl EucVecd2 {
     }
 }
 
-impl Into<[f64;2]> for EucVecd2 {
+impl Into<[f64;2]> for EucVec2d {
     #[inline(always)]
     fn into (self) -> [f64;2] {
         unsafe { transmute(self.0) }
     }
 }
 
-impl Into<EucVecf2> for EucVecd2 {
+impl Into<EucVec2f> for EucVec2d {
     #[inline(always)]
-    fn into(self) -> EucVecf2 {
-        unsafe { EucVecf2(_mm_cvtpd_ps(self.0)) }
+    fn into(self) -> EucVec2f {
+        unsafe { EucVec2f(_mm_cvtpd_ps(self.0)) }
     }
 }

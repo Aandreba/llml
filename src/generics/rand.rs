@@ -1,5 +1,5 @@
 use rand::{prelude::*, distributions::Standard};
-use crate::{vec::{EucVecf3, EucVecf4, EucVecd3, EucVecd4, EucVecd2, EucVecf2}, mat::{Matf2, Matf3, Matd2, Matd3}};
+use crate::{vec::*, mat::*};
 use super::{Complxf, Complxd};
 
 macro_rules! impl_rand {
@@ -29,8 +29,8 @@ impl Distribution<Complxd> for Standard {
     }
 }
 
-impl_rand!(EucVecf2, EucVecf3, EucVecf4);
-impl_rand!(Matf2, Matf3);
+impl_rand!(EucVec2f, EucVec3f, EucVec4f);
+impl_rand!(Mat2f, Mat3f);
 
-impl_rand!(EucVecd2, EucVecd3, EucVecd4);
-impl_rand!(Matd2, Matd3);
+impl_rand!(EucVec2d, EucVec3d, EucVec4d);
+impl_rand!(Mat2d, Mat3d);

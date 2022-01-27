@@ -100,29 +100,29 @@ macro_rules! impl_all {
 
 impl_all!(
     f32,
-    EucVecf2, 2,
-    EucVecf3, 3,
-    EucVecf4, 4
+    EucVec2f, 2,
+    EucVec3f, 3,
+    EucVec4f, 4
 );
 
 impl_all!(
     f64,
-    EucVecd2, 2,
-    EucVecd3, 3,
-    EucVecd4, 4
+    EucVec2d, 2,
+    EucVec3d, 3,
+    EucVec4d, 4
 );
 
 impl_unzip2! (
-    EucVecf2, f32,
-    EucVecd2, f64
+    EucVec2f, f32,
+    EucVec2d, f64
 );
 
 impl_unzip3! (
-    EucVecf3, f32,
-    EucVecd3, f64
+    EucVec3f, f32,
+    EucVec3d, f64
 );
 
 impl_unzip4! (
-    EucVecf4, f32,
-    EucVecd4, f64
+    EucVec4f, f32,
+    EucVec4d, f64
 );

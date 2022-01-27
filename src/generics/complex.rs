@@ -1,6 +1,6 @@
 use std::ops::*;
 use crate::traits::{ComplexSqrt, Zero};
-use crate::vec::{EucVecf2, EucVecd2};
+use crate::vec::{EucVec2f, EucVec2d};
 
 macro_rules! declare {
     ($($name:ident, $og:ident, $ogbig:ident, $ty:ident, $($tag:ident)?),+) => {
@@ -55,7 +55,7 @@ macro_rules! declare {
                 }
 
                 #[inline(always)]
-                /// Returns the real part of the complex number
+                /// Returns the imaginary part of the complex number
                 pub fn im (&self) -> $ty {
                     self.0.y()
                 }
@@ -281,14 +281,14 @@ macro_rules! impl_arith_scal {
 }
 
 declare!(
-    Complxf, EucVecf2, Matf2, f32, ,
-    Complxd, EucVecd2, Matd2, f64, q
+    Complxf, EucVec2f, Matf2, f32, ,
+    Complxd, EucVec2d, Matd2, f64, q
 );
 
 impl Into<Complxd> for Complxf {
     #[inline(always)]
     fn into(self) -> Complxd {
-        Complxd(Into::<EucVecd2>::into(self.0))
+        Complxd(Into::<EucVec2d>::into(self.0))
     }
 }
 

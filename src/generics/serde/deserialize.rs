@@ -323,28 +323,28 @@ macro_rules! impl_mat3 {
 }
 
 impl_vec2!(
-    EucVecf2, f32,
-    EucVecd2, f64
+    EucVec2f, f32,
+    EucVec2d, f64
 );
 
 impl_vec3!(
-    EucVecf3, f32,
-    EucVecd3, f64
+    EucVec3f, f32,
+    EucVec3d, f64
 );
 
 impl_vec4!(
-    EucVecf4, f32,
-    EucVecd4, f64
+    EucVec4f, f32,
+    EucVec4d, f64
 );
 
 impl_mat2!(
-    Matf2, EucVecf2,
-    Matd2, EucVecd2
+    Mat2f, EucVec2f,
+    Mat2d, EucVec2d
 );
 
 impl_mat3!(
-    Matf3, EucVecf3,
-    Matd3, EucVecd3
+    Mat3f, EucVec3f,
+    Mat3d, EucVec3d
 );
 
 #[inline(always)]

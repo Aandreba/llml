@@ -1,14 +1,14 @@
 x86_use!();
-use crate::vec::EucVecd2;
-use super::{_mm_sum_ps, EucVecd3};
+use crate::vec::EucVec2d;
+use super::{_mm_sum_ps, EucVec3d};
 use cfg_if::cfg_if;
 use std::ops::{Add, Sub, Mul, Div, Neg};
 
 #[repr(transparent)]
-pub struct EucVecf3 (pub(crate) __m128);
-impl_arith_sse!(EucVecf3, f32);
+pub struct EucVec3f (pub(crate) __m128);
+impl_arith_sse!(EucVec3f, f32);
 
-impl EucVecf3 {
+impl EucVec3f {
     const DIV_MASK : __m128 = unsafe { *(&[u32::MAX, u32::MAX, u32::MAX, 0] as *const [u32;4] as *const __m128) };
     const ABS_MASK : __m128 = unsafe { *(&[i32::MAX, i32::MAX, i32::MAX, 0] as *const [i32;4] as *const __m128) };
 
@@ -79,7 +79,7 @@ impl EucVecf3 {
     }
 }
 
-impl Into<[f32;3]> for EucVecf3 {
+impl Into<[f32;3]> for EucVec3f {
     #[inline(always)]
     fn into (self) -> [f32;3] {
         unsafe { *(&self as *const Self as *const [f32;3]) }
@@ -87,14 +87,14 @@ impl Into<[f32;3]> for EucVecf3 {
 }
 
 #[cfg(target_feature = "sse2")]
-impl Into<EucVecd3> for EucVecf3 {
+impl Into<EucVec3d> for EucVec3f {
     #[inline(always)]
-    fn into (self) -> EucVecd3 {
+    fn into (self) -> EucVec3d {
         cfg_if! {
             if #[cfg(target_feature = "avx")] { 
                 unsafe { EucVecd3(_mm256_cvtps_pd(self.0)) }
             } else {
-                unsafe { EucVecd3(EucVecd2(_mm_cvtps_pd(self.0)), self.z().into()) }
+                unsafe { EucVec3d(EucVec2d(_mm_cvtps_pd(self.0)), self.z().into()) }
             }
         }
     }

@@ -10,16 +10,47 @@ macro_rules! import {
     };
 }
 
+macro_rules! depr_names {
+    ($($from:ident, $to:ident),+) => {
+        $(
+            #[deprecated(note = "use new naming convention instead")]    
+            pub type $from = $to; 
+        )*
+    }
+}
+
 /// Euclidian vector types
 pub mod vec {
-    import!(EucVecf2, EucVecf3, EucVecf4);
-    import!(EucVecd2, EucVecd3, EucVecd4);
+    import!(EucVec2f, EucVec3f, EucVec4f);
+    import!(EucVec2d, EucVec3d, EucVec4d);
+    
+    depr_names!(
+        EucVecf2, EucVec2f,
+        EucVecf3, EucVec3f,
+        EucVecf4, EucVec4f
+    );
+
+    depr_names!(
+        EucVecd2, EucVec2d,
+        EucVecd3, EucVec3d,
+        EucVecd4, EucVec4d
+    );
 }
 
 /// Matrix types
 pub mod mat {
-    import!(Matf2, Matf3);
-    import!(Matd2, Matd3);
+    import!(Mat2f, Mat3f);
+    import!(Mat2d, Mat3d);
+
+    depr_names!(
+        Matf2, Mat2f,
+        Matf3, Mat3f
+    );
+
+    depr_names!(
+        Matd2, Mat2d,
+        Matd3, Mat3d
+    );
 }
 
 /// Other data types & traits

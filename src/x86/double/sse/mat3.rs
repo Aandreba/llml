@@ -1,7 +1,7 @@
 x86_use!();
-use crate::{traits::Zero, vec::EucVecd2, mat::Matf3};
+use crate::{traits::Zero, vec::EucVec2d, mat::Mat3f};
 use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
-use super::{EucVecd4, EucVecd3};
+use super::{EucVec4d, EucVec3d};
 
 macro_rules! impl_matd3 {
     () => {
@@ -18,7 +18,7 @@ macro_rules! impl_matd3 {
 
     ($($trait:ident, $fun:ident),+) => {
         $(
-            impl $trait for Matd3 {
+            impl $trait for Mat3d {
                 type Output = Self;
 
                 #[inline(always)]
@@ -39,7 +39,7 @@ macro_rules! impl_matd3 {
 macro_rules! impl_matd3_scal {
     ($($trait:ident, $fun:ident),+) => {
         $(
-            impl $trait<f64> for Matd3 {
+            impl $trait<f64> for Mat3d {
                 type Output = Self;
 
                 #[inline(always)]
@@ -52,12 +52,12 @@ macro_rules! impl_matd3_scal {
                 }
             }
 
-            impl $trait<Matd3> for f64 {
-                type Output = Matd3;
+            impl $trait<Mat3d> for f64 {
+                type Output = Mat3d;
 
                 #[inline(always)]
-                fn $fun (self, rhs: Matd3) -> Self::Output {
-                    Matd3(
+                fn $fun (self, rhs: Mat3d) -> Self::Output {
+                    Mat3d(
                         self.$fun(rhs.0),
                         self.$fun(rhs.1),
                         self.$fun(rhs.2)
@@ -70,14 +70,14 @@ macro_rules! impl_matd3_scal {
 
 #[derive(Clone, Copy, PartialEq)]
 #[repr(C, align(64))]
-pub struct Matd3 (
-    pub(crate) EucVecd4, pub(crate) EucVecd4, 
+pub struct Mat3d (
+    pub(crate) EucVec4d, pub(crate) EucVec4d, 
     pub(crate) f64
 );
 impl_matd3!();
-impl Eq for Matd3 {}
+impl Eq for Mat3d {}
 
-impl Neg for Matd3 {
+impl Neg for Mat3d {
     type Output = Self;
 
     #[inline(always)]
@@ -86,12 +86,12 @@ impl Neg for Matd3 {
     }
 }
 
-impl Matd3 {
+impl Mat3d {
     #[inline]
     pub fn new (a: [f64;9]) -> Self {
-        Matd3 (
-            EucVecd4::new([a[0], a[1], a[2], a[3]]),
-            EucVecd4::new([a[4], a[5], a[6], a[7]]),
+        Mat3d (
+            EucVec4d::new([a[0], a[1], a[2], a[3]]),
+            EucVec4d::new([a[4], a[5], a[6], a[7]]),
             a[8]
         )
     }
@@ -106,8 +106,8 @@ impl Matd3 {
     }
 
     #[inline(always)]
-    pub fn x (&self) -> EucVecd3 {
-        EucVecd3(self.0.0, self.0.z())
+    pub fn x (&self) -> EucVec3d {
+        EucVec3d(self.0.0, self.0.z())
     }
 
     #[inline(always)]
@@ -126,8 +126,8 @@ impl Matd3 {
     }
 
     #[inline(always)]
-    pub fn y (&self) -> EucVecd3 {
-        EucVecd3::new([self.0.w(), self.1.x(), self.1.y()])
+    pub fn y (&self) -> EucVec3d {
+        EucVec3d::new([self.0.w(), self.1.x(), self.1.y()])
     }
 
     #[inline(always)]
@@ -146,8 +146,8 @@ impl Matd3 {
     }
 
     #[inline(always)]
-    pub fn z (&self) -> EucVecd3 {
-        EucVecd3(self.1.1, self.2)
+    pub fn z (&self) -> EucVec3d {
+        EucVec3d(self.1.1, self.2)
     }
 
     #[inline(always)]
@@ -185,7 +185,7 @@ impl Matd3 {
 
     #[inline(always)]
     pub fn tr (self) -> f64 {
-        EucVecd3::new([self.xx(), self.yy(), self.zz()]).sum()
+        EucVec3d::new([self.xx(), self.yy(), self.zz()]).sum()
     }
 
     #[inline(always)]
@@ -194,17 +194,17 @@ impl Matd3 {
         let neg = -self.0;
 
         // Subdets 1 & 2
-        let v0 = EucVecd4::new([self.xx(), neg.y(), neg.x(), self.xy()]);
-        let v1 = EucVecd4::new([self.yy(), self.yx(), self.yz(), self.yz()]);
-        let v2 = EucVecd4::new([self.zz(), self.zz(), self.zy(), self.zx()]);
+        let v0 = EucVec4d::new([self.xx(), neg.y(), neg.x(), self.xy()]);
+        let v1 = EucVec4d::new([self.yy(), self.yx(), self.yz(), self.yz()]);
+        let v2 = EucVec4d::new([self.zz(), self.zz(), self.zy(), self.zx()]);
 
         let m1 = v0 * v1 * v2;
         let s1 = m1.0 + m1.1;
 
         // Subdet 3
-        let v5 = EucVecd2::new([self.xz(), neg.z()]);
-        let v6 = EucVecd2::new([self.yx(), self.yy()]);
-        let v7 = EucVecd2::new([self.zy(), self.zx()]);
+        let v5 = EucVec2d::new([self.xz(), neg.z()]);
+        let v6 = EucVec2d::new([self.yx(), self.yy()]);
+        let v7 = EucVec2d::new([self.zy(), self.zx()]);
 
         let m2 = v5 * v6 * v7;
         s1.sum() + m2.sum()
@@ -232,29 +232,29 @@ impl Matd3 {
     #[inline(always)]
     unsafe fn _inv (self, det: f64) -> Self {
         // Section #1
-        let v1 = EucVecd4::new([self.yy(), self.xz(), self.xy(), self.yz()]);
-        let v2 = EucVecd4::new([self.zz(), self.zy(), self.yz(), self.zx()]);
+        let v1 = EucVec4d::new([self.yy(), self.xz(), self.xy(), self.yz()]);
+        let v2 = EucVec4d::new([self.zz(), self.zy(), self.yz(), self.zx()]);
         let m1 = v1 * v2;
 
-        let v1 = EucVecd4::new([self.yz(), self.xy(), self.xz(), self.yx()]);
-        let v2 = EucVecd4::new([self.zy(), self.zz(), self.yy(), self.zz()]);
+        let v1 = EucVec4d::new([self.yz(), self.xy(), self.xz(), self.yx()]);
+        let v2 = EucVec4d::new([self.zy(), self.zz(), self.yy(), self.zz()]);
         let m2 = v1 * v2;
 
         let s1 = (m1 - m2) / det;
 
         // Section #2
-        let v1 = EucVecd4::new([self.xx(), self.xz(), self.yx(), self.xy()]);
-        let v2 = EucVecd4::new([self.zz(), self.yx(), self.zy(), self.zx()]);
+        let v1 = EucVec4d::new([self.xx(), self.xz(), self.yx(), self.xy()]);
+        let v2 = EucVec4d::new([self.zz(), self.yx(), self.zy(), self.zx()]);
         let m1 = v1 * v2;
 
-        let v1 = EucVecd4::new([self.xz(), self.xx(), self.yy(), self.xx()]);
-        let v2 = EucVecd4::new([self.zx(), self.yz(), self.zx(), self.zy()]);
+        let v1 = EucVec4d::new([self.xz(), self.xx(), self.yy(), self.xx()]);
+        let v2 = EucVec4d::new([self.zx(), self.yz(), self.zx(), self.zy()]);
         let m2 = v1 * v2;
 
         let s2 = (m1 - m2) / det;
 
         // Section #3
-        let v1 : EucVecd2 = self.0.0 * EucVecd2::new([self.yy(), self.yx()]);
+        let v1 : EucVec2d = self.0.0 * EucVec2d::new([self.yy(), self.yx()]);
         let s3 = (v1.x() - v1.y()) / det;
         
         // Result
@@ -262,50 +262,50 @@ impl Matd3 {
     }
 }
 
-impl Mul<EucVecd3> for Matd3 {
-    type Output = EucVecd3;
+impl Mul<EucVec3d> for Mat3d {
+    type Output = EucVec3d;
 
     #[inline(always)]
-    fn mul (self, rhs: EucVecd3) -> Self::Output {
-        let m1 = self.0 * EucVecd4::new([rhs.x(), rhs.y(), rhs.z(), rhs.x()]);
-        let m2 = self.1 * EucVecd4::new([rhs.y(), rhs.z(), rhs.x(), rhs.y()]);
+    fn mul (self, rhs: EucVec3d) -> Self::Output {
+        let m1 = self.0 * EucVec4d::new([rhs.x(), rhs.y(), rhs.z(), rhs.x()]);
+        let m2 = self.1 * EucVec4d::new([rhs.y(), rhs.z(), rhs.x(), rhs.y()]);
         let m3 = self.2 * rhs.z();
 
-        let s1 = EucVecd3(m1.0, m1.z()).sum();
-        let s2 = EucVecd3(m2.0, m1.w()).sum();
-        let s3 = EucVecd3(m2.1, m3).sum();
-        EucVecd3::new([s1, s2, s3])
+        let s1 = EucVec3d(m1.0, m1.z()).sum();
+        let s2 = EucVec3d(m2.0, m1.w()).sum();
+        let s3 = EucVec3d(m2.1, m3).sum();
+        EucVec3d::new([s1, s2, s3])
     }
 }
 
 // TODO Optimize\
 // In particular, Vec -> Mat m3 multiplcation could be joined into a single EucVecd3
-impl Mul for Matd3 {
+impl Mul for Mat3d {
     type Output = Self;
 
     #[inline(always)]
     fn mul(self, rhs: Self) -> Self::Output {
-        let m1 = self * EucVecd3::new([rhs.xx(), rhs.yx(), rhs.zx()]);
-        let m2 = self * EucVecd3::new([rhs.xy(), rhs.yy(), rhs.zy()]);
-        let m3 = self * EucVecd3::new([rhs.xz(), rhs.yz(), rhs.zz()]);
+        let m1 = self * EucVec3d::new([rhs.xx(), rhs.yx(), rhs.zx()]);
+        let m2 = self * EucVec3d::new([rhs.xy(), rhs.yy(), rhs.zy()]);
+        let m3 = self * EucVec3d::new([rhs.xz(), rhs.yz(), rhs.zz()]);
 
         Self (
-            EucVecd4::new([m1.x(), m2.x(), m3.x(), m1.y()]),
-            EucVecd4::new([m2.y(), m3.y(), m1.z(), m2.z()]),
+            EucVec4d::new([m1.x(), m2.x(), m3.x(), m1.y()]),
+            EucVec4d::new([m2.y(), m3.y(), m1.z(), m2.z()]),
             m3.z()
         )
     }
 }
 
-impl Into<[f64;9]> for Matd3 {
+impl Into<[f64;9]> for Mat3d {
     fn into(self) -> [f64;9] {
         unsafe { transmute([Into::<[f64;3]>::into(self.x()), self.y().into(), self.z().into()]) }
     }
 }
 
-impl Into<Matf3> for Matd3 {
+impl Into<Mat3f> for Mat3d {
     #[inline(always)]
-    fn into(self) -> Matf3 {
-        Matf3(self.x().into(), self.y().into(), self.z().into())
+    fn into(self) -> Mat3f {
+        Mat3f(self.x().into(), self.y().into(), self.z().into())
     }
 }

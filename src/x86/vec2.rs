@@ -1,12 +1,12 @@
 x86_use!();
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
-use super::EucVecd2;
+use super::EucVec2d;
 
 #[repr(transparent)]
-pub struct EucVecf2 (pub(crate) __m128);
-impl_arith_sse!(EucVecf2, f32);
+pub struct EucVec2f (pub(crate) __m128);
+impl_arith_sse!(EucVec2f, f32);
 
-impl EucVecf2 {
+impl EucVec2f {
     const DIV_MASK : __m128 = unsafe { *(&[u32::MAX, u32::MAX, 0, 0] as *const [u32;4] as *const __m128) };
     const ABS_MASK : __m128 = unsafe { *(&[i32::MAX, i32::MAX, 0, 0] as *const [i32;4] as *const __m128) };
 
@@ -61,7 +61,7 @@ impl EucVecf2 {
     }
 }
 
-impl Into<[f32;2]> for EucVecf2 {
+impl Into<[f32;2]> for EucVec2f {
     #[inline(always)]
     fn into (self) -> [f32;2] {
         unsafe { *(&self as *const Self as *const [f32;2]) }
@@ -69,9 +69,9 @@ impl Into<[f32;2]> for EucVecf2 {
 }
 
 #[cfg(target_feature = "sse2")]
-impl Into<EucVecd2> for EucVecf2 {
+impl Into<EucVec2d> for EucVec2f {
     #[inline(always)]
-    fn into (self) -> EucVecd2 {
-        unsafe { EucVecd2(_mm_cvtps_pd(self.0)) }
+    fn into (self) -> EucVec2d {
+        unsafe { EucVec2d(_mm_cvtps_pd(self.0)) }
     }
 }

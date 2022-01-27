@@ -1,15 +1,14 @@
 x86_use!();
-
 use cfg_if::cfg_if;
 use std::{ops::{Add, Sub, Mul, Div, Neg}};
 use crate::{x86::{_mm_low_ps, _mm_high_ps}, others::Zero};
-use super::{vec4::EucVecf4, vec2::EucVecf2, Matd2};
+use super::{vec4::EucVec4f, vec2::EucVec2f, Mat2d};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
-pub struct Matf2 (pub(crate) EucVecf4);
+pub struct Mat2f (pub(crate) EucVec4f);
 
-impl Matf2 {
+impl Mat2f {
     #[inline]
     pub fn new (a: [f32;4]) -> Self {
         Self(a.into())
@@ -22,8 +21,8 @@ impl Matf2 {
     }
 
     #[inline(always)]
-    pub fn x (&self) -> EucVecf2 {
-        unsafe { EucVecf2(_mm_high_ps(self.0.0)) }
+    pub fn x (&self) -> EucVec2f {
+        unsafe { EucVec2f(_mm_high_ps(self.0.0)) }
     }
 
     #[inline(always)]
@@ -37,8 +36,8 @@ impl Matf2 {
     }
 
     #[inline(always)]
-    pub fn y (&self) -> EucVecf2 {
-        unsafe { EucVecf2(_mm_low_ps(self.0.0)) }
+    pub fn y (&self) -> EucVec2f {
+        unsafe { EucVec2f(_mm_low_ps(self.0.0)) }
     }
 
     #[inline(always)]
@@ -70,7 +69,7 @@ impl Matf2 {
     pub fn det (self) -> f32 {
         unsafe {
             let v2 = _mm_shuffle_ps(self.0.0, _mm_setzero_ps(), _MM_SHUFFLE(0, 0, 2, 3));
-            let m1 = EucVecf2(_mm_mul_ps(self.0.0, v2));
+            let m1 = EucVec2f(_mm_mul_ps(self.0.0, v2));
 
             m1.x() - m1.y()
         }
@@ -93,24 +92,24 @@ impl Matf2 {
 
     #[inline(always)]
     unsafe fn _inv (self, det: f32) -> Self {
-        let neg = EucVecf4(_mm_sub_ps(_mm_setzero_ps(), _mm_shuffle_ps(self.0.0, self.0.0, _MM_SHUFFLE(0, 0, 2, 1))));
-        Self(EucVecf4::new([self.0.w(), neg.x(), neg.y(), self.0.x()]) / det)
+        let neg = EucVec4f(_mm_sub_ps(_mm_setzero_ps(), _mm_shuffle_ps(self.0.0, self.0.0, _MM_SHUFFLE(0, 0, 2, 1))));
+        Self(EucVec4f::new([self.0.w(), neg.x(), neg.y(), self.0.x()]) / det)
     }
 }
 
 trait_map!(
-    Matf2, f32,
+    Mat2f, f32,
     Add, add,
     Sub, sub
 );
 
 trait_map_scal!(
-    Matf2, f32,
+    Mat2f, f32,
     Mul, mul,
     Div, div
 );
 
-impl Neg for Matf2 {
+impl Neg for Mat2f {
     type Output = Self;
 
     #[inline(always)]
@@ -119,11 +118,11 @@ impl Neg for Matf2 {
     }
 }
 
-impl Mul<EucVecf2> for Matf2 {
-    type Output = EucVecf2;
+impl Mul<EucVec2f> for Mat2f {
+    type Output = EucVec2f;
 
     #[inline(always)]
-    fn mul (self, rhs: EucVecf2) -> Self::Output {
+    fn mul (self, rhs: EucVec2f) -> Self::Output {
         unsafe {
             let v1 = self.0.0;
             let v2 = _mm_shuffle_ps(rhs.0, rhs.0, _MM_SHUFFLE(1, 0, 1, 0));
@@ -138,12 +137,12 @@ impl Mul<EucVecf2> for Matf2 {
                 }
             }
 
-            EucVecf2(_mm_shuffle_ps(_mm_add_ps(m1, v1), _mm_setzero_ps(), _MM_SHUFFLE(0, 0, 3, 1)))
+            EucVec2f(_mm_shuffle_ps(_mm_add_ps(m1, v1), _mm_setzero_ps(), _MM_SHUFFLE(0, 0, 3, 1)))
         }
     }
 }
 
-impl Mul for Matf2 {
+impl Mul for Mat2f {
     type Output = Self;
 
     #[inline(always)]
@@ -167,21 +166,21 @@ impl Mul for Matf2 {
 
             let m1 = _mm_mul_ps(v1, v2);
             let m2 = _mm_mul_ps(v3, v4);
-            Self(EucVecf4(_mm_add_ps(m1, m2)))
+            Self(EucVec4f(_mm_add_ps(m1, m2)))
         }
     }
 }
 
-impl Into<[f32;4]> for Matf2 {
+impl Into<[f32;4]> for Mat2f {
     #[inline(always)]
     fn into(self) -> [f32;4] {
         self.0.into()
     }
 }
 
-impl Into<Matd2> for Matf2 {
+impl Into<Mat2d> for Mat2f {
     #[inline(always)]
-    fn into(self) -> Matd2 {
-        Matd2(self.0.into())
+    fn into(self) -> Mat2d {
+        Mat2d(self.0.into())
     }
 }

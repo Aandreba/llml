@@ -1,20 +1,20 @@
 x86_use!();
-use crate::{x86::vec3::EucVecf3, vec::EucVecd2};
+use crate::{x86::vec3::EucVec3f, vec::EucVec2d};
 use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
 
 #[repr(C, align(32))]
-pub struct EucVecd3 (pub(crate) EucVecd2, pub(crate) f64);
-impl_arith_x2!(EucVecd3);
+pub struct EucVec3d (pub(crate) EucVec2d, pub(crate) f64);
+impl_arith_x2!(EucVec3d);
 
-impl EucVecd3 {
+impl EucVec3d {
     #[inline(always)]
     pub fn new (a: [f64;3]) -> Self {
-        Self(EucVecd2::new([a[0], a[1]]), a[2])
+        Self(EucVec2d::new([a[0], a[1]]), a[2])
     }
 
     #[inline(always)]
     pub fn from_scal (x: f64) -> Self {
-        Self(EucVecd2::from_scal(x), x)
+        Self(EucVec2d::from_scal(x), x)
     }
 
     #[inline(always)]
@@ -45,10 +45,10 @@ impl EucVecd3 {
     #[inline(always)]
     // from [here](http://threadlocalmutex.com/?p=8)
     pub fn cross (self, rhs: Self) -> Self {
-        let a_yzx = Self(EucVecd2::new([self.y(), self.z()]), self.x());
-        let b_yzx = Self(EucVecd2::new([rhs.y(), rhs.z()]), rhs.x());
+        let a_yzx = Self(EucVec2d::new([self.y(), self.z()]), self.x());
+        let b_yzx = Self(EucVec2d::new([rhs.y(), rhs.z()]), rhs.x());
         let c = (self * b_yzx) - (a_yzx * rhs);
-        Self(EucVecd2::new([c.y(), c.z()]), c.x())
+        Self(EucVec2d::new([c.y(), c.z()]), c.x())
     }
 
     #[inline(always)]
@@ -83,19 +83,19 @@ impl EucVecd3 {
     }
 }
 
-impl Into<[f64;3]> for EucVecd3 {
+impl Into<[f64;3]> for EucVec3d {
     #[inline(always)]
     fn into (self) -> [f64;3] {
         [self.x(), self.y(), self.1]
     }
 }
 
-impl Into<EucVecf3> for EucVecd3 {
-    fn into (self) -> EucVecf3 {
+impl Into<EucVec3f> for EucVec3d {
+    fn into (self) -> EucVec3f {
         let z : f32 = self.1 as f32;
         unsafe {
             let a = _mm_cvtpd_ps(self.0.0);
-            EucVecf3(_mm_or_ps(a, _mm_set_ps(0., z, 0., 0.)))
+            EucVec3f(_mm_or_ps(a, _mm_set_ps(0., z, 0., 0.)))
         }
     }
 }

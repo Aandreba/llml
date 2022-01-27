@@ -1,7 +1,7 @@
 x86_use!();
-use crate::{traits::Zero, mat::Matf2, vec::EucVecd2};
+use crate::{traits::Zero, mat::Mat2f, vec::EucVec2d};
 use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
-use super::EucVecd4;
+use super::EucVec4d;
 
 macro_rules! impl_mat2 {
     ($target:ident, $ty:ident) => {
@@ -67,17 +67,17 @@ macro_rules! impl_mat2_scal {
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
-pub struct Matd2 (pub(crate) EucVecd4);
-impl_mat2!(Matd2, f64);
+pub struct Mat2d (pub(crate) EucVec4d);
+impl_mat2!(Mat2d, f64);
 
-impl Matd2 {
+impl Mat2d {
     #[inline(always)]
     pub fn new (a: [f64;4]) -> Self {
-        Self(EucVecd4::new(a))
+        Self(EucVec4d::new(a))
     }
 
     #[inline(always)]
-    pub fn x (&self) -> EucVecd2 {
+    pub fn x (&self) -> EucVec2d {
         self.0.0
     }
 
@@ -92,7 +92,7 @@ impl Matd2 {
     }
 
     #[inline(always)]
-    pub fn y (&self) -> EucVecd2 {
+    pub fn y (&self) -> EucVec2d {
         self.0.1
     }
 
@@ -123,7 +123,7 @@ impl Matd2 {
 
     #[inline(always)]
     pub fn det (self) -> f64 {
-        let m1 : EucVecd2 = self.0.0 * EucVecd2::new([self.0.1.y(), self.0.1.x()]);
+        let m1 : EucVec2d = self.0.0 * EucVec2d::new([self.0.1.y(), self.0.1.x()]);
         m1.x() - m1.y()
     }
 
@@ -134,42 +134,42 @@ impl Matd2 {
             return None
         }
 
-        let vec = -EucVecd2::new([self.0.y(), self.0.z()]);
-        Some(Self(EucVecd4::new([self.0.w(), vec.x(), vec.y(), self.0.x()]) / det))
+        let vec = -EucVec2d::new([self.0.y(), self.0.z()]);
+        Some(Self(EucVec4d::new([self.0.w(), vec.x(), vec.y(), self.0.x()]) / det))
     }
 
     #[inline(always)]
     pub unsafe fn inv_unsafe (self) -> Self {
-        let vec = -EucVecd2::new([self.0.y(), self.0.z()]);
-        Self(EucVecd4::new([self.0.w(), vec.x(), vec.y(), self.0.x()]) / self.det())
+        let vec = -EucVec2d::new([self.0.y(), self.0.z()]);
+        Self(EucVec4d::new([self.0.w(), vec.x(), vec.y(), self.0.x()]) / self.det())
     }
 }
 
-impl Mul<EucVecd2> for Matd2 {
-    type Output = EucVecd2;
+impl Mul<EucVec2d> for Mat2d {
+    type Output = EucVec2d;
 
     #[inline(always)]
-    fn mul(self, rhs: EucVecd2) -> Self::Output {
-        let mul = self.0 * EucVecd4(rhs, rhs);
-        let v1 = EucVecd2::new([mul.y(), mul.w()]); // odd
-        let v2 = EucVecd2::new([mul.x(), mul.z()]); // even
+    fn mul(self, rhs: EucVec2d) -> Self::Output {
+        let mul = self.0 * EucVec4d(rhs, rhs);
+        let v1 = EucVec2d::new([mul.y(), mul.w()]); // odd
+        let v2 = EucVec2d::new([mul.x(), mul.z()]); // even
         v1 + v2
     }
 }
 
 
-impl Mul for Matd2 {
-    type Output = Matd2;
+impl Mul for Mat2d {
+    type Output = Mat2d;
 
     #[inline(always)]
     fn mul (self, rhs: Self) -> Self::Output {
         unsafe {
-            let v1 : EucVecd4 = EucVecd4::new([self.0.x(), self.0.x(), self.0.z(), self.0.z()]);
-            let v2 : EucVecd4 = EucVecd4(rhs.0.0, rhs.0.0);
+            let v1 : EucVec4d = EucVec4d::new([self.0.x(), self.0.x(), self.0.z(), self.0.z()]);
+            let v2 : EucVec4d = EucVec4d(rhs.0.0, rhs.0.0);
             let m1 = v1 * v2;
 
-            let v3 : EucVecd4 = EucVecd4::new([self.0.y(), self.0.y(), self.0.w(), self.0.w()]);
-            let v4 : EucVecd4 = EucVecd4(rhs.0.1, rhs.0.1);
+            let v3 : EucVec4d = EucVec4d::new([self.0.y(), self.0.y(), self.0.w(), self.0.w()]);
+            let v4 : EucVec4d = EucVec4d(rhs.0.1, rhs.0.1);
             let m2 = v3 * v4;
 
             Self(m1 + m2)
@@ -177,8 +177,8 @@ impl Mul for Matd2 {
     }
 }
 
-impl Neg for Matd2 {
-    type Output = Matd2;
+impl Neg for Mat2d {
+    type Output = Mat2d;
 
     #[inline(always)]
     fn neg(self) -> Self::Output {
@@ -186,16 +186,16 @@ impl Neg for Matd2 {
     }
 }
 
-impl Into<[f64;4]> for Matd2 {
+impl Into<[f64;4]> for Mat2d {
     #[inline(always)]
     fn into(self) -> [f64;4] {
         self.0.into()
     }
 }
 
-impl Into<Matf2> for Matd2 {
+impl Into<Mat2f> for Mat2d {
     #[inline(always)]
-    fn into(self) -> Matf2 {
-        Matf2(self.0.into())
+    fn into(self) -> Mat2f {
+        Mat2f(self.0.into())
     }
 }

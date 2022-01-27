@@ -50,16 +50,16 @@ macro_rules! serialize_len4 {
 }
 
 serialize_len2!(
-    EucVecf2, EucVecd2,
-    Matf2, Matd2
+    EucVec2f, EucVec2d,
+    Mat2f, Mat2d
 );
 
 serialize_len3!(
-    EucVecf3, EucVecd3,
-    Matf3, Matd3
+    EucVec3f, EucVec3d,
+    Mat3f, Mat3d
 );
 
 serialize_len4!(
-    EucVecf4, EucVecd4
+    EucVec4f, EucVec4d
 );
 

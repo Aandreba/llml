@@ -1,21 +1,21 @@
 x86_use!();
-use crate::{x86::vec4::EucVecf4, vec::EucVecd2};
+use crate::{x86::vec4::EucVec4f, vec::EucVec2d};
 use std::ops::{Add, Sub, Mul, Div, Neg};
 use std::mem::transmute;
 
 #[repr(C, align(32))]
-pub struct EucVecd4 (pub(crate) EucVecd2, pub(crate) EucVecd2);
-impl_arith_x2!(EucVecd4);
+pub struct EucVec4d (pub(crate) EucVec2d, pub(crate) EucVec2d);
+impl_arith_x2!(EucVec4d);
 
-impl EucVecd4 {
+impl EucVec4d {
     #[inline(always)]
     pub fn new (a: [f64;4]) -> Self {
-        Self(EucVecd2::new([a[0], a[1]]), EucVecd2::new([a[2], a[3]]))
+        Self(EucVec2d::new([a[0], a[1]]), EucVec2d::new([a[2], a[3]]))
     }
 
     #[inline(always)]
     pub fn from_scal (x: f64) -> Self {
-        Self(EucVecd2::from_scal(x), EucVecd2::from_scal(x))
+        Self(EucVec2d::from_scal(x), EucVec2d::from_scal(x))
     }
 
     #[inline(always)]
@@ -80,17 +80,17 @@ impl EucVecd4 {
     }
 }
 
-impl Into<[f64;4]> for EucVecd4 {
+impl Into<[f64;4]> for EucVec4d {
     #[inline(always)]
     fn into (self) -> [f64;4] {
         unsafe { transmute(self) }
     }
 }
 
-impl Into<EucVecf4> for EucVecd4 {
-    fn into (self) -> EucVecf4 {
+impl Into<EucVec4f> for EucVec4d {
+    fn into (self) -> EucVec4f {
         unsafe {
-            EucVecf4(_mm_shuffle_ps(_mm_cvtpd_ps(self.0.0),  _mm_cvtpd_ps(self.1.0), _MM_SHUFFLE(1, 0, 1, 0)))
+            EucVec4f(_mm_shuffle_ps(_mm_cvtpd_ps(self.0.0),  _mm_cvtpd_ps(self.1.0), _MM_SHUFFLE(1, 0, 1, 0)))
         }
     }
 }
