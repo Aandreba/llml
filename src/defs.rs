@@ -23,6 +23,7 @@ macro_rules! depr_names {
 pub mod vec {
     import!(EucVec2f, EucVec3f, EucVec4f);
     import!(EucVec2d, EucVec3d, EucVec4d);
+    //import!(EucVec2sb, EucVec2ss, EucVec2si, EucVec2sl);
     
     depr_names!(
         EucVecf2, EucVec2f,
