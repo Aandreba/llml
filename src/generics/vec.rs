@@ -1,6 +1,8 @@
 use crate::vec::*;
 use std::ops::*;
 
+use super::{Complxf, Complxd};
+
 macro_rules! impl_from_array {
     ($ty:ty, $($target:ident, $len:literal),+) => {
         $(
@@ -94,6 +96,15 @@ macro_rules! impl_all {
                 MulAssign, mul_assign, mul,
                 DivAssign, div_assign, div
             );
+
+            impl $target {
+                /// Calculates the scalar distance between two points\
+                /// Short for ```(self - rhs).norm()```
+                #[inline(always)]
+                pub fn dist (self, rhs: Self) -> $ty {
+                    (self - rhs).norm()
+                }
+            }
         )*
     };
 }
@@ -126,3 +137,17 @@ impl_unzip4! (
     EucVec4f, f32,
     EucVec4d, f64
 );
+
+impl Into<Complxf> for EucVec2f {
+    #[inline(always)]
+    fn into(self) -> Complxf {
+        Complxf(self)
+    }
+}
+
+impl Into<Complxd> for EucVec2d {
+    #[inline(always)]
+    fn into(self) -> Complxd {
+        Complxd(self)
+    }
+}

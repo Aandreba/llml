@@ -197,7 +197,6 @@ macro_rules! trait_map_scal {
 x86_use!();
 flat_mod!(complex, vec2, vec3, vec4, mat2);
 
-flat_mod!(int);
 #[cfg(target_feature = "sse2")]
 flat_mod!(double);
 
