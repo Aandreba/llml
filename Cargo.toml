@@ -10,6 +10,7 @@ keywords = ["sse", "instrinsics", "simd", "neon", "math"]
 categories = ["data-structures", "hardware-support", "mathematics"]
 
 [features]
+llml_avx = []
 llml_serde = ["serde", "bytemuck"]
 llml_rand = ["rand", "randerive"]
 

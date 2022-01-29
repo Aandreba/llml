@@ -1,20 +1,22 @@
 x86_use!();
 use std::ops::{Add, Sub, Mul, Div, Neg};
-use crate::{EucVecd2, EucVecf3};
+use crate::vec::{EucVec2d, EucVec3f};
 
-#[derive(Debug)]
 #[repr(transparent)]
-pub struct EucVecd3 (pub(crate) __m256d);
-impl_arith!(EucVecd3, f64, m256);
+pub struct EucVec3d (pub(crate) __m256d);
+impl_arith!(EucVec3d, f64, m256);
 
-impl EucVecd3 {
+impl EucVec3d {
+    const DIV_MASK : __m256d = unsafe { *(&[u64::MAX, u64::MAX, u64::MAX, 0] as *const [u64;4] as *const __m256d) };
+    const ABS_MASK : __m256d = unsafe { *(&[i64::MAX, i64::MAX, i64::MAX, 0] as *const [i64;4] as *const __m256d) };
+
     #[inline(always)]
     pub fn new (x: f64, y: f64, z: f64) -> Self {
         unsafe { Self(_mm256_set_pd(0., z, y, x)) }
     }
 
     #[inline(always)]
-    pub fn from_scalar (x: f64) -> Self {
+    pub fn from_scal (x: f64) -> Self {
         Self::new(x, x, x)
     }
 
@@ -38,7 +40,7 @@ impl EucVecd3 {
         unsafe {
             let vlow  = _mm256_castpd256_pd128(self.0);
             let vhigh = _mm256_extractf128_pd(self.0, 1); // high 128
-            EucVecd2(_mm_add_pd(vlow, vhigh)).sum()
+            EucVec2d(_mm_add_pd(vlow, vhigh)).sum()
         }
     }
 
@@ -60,7 +62,7 @@ impl EucVecd3 {
 }
 
 
-impl PartialEq for EucVecd3 {
+impl PartialEq for EucVec3d {
     #[inline(always)]
     fn eq (&self, rhs: &Self) -> bool {
         unsafe {
@@ -72,9 +74,16 @@ impl PartialEq for EucVecd3 {
     }
 }
 
-impl Into<EucVecf3> for EucVecd3 {
+impl Into<[f64;3]> for EucVec3d {
     #[inline(always)]
-    fn into (self) -> EucVecf3 {
-        unsafe { EucVecf3(_mm256_cvtpd_ps(self.0)) }
+    fn into (self) -> [f64;3] {
+        unsafe { *(&self as *const Self as *const [f64;3]) }
+    }
+}
+
+impl Into<EucVec3f> for EucVec3d {
+    #[inline(always)]
+    fn into (self) -> EucVec3f {
+        unsafe { EucVec3f(_mm256_cvtpd_ps(self.0)) }
     }
 }

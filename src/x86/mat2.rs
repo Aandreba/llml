@@ -70,7 +70,6 @@ impl Mat2f {
         unsafe {
             let v2 = _mm_shuffle_ps(self.0.0, _mm_setzero_ps(), _MM_SHUFFLE(0, 0, 2, 3));
             let m1 = EucVec2f(_mm_mul_ps(self.0.0, v2));
-
             m1.x() - m1.y()
         }
     }

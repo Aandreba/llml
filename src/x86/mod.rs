@@ -197,14 +197,12 @@ macro_rules! trait_map_scal {
 x86_use!();
 flat_mod!(complex, vec2, vec3, vec4, mat2);
 
-flat_mod!(int);
 #[cfg(target_feature = "sse2")]
 flat_mod!(double);
 
 cfg_if! {
-    if #[cfg(target_feature = "avx")] {
-        flat_mod!(sse);
-        //flat_mod!(avx);
+    if #[cfg(all(feature = "llml_avx", target_feature = "avx"))] {
+        flat_mod!(avx);
     } else {
         flat_mod!(sse);
     }

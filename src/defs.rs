@@ -59,3 +59,6 @@ pub mod others {
     pub use crate::generics::Complxd;
     pub use crate::traits::*;
 }
+
+pub use crate::generics::TargetArch;
+pub use crate::generics::CURRENT_TARGET;

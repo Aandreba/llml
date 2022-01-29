@@ -1,20 +1,22 @@
 x86_use!();
-use std::ops::{Add, Sub, Mul, Div, Neg};
-use crate::{EucVecd2, EucVecf4};
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
+use crate::vec::{EucVec2d, EucVec4f};
 
-#[derive(Debug)]
 #[repr(transparent)]
-pub struct EucVecd4 (pub(crate) __m256d);
-impl_arith!(EucVecd4, f64, m256);
+pub struct EucVec4d (pub(crate) __m256d);
+impl_arith!(EucVec4d, f64, m256);
 
-impl EucVecd4 {
+impl EucVec4d {
+    const DIV_MASK : __m256d = unsafe { *(&[u64::MAX, u64::MAX, u64::MAX, u64::MAX] as *const [u64;4] as *const __m256d) };
+    const ABS_MASK : __m256d = unsafe { *(&[i64::MAX, i64::MAX, i64::MAX, i64::MAX] as *const [i64;4] as *const __m256d) };
+
     #[inline(always)]
-    pub fn new (x: f64, y: f64, z: f64, w: f64) -> Self {
-        unsafe { Self(_mm256_set_pd(w, z, y, x)) }
+    pub fn new (a: [f64;4]) -> Self {
+        unsafe { Self(_mm256_set_pd(a[3], a[2], a[1], a[0])) }
     }
 
     #[inline(always)]
-    pub fn from_scalar (x: f64) -> Self {
+    pub fn from_scal (x: f64) -> Self {
         unsafe { Self(_mm256_set1_pd(x)) }
     }
 
@@ -43,7 +45,7 @@ impl EucVecd4 {
         unsafe {
             let vlow  = _mm256_castpd256_pd128(self.0);
             let vhigh = _mm256_extractf128_pd(self.0, 1); // high 128
-            EucVecd2(_mm_add_pd(vlow, vhigh)).sum()
+            EucVec2d(_mm_add_pd(vlow, vhigh)).sum()
         }
     }
 
@@ -54,7 +56,7 @@ impl EucVecd4 {
 }
 
 
-impl PartialEq for EucVecd4 {
+impl PartialEq for EucVec4d {
     #[inline(always)]
     fn eq (&self, rhs: &Self) -> bool {
         unsafe {
@@ -66,18 +68,16 @@ impl PartialEq for EucVecd4 {
     }
 }
 
-impl Into<EucVecf4> for EucVecd4 {
+impl Into<[f64;4]> for EucVec4d {
     #[inline(always)]
-    fn into (self) -> EucVecf4 {
-        unsafe { EucVecf4(_mm256_cvtpd_ps(self.0)) }
+    fn into (self) -> [f64;4] {
+        unsafe { transmute(self.0) }
     }
 }
 
-impl From<[f64;4]> for EucVecd4 {
+impl Into<EucVec4f> for EucVec4d {
     #[inline(always)]
-    fn from(x: [f64;4]) -> Self {
-        unsafe {
-            Self(_mm256_loadu_pd(&x as *const [f64;4] as *const f64))
-        }
+    fn into (self) -> EucVec4f {
+        unsafe { EucVec4f(_mm256_cvtpd_ps(self.0)) }
     }
 }

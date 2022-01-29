@@ -11,14 +11,14 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Set nightly
       run: rustup toolchain install nightly && rustup override set nightly
     - name: Build
-      run: cargo build --verbose --all-features
-    - name: Run tests
-      run: cargo test --verbose --all-features
+      run: cargo build --all-features
+    - name: Run tests (without AVX)
+      run: cargo test --all-features
+    - name: Run tests (with AVX)
+      run: RUSTFLAGS="-C target-feature=+avx2" cargo test --all-features
