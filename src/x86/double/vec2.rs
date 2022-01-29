@@ -1,5 +1,5 @@
 x86_use!();
-use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute, ptr::addr_of};
 use crate::x86::vec2::EucVec2f;
 
 #[repr(transparent)]
@@ -12,7 +12,8 @@ impl EucVec2d {
 
     #[inline(always)]
     pub fn new (a: [f64;2]) -> Self {
-        unsafe { Self(_mm_set_pd(a[1], a[0])) }
+        unsafe { Self(_mm_load_pd(addr_of!(a).cast())) }
+        //unsafe { Self(_mm_set_ps(a[3], a[2], a[1], a[0])) }
     }
 
     #[inline(always)]

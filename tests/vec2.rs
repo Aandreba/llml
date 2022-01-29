@@ -8,6 +8,12 @@ macro_rules! test_arith {
     }
 }
 
+#[cfg(feature = "llml_avx")]
+#[test]
+fn avx () {
+    assert!(llml::CURRENT_TARGET.is_avx())
+}
+
 #[cfg(feature = "llml_serde")]
 #[test]
 fn serde () {

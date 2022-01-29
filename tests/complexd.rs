@@ -1,4 +1,4 @@
-use llml::{others::{Complxd, Complxf, ComplexSqrt}, vec::EucVecd2};
+use llml::{others::{Complxd, Complxf, ComplexSqrt, Zero}, vec::EucVecd2};
 use rand::{random, distributions::Uniform, thread_rng, Rng};
 
 #[test]
@@ -84,10 +84,14 @@ fn ln () {
 #[test]
 fn powi () {
     let alpha : Complxd = random();
-    let beta : i32 = thread_rng().gen_range(-10..=10);
+    loop {
+        let beta : i32 = thread_rng().gen_range(-10..=10);
+        if beta.is_zero() { continue; }
 
-    let diff : EucVecd2 = (alpha.powi(beta as i32) - Complxd::exp((beta as f64) * alpha.ln())).into();
-    assert!(diff.abs().sum() <= f64::EPSILON * 2.);
+        let diff : EucVecd2 = (alpha.powi(beta as i32) - Complxd::exp((beta as f64) * alpha.ln())).into();
+        assert!(diff.abs().sum() <= f64::EPSILON * 2.);
+        break;
+    }
 }
 
 #[test]

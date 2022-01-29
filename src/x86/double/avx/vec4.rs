@@ -1,5 +1,5 @@
 x86_use!();
-use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute, ptr::addr_of};
 use crate::vec::{EucVec2d, EucVec4f};
 
 #[repr(transparent)]
@@ -11,8 +11,11 @@ impl EucVec4d {
     const ABS_MASK : __m256d = unsafe { *(&[i64::MAX, i64::MAX, i64::MAX, i64::MAX] as *const [i64;4] as *const __m256d) };
 
     #[inline(always)]
-    pub fn new (a: [f64;4]) -> Self {
-        unsafe { Self(_mm256_set_pd(a[3], a[2], a[1], a[0])) }
+    pub fn new (a: [f32;4]) -> Self {
+        unsafe { 
+            let vec = _mm256_load_pd(addr_of!(a).cast());
+            Self(_mm256_shuffle_pd(vec, vec, _MM_SHUFFLE(0, 1, 2, 3)))
+        }
     }
 
     #[inline(always)]

@@ -1,6 +1,6 @@
 x86_use!();
 use cfg_if::cfg_if;
-use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute};
+use std::{ops::{Add, Sub, Mul, Div, Neg}, intrinsics::transmute, ptr::addr_of};
 use crate::vec::EucVec2d;
 use super::{_mm_sum_ps, EucVec4d};
 
@@ -14,7 +14,7 @@ impl EucVec4f {
 
     #[inline(always)]
     pub fn new (a: [f32;4]) -> Self {
-        unsafe { Self(_mm_set_ps(a[3], a[2], a[1], a[0])) }
+        unsafe { Self(_mm_load_ps(addr_of!(a).cast())) }
     }
 
     #[inline(always)]

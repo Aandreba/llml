@@ -11,13 +11,13 @@ impl EucVec3d {
     const ABS_MASK : __m256d = unsafe { *(&[i64::MAX, i64::MAX, i64::MAX, 0] as *const [i64;4] as *const __m256d) };
 
     #[inline(always)]
-    pub fn new (x: f64, y: f64, z: f64) -> Self {
-        unsafe { Self(_mm256_set_pd(0., z, y, x)) }
+    pub fn new (a: [f64;3]) -> Self {
+        unsafe { Self(_mm256_set_pd(0., a[2], a[1], a[0])) }
     }
 
     #[inline(always)]
     pub fn from_scal (x: f64) -> Self {
-        Self::new(x, x, x)
+        Self::new([x, x, x])
     }
 
     #[inline(always)]
